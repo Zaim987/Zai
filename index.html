@@ -1,0 +1,155 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hacker Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="matrix-bg"></div>  <div class="dashboard">
+    <div class="terminal">
+      <div class="terminal-header">root@zaim:~#</div>
+      <div class="terminal-body" id="terminalOutput"></div>
+    </div><div class="info-panel">
+  <h2>System Info</h2>
+  <div id="systemInfo" class="typing"></div>
+</div>
+
+<div class="globe-container">
+  <canvas id="globeCanvas"></canvas>
+</div>
+
+  </div>  <script>
+    const terminalOutput = document.getElementById('terminalOutput');
+    const systemInfo = document.getElementById('systemInfo');
+
+    function typeOutput(text, speed = 50, callback = () => {}) {
+      let i = 0;
+      const interval = setInterval(() => {
+        terminalOutput.innerHTML += text.charAt(i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          callback();
+        }
+      }, speed);
+    }
+
+    // Fake terminal lines
+    const lines = [
+      'Initializing hack tool...',
+      'Bypassing firewall...',
+      'Accessing internal server...',
+      'Decrypting data...',
+      'Data found: Exporting...'
+    ];
+
+    let delay = 0;
+    lines.forEach((line, index) => {
+      setTimeout(() => {
+        typeOutput(line + '\n');
+      }, delay);
+      delay += line.length * 50 + 500;
+    });
+
+    // Fake system info
+    const infoText = `IP: 192.168.001.024\nCPU: 27%\nRAM: 64%\nLocation: Jakarta, Indonesia\nEncryption: Enabled\nStatus: ACTIVE`;
+
+    setTimeout(() => {
+      systemInfo.textContent = infoText;
+    }, delay + 1000);
+
+    // Globe (placeholder)
+    const canvas = document.getElementById("globeCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx.fillStyle = "#00ff00";
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // Online check
+    window.addEventListener('load', () => {
+      if (!navigator.onLine) {
+        alert('You are offline. Some features may not work.');
+      }
+    });
+
+    // Optional real IP fetch
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(data => {
+        terminalOutput.innerHTML += `\nYour IP: ${data.ip}`;
+      });
+  </script>  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+    }
+
+    .matrix-bg {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: url('https://i.ibb.co/3RCZXYW/matrix-rain.gif') repeat;
+      opacity: 0.15;
+      z-index: 0;
+    }
+
+    .dashboard {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100vh;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .terminal {
+      background: rgba(0,0,0,0.8);
+      border: 1px solid #00ff00;
+      padding: 10px;
+      overflow-y: auto;
+      height: 90vh;
+    }
+
+    .terminal-header {
+      color: #0f0;
+      font-weight: bold;
+    }
+
+    .info-panel {
+      background: rgba(0,0,0,0.8);
+      border: 1px solid #00ff00;
+      padding: 10px;
+      height: 45vh;
+    }
+
+    .typing {
+      white-space: pre;
+      overflow: hidden;
+      border-right: 2px solid #0f0;
+      animation: typing 4s steps(40, end), blink .75s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    .globe-container {
+      height: 45vh;
+      background: rgba(0, 255, 0, 0.05);
+      border: 1px solid #00ff00;
+    }
+  </style></body>
+</html>
