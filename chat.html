@@ -1,1 +1,154 @@
-h
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Chat</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      font-family: sans-serif;
+      color: white;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
+    }
+
+    header {
+      background-color: #111;
+      padding: 1rem;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 0.7rem 1rem;
+      border-radius: 1rem;
+      word-wrap: break-word;
+    }
+
+    .message.received {
+      align-self: flex-start;
+      background-color: #2a2a2a;
+    }
+
+    .message.sent {
+      align-self: flex-end;
+      background-color: #0b93f6;
+      color: white;
+    }
+
+    footer {
+      background-color: #111;
+      border-top: 1px solid #333;
+      display: flex;
+      align-items: center;
+      padding: 0.5rem;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 2rem;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background-color: #222;
+      color: white;
+    }
+
+    button {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background-color: #0b93f6;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <header>👑💝 Nama Kontak</header>
+
+    <div class="chat-body" id="chatBody">
+      <div class="message received">Halo!</div>
+      <div class="message sent">Hai juga!</div>
+      <div class="message received">Apa kabar?</div>
+    </div>
+
+    <footer>
+      <input type="text" id="chatInput" placeholder="Ketik pesan..." />
+      <button id="sendBtn">➤</button>
+    </footer>
+  </div>
+
+  <script>
+    const chatBody = document.getElementById('chatBody');
+    const input = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Scroll ke bawah saat pesan baru
+    function scrollToBottom() {
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const text = input.value.trim();
+      if (text !== "") {
+        const msg = document.createElement('div');
+        msg.classList.add('message', 'sent');
+        msg.textContent = text;
+        chatBody.appendChild(msg);
+        input.value = "";
+        scrollToBottom();
+      }
+    });
+
+    // Enter key to send
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        sendBtn.click();
+      }
+    });
+
+    // Scroll ulang saat keyboard muncul
+    window.addEventListener('resize', scrollToBottom);
+
+    // Pertama kali buka scroll ke bawah
+    scrollToBottom();
+  </script>
+</body>
+</html>
