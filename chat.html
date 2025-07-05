@@ -4,130 +4,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chat - MeuChat</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-    html, body {
+    * { box-sizing: border-box; }
+    body {
       margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #0a0a12;
       color: #fff;
-      height: 100%;
-      overflow: hidden;
-    }
-    body {
       display: flex;
       flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
     }
     header {
       display: flex;
       align-items: center;
+      gap: 1rem;
       padding: 1rem;
       background: #111;
       border-bottom: 1px solid #222;
-      flex-shrink: 0;
     }
-    .back {
-      font-size: 1.5rem;
-      margin-right: 1rem;
-      cursor: pointer;
-    }
-    .chat-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .chat-header img {
-      width: 40px;
-      height: 40px;
+    .avatar {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
     }
-    .chat-header .name {
-      font-weight: bold;
+    .name {
       font-size: 1rem;
+      font-weight: bold;
     }
-    .messages {
+    .chat-area {
       flex: 1;
       overflow-y: auto;
       padding: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
-    .bubble {
-      max-width: 75%;
-      padding: 0.6rem 1rem;
+    .msg {
+      max-width: 70%;
+      padding: 0.75rem 1rem;
       border-radius: 1rem;
-      position: relative;
-      animation: fadeIn 0.3s ease;
-    }
-    .from-me {
-      align-self: flex-end;
-      background: #00bfff;
-      color: #000;
-    }
-    .from-them {
+      background: #1a1a2e;
       align-self: flex-start;
-      background: #1a1a2e;
-      color: #fff;
     }
-    .bubble time {
-      display: block;
-      font-size: 0.75rem;
-      opacity: 0.6;
-      margin-top: 0.25rem;
-      text-align: right;
+    .me {
+      background: #005eff;
+      align-self: flex-end;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .input-bar {
+    footer {
       display: flex;
-      padding: 0.75rem;
+      padding: 0.5rem;
       background: #111;
-      border-top: 1px solid #222;
-      flex-shrink: 0;
     }
-    .input-bar input {
+    input[type="text"] {
       flex: 1;
-      padding: 0.6rem 1rem;
-      border-radius: 999px;
+      padding: 0.5rem 1rem;
       border: none;
+      border-radius: 2rem;
       outline: none;
-      font-size: 1rem;
-      background: #1a1a2e;
-      color: #fff;
     }
-    .input-bar button {
-      background: #00bfff;
-      border: none;
-      border-radius: 999px;
-      padding: 0.6rem 1rem;
+    button {
       margin-left: 0.5rem;
-      color: #000;
-      font-weight: bold;
-      font-size: 1.1rem;
-      cursor: pointer;
+      padding: 0 1rem;
+      background: #005eff;
+      color: white;
+      border: none;
+      border-radius: 2rem;
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="back" onclick="history.back()">←</div>
-    <div class="chat-header">
-      <img id="avatar" src="" alt="Avatar" />
-      <div class="name" id="chatName">Nama User</div>
-    </div>
-  </header>  <div class="messages" id="messageList">
-    <!-- Chat bubbles akan ditampilkan di sini -->
-  </div>  <div class="input-bar">
-    <input type="text" id="messageInput" placeholder="Ketik pesan..." />
-    <button id="sendBtn">➤</button>
-  </div>  <script type="module">
+    <img id="avatar" class="avatar" src="" />
+    <div class="name" id="displayName">Loading...</div>
+  </header>  <div class="chat-area" id="chatArea"></div>  <footer>
+    <input type="text" id="messageInput" placeholder="Tulis pesan..." />
+    <button onclick="sendMessage()">Kirim</button>
+  </footer>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, onSnapshot, collection, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -144,57 +99,77 @@
     const db = getFirestore(app);
     const auth = getAuth();
 
-    const uidTarget = new URLSearchParams(location.search).get('uid');
-    const avatarEl = document.getElementById('avatar');
-    const nameEl = document.getElementById('chatName');
-    const msgInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const msgList = document.getElementById('messageList');
+    const params = new URLSearchParams(location.search);
+    const targetUid = params.get("uid");
 
-    let currentUser;
+    const displayName = document.getElementById("displayName");
+    const avatar = document.getElementById("avatar");
+    const chatArea = document.getElementById("chatArea");
+    const input = document.getElementById("messageInput");
 
-    onAuthStateChanged(auth, async user => {
-      if (!user || !uidTarget) return location.href = "login.html";
-      currentUser = user;
+    let currentUid;
 
-      const targetRef = doc(db, "users", uidTarget);
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "login.html";
+      currentUid = user.uid;
+
+      // Tandai online
+      const meRef = doc(db, "users", currentUid);
+      await updateDoc(meRef, {
+        online: true,
+        lastActive: serverTimestamp()
+      });
+
+      // Tandai offline saat keluar
+      window.addEventListener("beforeunload", () => {
+        updateDoc(meRef, {
+          online: false,
+          lastActive: serverTimestamp()
+        });
+      });
+
+      // Ambil data lawan bicara
+      const targetRef = doc(db, "users", targetUid);
       const targetSnap = await getDoc(targetRef);
-      const targetData = targetSnap.data();
-      const name = targetData?.displayName || uidTarget;
-      const avatar = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
-      nameEl.textContent = name;
-      avatarEl.src = avatar;
+      const data = targetSnap.data();
+      const name = data?.displayName || data?.email || "User";
+      displayName.textContent = name;
+      avatar.src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
 
-      const chatId = [user.uid, uidTarget].sort().join('_');
-      const msgRef = collection(db, "chats", chatId, "messages");
-      const q = query(msgRef, orderBy("timestamp"));
+      // Room ID gabungan
+      const roomId = [currentUid, targetUid].sort().join("_");
+      const messagesRef = collection(db, "chats", roomId, "messages");
 
-      onSnapshot(q, snap => {
-        msgList.innerHTML = '';
+      // Load pesan
+      onSnapshot(query(messagesRef, orderBy("timestamp")), (snap) => {
+        chatArea.innerHTML = "";
         snap.forEach(doc => {
-          const d = doc.data();
-          const bubble = document.createElement('div');
-          bubble.className = 'bubble ' + (d.from === user.uid ? 'from-me' : 'from-them');
-          bubble.innerHTML = `${d.text}<time>${d.timestamp?.toDate().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) ?? ''}</time>`;
-          msgList.appendChild(bubble);
+          const msg = doc.data();
+          const bubble = document.createElement("div");
+          bubble.className = "msg" + (msg.from === currentUid ? " me" : "");
+          bubble.textContent = msg.text;
+          chatArea.appendChild(bubble);
         });
-        msgList.scrollTop = msgList.scrollHeight;
+        chatArea.scrollTop = chatArea.scrollHeight;
       });
+    });
 
-      sendBtn.onclick = async () => {
-        const text = msgInput.value.trim();
-        if (!text) return;
-        await addDoc(msgRef, {
-          from: user.uid,
-          text,
-          timestamp: serverTimestamp()
-        });
-        msgInput.value = '';
-      };
-
-      msgInput.addEventListener('keydown', e => {
-        if (e.key === 'Enter') sendBtn.click();
+    window.sendMessage = async () => {
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      const roomId = [currentUid, targetUid].sort().join("_");
+      const messagesRef = collection(db, "chats", roomId, "messages");
+      await addDoc(messagesRef, {
+        from: currentUid,
+        to: targetUid,
+        text,
+        timestamp: serverTimestamp()
       });
+    }
+
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
     });
   </script></body>
 </html>
