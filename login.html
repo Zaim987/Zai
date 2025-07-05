@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Login | Quantech</title>
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     html {
       font-size: 14px;
     }
@@ -17,7 +21,7 @@
 
     html, body {
       margin: 0;
-      padding: 0 2rem; /* lebih longgar di kiri-kanan */
+      padding: 0 2rem;
       overflow: hidden;
       overscroll-behavior: none;
       height: 100dvh;
@@ -38,12 +42,9 @@
       border-radius: 1rem;
       box-shadow: 0 0 24px rgba(0, 240, 255, 0.12);
       padding: 1.5rem;
-      width: auto;
-      min-width: 100%;
+      width: 100%;
       max-width: 320px;
-      margin: auto;
       animation: fadeIn 0.8s ease;
-      position: relative;
     }
 
     h2 {
