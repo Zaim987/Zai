@@ -1,93 +1,15 @@
-<•!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - QuanTech</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #0f0f0f;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #fff;
-    }
-    .login-container {
-      background: #1a1a1a;
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 0 20px #00ffff44;
-      width: 300px;
-    }
-    .login-container h2 {
-      margin-bottom: 1em;
-      text-align: center;
-    }
-    input {
-      width: 100%;
-      margin: 0.5em 0;
-      padding: 0.7em;
-      border: none;
-      border-radius: 5px;
-    }
-    button {
-      width: 100%;
-      padding: 0.7em;
-      margin-top: 1em;
-      background: #00ffff;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-  </style>
+  <meta http-equiv="refresh" content="0;url=login.html">
+  <title>Redirecting...</title>
+  <script>
+    // Fallback redirect jika meta tidak bekerja
+    window.location.href = "login.html";
+  </script>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button id="loginBtn">Masuk</button>
-  </div>  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-      authDomain: "quantechapp.firebaseapp.com",
-      databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
-      projectId: "quantechapp",
-      storageBucket: "quantechapp.firebasestorage.app",
-      messagingSenderId: "825384610343",
-      appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
-      measurementId: "G-E9L012VH32"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      try {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        const uid = result.user.uid;
-
-        await setDoc(doc(db, "users", uid), {
-          email: email,
-          online: true,
-          lastActive: serverTimestamp()
-        }, { merge: true });
-
-        location.href = "dashboard.html";
-      } catch (err) {
-        alert("Login gagal: " + err.message);
-      }
-    });
-  </script></body>
+  <p>Mengalihkan ke <a href="login.html">login.html</a>...</p>
+</body>
 </html>
