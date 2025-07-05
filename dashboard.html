@@ -3,216 +3,170 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
+  <title>Dashboard - MeuChat</title>
   <style>
     * {
       box-sizing: border-box;
     }
-
     body {
       margin: 0;
-      padding: 0 2rem;
-      background: #0d0d1a;
-      font-family: Arial, sans-serif;
-      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a12;
+      color: #fff;
       overflow-x: hidden;
     }
-
     header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 0;
+      padding: 1rem;
     }
-
-    .menu-icon {
-      font-size: 24px;
+    .hamburger {
+      font-size: 1.5rem;
       cursor: pointer;
     }
-
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .avatar-login {
-      width: 32px;
-      height: 32px;
+    .avatar {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
+      object-fit: cover;
     }
-
-    .user-row {
+    h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      margin: 0.5rem 0;
+    }
+    .user-scroll {
       display: flex;
       overflow-x: auto;
-      padding: 1rem 0;
       gap: 1rem;
+      padding: 0.5rem 1rem;
     }
-
-    .user-avatar {
+    .user-bubble {
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    .user-bubble img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+    }
+    .user-bubble.online img {
+      box-shadow: 0 0 0 3px #0f0;
+    }
+    .log-list {
+      padding: 1rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      width: 64px;
-      flex-shrink: 0;
+      gap: 1rem;
     }
-
-    .user-avatar img {
+    .log-item {
+      display: flex;
+      align-items: center;
+      background: #1a1a2e;
+      padding: 0.75rem;
+      border-radius: 1rem;
+    }
+    .log-item img {
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      border: 2px solid transparent;
+      margin-right: 1rem;
     }
-
-    .user-avatar.online img {
-      box-shadow: 0 0 5px 2px #0f0;
-    }
-
-    .user-avatar.offline img {
-      box-shadow: 0 0 5px 2px #555;
-    }
-
-    .user-avatar span {
-      font-size: 12px;
-      margin-top: 4px;
-      text-align: center;
-    }
-
-    .log-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding-bottom: 4rem;
-    }
-
-    .log-item {
-      background: #1a1a2e;
-      padding: 0.75rem;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .log-item img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-
-    .log-text {
+    .log-item .info {
       display: flex;
       flex-direction: column;
     }
-
-    .log-name {
+    .log-item .info .name {
       font-weight: bold;
-      font-size: 14px;
+      font-size: 1rem;
     }
-
-    .log-time {
-      font-size: 12px;
+    .log-item .info .time {
+      font-size: 0.85rem;
       color: #ccc;
     }
-
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #0d0d1a;
+    .footer {
       display: flex;
       justify-content: space-around;
       padding: 0.5rem 0;
-      border-top: 1px solid #222;
+      background: #111;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
     }
-
-    footer i {
-      font-size: 20px;
-      color: white;
+    .footer button {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.2rem;
     }
-
-    /* Sidebar kiri */
-    .sidebar {
+    .footer button.active {
+      color: #00bfff;
+    }
+    #sidebar {
       position: fixed;
       top: 0;
-      left: -100%;
-      height: 100%;
+      right: -200px;
       width: 200px;
-      background: #1a1a2e;
-      transition: left 0.3s ease;
+      height: 100%;
+      background: #1c1c2e;
       padding: 2rem 1rem;
-      z-index: 99;
+      transition: right 0.3s ease;
+      z-index: 999;
     }
-
-    .sidebar.active {
-      left: 0;
+    #sidebar.open {
+      right: 0;
     }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.4);
+    #overlay {
       display: none;
-      z-index: 98;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 998;
     }
-
-    .overlay.active {
+    #overlay.show {
       display: block;
     }
-
-    .logout-btn {
-      background: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 0.75rem;
-      border-radius: 8px;
+    button.logout {
       width: 100%;
-      font-size: 16px;
-      cursor: pointer;
+      padding: 0.5rem;
+      background: #ff4b5c;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="overlay" id="overlay"></div>
-  <div class="sidebar" id="sidebar">
-    <button class="logout-btn" onclick="logout()">Logout</button>
+  <div id="overlay" onclick="toggleSidebar(false)"></div>
+  <div id="sidebar">
+    <button class="logout" onclick="logout()">Logout</button>
   </div>
 
   <header>
-    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
-    <div class="title">MESSAGES</div>
-    <img src="" id="loginAvatar" class="avatar-login" />
+    <div class="hamburger" onclick="toggleSidebar(true)">☰</div>
+    <h1>MESSAGES</h1>
+    <img id="avatar" class="avatar" src="" alt="Me" />
   </header>
 
-  <div class="user-row" id="userRow"></div>
-  <hr style="border-color: #333; margin: 0.5rem 0;">
+  <div class="user-scroll" id="userList"></div>
+
   <div class="log-list" id="logList"></div>
 
-  <footer>
-    <i>💬</i>
-    <i style="color:#00bfff;">👥</i>
-    <i>⚙️</i>
-  </footer>
+  <div class="footer">
+    <button class="active">💬</button>
+    <button>👥</button>
+    <button>⚙️</button>
+  </div>
 
+  <!-- Firebase App -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      onSnapshot,
-      doc,
-      updateDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
@@ -226,98 +180,72 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app);
+    const auth = getAuth();
 
-    const userRow = document.getElementById("userRow");
-    const logList = document.getElementById("logList");
-    const loginAvatar = document.getElementById("loginAvatar");
+    const userList = document.getElementById('userList');
+    const logList = document.getElementById('logList');
+    const avatarImg = document.getElementById('avatar');
 
-    let currentUser;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "login.html";
 
-    function renderUsers(users) {
-      userRow.innerHTML = "";
-      logList.innerHTML = "";
-
-      users.forEach(user => {
-        const avatarUrl = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || user.email)}`;
-
-        // Baris atas
-        const avatar = document.createElement("div");
-        avatar.className = `user-avatar ${user.online ? "online" : "offline"}`;
-        avatar.innerHTML = `
-          <img src="${avatarUrl}" alt="${user.displayName}" />
-          <span>${user.displayName}</span>
-        `;
-        userRow.appendChild(avatar);
-
-        // Log bawah
-        const logItem = document.createElement("div");
-        logItem.className = "log-item";
-        logItem.innerHTML = `
-          <img src="${avatarUrl}" alt="${user.displayName}" />
-          <div class="log-text">
-            <div class="log-name">${user.displayName}</div>
-            <div class="log-time">${user.lastActive?.toDate().toLocaleString("id-ID") || ""}</div>
-          </div>
-        `;
-        logList.appendChild(logItem);
-      });
-    }
-
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("active");
-      document.getElementById("overlay").classList.toggle("active");
-    }
-
-    document.getElementById("overlay").addEventListener("click", () => {
-      document.getElementById("sidebar").classList.remove("active");
-      document.getElementById("overlay").classList.remove("active");
-    });
-
-    function logout() {
-      if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid);
-        updateDoc(userRef, {
-          online: false,
-          lastActive: serverTimestamp()
-        }).then(() => {
-          signOut(auth).then(() => {
-            window.location.href = "login.html";
-          });
-        });
-      }
-    }
-
-    onAuthStateChanged(auth, user => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-      currentUser = user;
-      loginAvatar.src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || user.email)}`;
-      const userRef = doc(db, "users", user.uid);
-      updateDoc(userRef, {
+      const meRef = doc(db, "users", user.uid);
+      await updateDoc(meRef, {
         online: true,
         lastActive: serverTimestamp()
       });
 
-      const usersCol = collection(db, "users");
-      onSnapshot(usersCol, snap => {
-        const users = [];
-        snap.forEach(doc => users.push(doc.data()));
-        renderUsers(users);
-      });
-    });
+      const meSnap = await getDocs(collection(db, "users"));
+      const meData = meSnap.docs.find(d => d.id === user.uid)?.data();
+      const meName = meData?.displayName || user.email;
+      avatarImg.src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(meName)}`;
 
-    window.addEventListener("beforeunload", () => {
-      if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid);
-        updateDoc(userRef, {
+      const unsubscribe = onSnapshot(collection(db, "users"), (snap) => {
+        userList.innerHTML = '';
+        logList.innerHTML = '';
+        snap.forEach(doc => {
+          const d = doc.data();
+          const name = d.displayName || d.email;
+          const avatar = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
+          const online = d.online;
+          const time = d.lastActive?.toDate().toLocaleString('id-ID') ?? '-';
+
+          // Horizontal user list
+          const bubble = document.createElement('div');
+          bubble.className = 'user-bubble' + (online ? ' online' : '');
+          bubble.innerHTML = `<img src="${avatar}" alt="${name}" /><div>${name}</div>`;
+          userList.appendChild(bubble);
+
+          // Vertical log list
+          const item = document.createElement('div');
+          item.className = 'log-item';
+          item.innerHTML = `
+            <img src="${avatar}" />
+            <div class="info">
+              <div class="name">${name}</div>
+              <div class="time">${time}</div>
+            </div>
+          `;
+          logList.appendChild(item);
+        });
+      });
+
+      window.addEventListener("beforeunload", () => {
+        updateDoc(meRef, {
           online: false,
           lastActive: serverTimestamp()
         });
-      }
+      });
     });
+
+    window.logout = () => {
+      signOut(auth).then(() => location.href = "login.html");
+    }
+
+    window.toggleSidebar = (show) => {
+      document.getElementById("sidebar").classList.toggle("open", show);
+      document.getElementById("overlay").classList.toggle("show", show);
+    }
   </script>
 </body>
 </html>
