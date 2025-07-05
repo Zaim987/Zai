@@ -152,7 +152,7 @@
     apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
     authDomain: "quantechapp.firebaseapp.com",
     projectId: "quantechapp",
-    storageBucket: "quantechapp.appspot.com", // PERBAIKAN STORAGE BUCKET!
+    storageBucket: "quantechapp.appspot.com", // pastikan benar
     messagingSenderId: "825384610343",
     appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
   };
@@ -260,24 +260,25 @@
     setupChatListener();
   });
 
-  // === Keyboard Fix (Android/Realme/Chrome) ===
+  // === Keyboard Fix: Input bar tetap fixed di bawah, lalu naik ke atas keyboard saat keyboard muncul ===
   if (window.visualViewport) {
     const inputBar = document.getElementById("input-bar");
     function adjustForKeyboard() {
-      const viewport = window.visualViewport;
-      const heightDiff = window.innerHeight - viewport.height;
-      if (heightDiff > 80) { // Lebih peka untuk Android/Realme
+      // Selisih tinggi viewport dan innerHeight (karena keyboard)
+      const heightDiff = window.innerHeight - window.visualViewport.height;
+      if (heightDiff > 80) {
         inputBar.style.transform = `translateY(-${heightDiff}px)`;
       } else {
         inputBar.style.transform = "translateY(0)";
       }
-      setTimeout(scrollToBottom, 100);
     }
     window.visualViewport.addEventListener("resize", adjustForKeyboard);
     window.visualViewport.addEventListener("scroll", adjustForKeyboard);
+    // Panggil sekali saat awal
+    adjustForKeyboard();
   }
 
-  // Scroll otomatis ke bawah saat input fokus (opsional, sangat disarankan)
+  // Agar otomatis scroll ke bawah saat input fokus
   document.getElementById("messageInput").addEventListener("focus", scrollToBottom);
 </script>
 
