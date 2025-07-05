@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -107,16 +108,16 @@
     #sidebar {
       position: fixed;
       top: 0;
-      right: -200px;
+      left: -200px;
       width: 200px;
       height: 100%;
       background: #1c1c2e;
       padding: 2rem 1rem;
-      transition: right 0.3s ease;
+      transition: left 0.3s ease;
       z-index: 999;
     }
     #sidebar.open {
-      right: 0;
+      left: 0;
     }
     #overlay {
       display: none;
@@ -143,15 +144,25 @@
   <div id="overlay" onclick="toggleSidebar(false)"></div>
   <div id="sidebar">
     <button class="logout" onclick="logout()">Logout</button>
-  </div>  <header>
+  </div>
+
+  <header>
     <div class="hamburger" onclick="toggleSidebar(true)">☰</div>
     <h1>MESSAGES</h1>
     <img id="avatar" class="avatar" src="" alt="Me" />
-  </header>  <div class="user-scroll" id="userList"></div>  <div class="log-list" id="logList"></div>  <div class="footer">
+  </header>
+
+  <div class="user-scroll" id="userList"></div>
+
+  <div class="log-list" id="logList"></div>
+
+  <div class="footer">
     <button class="active">💬</button>
     <button>👥</button>
     <button>⚙️</button>
-  </div>  <!-- Firebase App -->  <script type="module">
+  </div>
+
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -232,5 +243,6 @@
       document.getElementById("sidebar").classList.toggle("open", show);
       document.getElementById("overlay").classList.toggle("show", show);
     }
-  </script></body>
+  </script>
+</body>
 </html>
