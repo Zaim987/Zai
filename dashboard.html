@@ -1,155 +1,194 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Dashboard</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0 }
-    body {
-      background: #0d0f1a;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 0 1.5rem;
-      overflow: hidden;
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
     }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a12;
+      color: #fff;
+      overflow-x: hidden;
+      padding: 0 2rem;
+    }
+
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 60px;
-      margin-top: 1rem;
+      padding: 1rem 0;
     }
-    .hamburger {
-      font-size: 24px;
+
+    .menu-btn {
+      font-size: 1.5rem;
       cursor: pointer;
-      z-index: 11;
     }
-    .user-avatar {
+
+    .avatar {
       width: 36px;
       height: 36px;
       border-radius: 50%;
     }
-    h1 {
-      font-size: 1.4rem;
+
+    h2 {
       text-align: center;
-      flex: 1;
+      margin-bottom: 1rem;
     }
 
     .user-list {
       display: flex;
       overflow-x: auto;
       gap: 1rem;
-      padding: 1rem 0;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
     }
-    .user-card {
+
+    .user-item {
       text-align: center;
+      flex-shrink: 0;
     }
-    .user-card img {
+
+    .user-item img {
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      border: 2px solid gray;
+      border: 3px solid;
+      border-color: grey;
     }
-    .user-card.online img {
-      border-color: lime;
-      box-shadow: 0 0 10px lime;
+
+    .user-item.online img {
+      border-color: #00ff66;
+      box-shadow: 0 0 6px #00ff66;
     }
-    .user-card.offline img {
-      border-color: gray;
-    }
-    .user-card span {
-      display: block;
-      margin-top: 4px;
-      font-size: 0.75rem;
+
+    .user-name {
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
     }
 
     .log-list {
-      height: 55vh;
-      overflow-y: auto;
-      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 5rem;
     }
-    .log-entry {
+
+    .log-item {
       display: flex;
       align-items: center;
-      margin-bottom: 1rem;
+      gap: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      background-color: rgba(255, 255, 255, 0.03);
     }
-    .log-entry img {
-      width: 40px;
-      height: 40px;
+
+    .log-item img {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      margin-right: 0.75rem;
+      border: 2px solid #444;
     }
-    .log-info {
-      flex: 1;
+
+    .log-info .name {
+      font-weight: 600;
+      font-size: 1rem;
     }
-    .log-info strong {
-      display: block;
-    }
-    .log-info small {
-      color: #aaa;
+
+    .log-info .time {
+      font-size: 0.85rem;
+      color: #bbb;
     }
 
     .sidebar {
       position: fixed;
       top: 0;
-      left: -200px;
-      width: 200px;
+      right: -100%;
+      width: 60%;
+      max-width: 240px;
       height: 100%;
-      background: #1a1d2b;
-      padding: 1rem;
-      transition: left 0.3s ease;
-      z-index: 10;
-    }
-    .sidebar.show {
-      left: 0;
-    }
-    .sidebar button {
-      width: 100%;
-      padding: 0.75rem;
-      background: #ff4444;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 6px;
-      margin-top: 2rem;
-      cursor: pointer;
+      background: #111;
+      transition: right 0.3s ease;
+      padding: 2rem 1rem;
+      z-index: 100;
     }
 
-    #overlay {
+    .sidebar.active {
+      right: 0;
+    }
+
+    .overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.4);
-      z-index: 5;
+      background: rgba(0,0,0,0.3);
       display: none;
+      z-index: 99;
     }
-    .sidebar.show + #overlay {
+
+    .overlay.active {
       display: block;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      padding: 0.7rem 1rem;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #222;
+    }
+
+    footer button {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
+  <div class="overlay" id="overlay"></div>
   <div class="sidebar" id="sidebar">
     <button id="logoutBtn">Logout</button>
   </div>
-  <div id="overlay"></div>
 
   <header>
-    <div class="hamburger" id="menuBtn">☰</div>
-    <h1>MESSAGES</h1>
-    <img src="" alt="avatar" class="user-avatar" id="currentAvatar">
+    <div class="menu-btn" id="menuBtn">&#9776;</div>
+    <h2>MESSAGES</h2>
+    <img id="myAvatar" class="avatar" src="" alt="Me">
   </header>
 
-  <div class="user-list" id="userList"></div>
-  <div class="log-list" id="logList"></div>
+  <div class="user-list" id="userList">
+    <!-- user online/offline ditampilkan di sini -->
+  </div>
 
+  <div class="log-list" id="log-list">
+    <!-- log aktivitas -->
+  </div>
+
+  <footer>
+    <button>💬</button>
+    <button>👥</button>
+    <button>⚙️</button>
+  </footer>
+
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
@@ -162,94 +201,92 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const auth = getAuth();
     const db = getFirestore(app);
 
-    const sidebar = document.getElementById('sidebar');
-    const menuBtn = document.getElementById('menuBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const overlay = document.getElementById('overlay');
     const userList = document.getElementById('userList');
-    const logList = document.getElementById('logList');
-    const currentAvatar = document.getElementById('currentAvatar');
+    const logList = document.getElementById('log-list');
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const myAvatar = document.getElementById('myAvatar');
 
     menuBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('show');
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
     });
 
     overlay.addEventListener('click', () => {
-      sidebar.classList.remove('show');
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
     });
 
-    logoutBtn.addEventListener('click', async () => {
-      const user = auth.currentUser;
-      if (user) {
-        await setDoc(doc(db, "users", user.uid), {
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        location.href = "login.html";
+        return;
+      }
+
+      const uid = user.uid;
+      const displayName = user.displayName || user.email;
+
+      myAvatar.src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(displayName)}`;
+
+      const userRef = doc(db, "users", uid);
+      await setDoc(userRef, {
+        uid,
+        displayName,
+        email: user.email,
+        online: true,
+        lastActive: serverTimestamp()
+      }, { merge: true });
+
+      window.addEventListener('beforeunload', async () => {
+        await updateDoc(userRef, {
           online: false,
           lastActive: serverTimestamp()
-        }, { merge: true });
-        await signOut(auth);
-      }
-    });
+        });
+      });
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        const displayName = user.displayName || "Pengguna";
-        const avatarUrl = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(displayName)}`;
+      const q = query(collection(db, "users"), orderBy("lastActive", "desc"));
+      onSnapshot(q, snapshot => {
+        userList.innerHTML = "";
+        logList.innerHTML = "";
 
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          online: true,
-          lastActive: serverTimestamp(),
-          avatar: avatarUrl,
-          displayName: displayName
-        }, { merge: true });
+        snapshot.docs.forEach(docSnap => {
+          const data = docSnap.data();
+          const name = data.displayName || data.email;
+          const avatar = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
 
-        currentAvatar.src = avatarUrl;
+          // Bagian atas: user online/offline
+          const item = document.createElement("div");
+          item.className = "user-item" + (data.online ? " online" : "");
+          item.innerHTML = `
+            <img src="${avatar}">
+            <div class="user-name">${name}</div>
+          `;
+          userList.appendChild(item);
 
-        onSnapshot(collection(db, "users"), (snapshot) => {
-          userList.innerHTML = "";
-          logList.innerHTML = "";
-          snapshot.forEach(docSnap => {
-            const u = docSnap.data();
-            if (!u.uid) return;
-
-            const displayName = u.displayName || "Pengguna";
-            const isOnline = u.online;
-            const avatar = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(displayName)}`;
-
-            // horizontal user
-            const userCard = document.createElement("div");
-            userCard.className = "user-card " + (isOnline ? "online" : "offline");
-            userCard.innerHTML = `
-              <img src="${avatar}" alt="avatar">
-              <span>${displayName}</span>
-            `;
-            userList.appendChild(userCard);
-
-            // vertical log
-            const log = document.createElement("div");
-            log.className = "log-entry";
-            log.innerHTML = `
+          // Bagian bawah: log aktivitas
+          if (data.lastActive) {
+            const div = document.createElement('div');
+            div.className = 'log-item';
+            div.innerHTML = `
               <img src="${avatar}" />
               <div class="log-info">
-                <strong>${displayName}</strong>
-                <small>${u.lastActive?.toDate().toLocaleString() || '-'}</small>
+                <div class="name">${name}</div>
+                <div class="time">${data.lastActive.toDate().toLocaleString('id-ID')}</div>
               </div>
             `;
-            logList.appendChild(log);
-          });
+            logList.appendChild(div);
+          }
         });
-
-        window.addEventListener("beforeunload", async () => {
-          await setDoc(doc(db, "users", user.uid), {
-            online: false,
-            lastActive: serverTimestamp()
-          }, { merge: true });
-        });
-      }
+      });
     });
   </script>
 </body>
