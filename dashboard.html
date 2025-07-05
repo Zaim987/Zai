@@ -6,58 +6,75 @@
   <title>Dashboard</title>
   <style>
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
     }
+
     body {
-      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0 2rem;
       background: #0d0d1a;
-      color: #fff;
-      padding: 0 1rem;
+      font-family: Arial, sans-serif;
+      color: white;
       overflow-x: hidden;
     }
+
     header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       padding: 1rem 0;
     }
-    .hamburger {
-      font-size: 1.5rem;
+
+    .menu-icon {
+      font-size: 24px;
       cursor: pointer;
     }
-    .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1rem;
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
     }
 
-    .user-list {
-      display: flex;
-      gap: 1rem;
-      overflow-x: auto;
-      padding-bottom: 1rem;
-    }
-    .user-item {
-      text-align: center;
-    }
-    .user-item img {
-      width: 60px;
-      height: 60px;
+    .avatar-login {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      border: 3px solid transparent;
     }
-    .online {
-      border-color: #00ff00;
-      box-shadow: 0 0 8px #00ff00;
+
+    .user-row {
+      display: flex;
+      overflow-x: auto;
+      padding: 1rem 0;
+      gap: 1rem;
     }
-    .offline {
-      border-color: #555;
+
+    .user-avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 64px;
+      flex-shrink: 0;
+    }
+
+    .user-avatar img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+    }
+
+    .user-avatar.online img {
+      box-shadow: 0 0 5px 2px #0f0;
+    }
+
+    .user-avatar.offline img {
+      box-shadow: 0 0 5px 2px #555;
+    }
+
+    .user-avatar span {
+      font-size: 12px;
+      margin-top: 4px;
+      text-align: center;
     }
 
     .log-list {
@@ -66,116 +83,136 @@
       gap: 1rem;
       padding-bottom: 4rem;
     }
+
     .log-item {
+      background: #1a1a2e;
+      padding: 0.75rem;
+      border-radius: 12px;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      background: #1a1a2e;
-      padding: 1rem;
-      border-radius: 12px;
+      gap: 0.75rem;
     }
+
     .log-item img {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
     }
 
-    #sidebar {
-      position: fixed;
-      top: 0;
-      left: -200px;
-      width: 200px;
-      height: 100%;
-      background: #1c1c2e;
-      padding: 2rem 1rem;
-      transition: left 0.3s ease;
-      z-index: 999;
-    }
-    #sidebar.open {
-      left: 0;
-    }
-    #overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.4);
-      display: none;
-      z-index: 998;
-    }
-    #overlay.show {
-      display: block;
+    .log-text {
+      display: flex;
+      flex-direction: column;
     }
 
-    .logout-btn {
-      background: #ff4757;
-      border: none;
-      color: white;
-      padding: 1rem;
-      border-radius: 12px;
-      font-size: 1rem;
-      width: 100%;
+    .log-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .log-time {
+      font-size: 12px;
+      color: #ccc;
     }
 
     footer {
       position: fixed;
       bottom: 0;
       left: 0;
-      width: 100%;
-      background: #1a1a2e;
+      right: 0;
+      background: #0d0d1a;
       display: flex;
       justify-content: space-around;
-      padding: 0.7rem 0;
-      z-index: 10;
+      padding: 0.5rem 0;
+      border-top: 1px solid #222;
     }
+
     footer i {
-      font-size: 1.4rem;
-      color: #888;
+      font-size: 20px;
+      color: white;
     }
-    footer .active {
-      color: #00bfff;
+
+    /* Sidebar kiri */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      height: 100%;
+      width: 200px;
+      background: #1a1a2e;
+      transition: left 0.3s ease;
+      padding: 2rem 1rem;
+      z-index: 99;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      z-index: 98;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    .logout-btn {
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="overlay" onclick="toggleSidebar(false)"></div>
-  <div id="sidebar">
+  <div class="overlay" id="overlay"></div>
+  <div class="sidebar" id="sidebar">
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <header>
-    <div class="hamburger" onclick="toggleSidebar(true)">☰</div>
-    <h2>MESSAGES</h2>
-    <img src="" alt="Avatar" class="user-avatar" id="my-avatar" />
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="title">MESSAGES</div>
+    <img src="" id="loginAvatar" class="avatar-login" />
   </header>
 
-  <section class="user-list" id="user-list"></section>
-  <section class="log-list" id="log-list"></section>
+  <div class="user-row" id="userRow"></div>
+  <hr style="border-color: #333; margin: 0.5rem 0;">
+  <div class="log-list" id="logList"></div>
 
   <footer>
-    <i class="active">💬</i>
-    <i>👥</i>
+    <i>💬</i>
+    <i style="color:#00bfff;">👥</i>
     <i>⚙️</i>
   </footer>
 
-  <!-- Firebase SDK -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      onSnapshot,
+      doc,
+      updateDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
     import {
       getAuth,
       onAuthStateChanged,
       signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      collection,
-      getDocs,
-      updateDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
@@ -188,86 +225,94 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    const avatarURL = (name) =>
-      `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(
-        name
-      )}`;
+    const userRow = document.getElementById("userRow");
+    const logList = document.getElementById("logList");
+    const loginAvatar = document.getElementById("loginAvatar");
 
-    function toggleSidebar(show) {
-      document.getElementById("sidebar").classList.toggle("open", show);
-      document.getElementById("overlay").classList.toggle("show", show);
+    let currentUser;
+
+    function renderUsers(users) {
+      userRow.innerHTML = "";
+      logList.innerHTML = "";
+
+      users.forEach(user => {
+        const avatarUrl = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || user.email)}`;
+
+        // Baris atas
+        const avatar = document.createElement("div");
+        avatar.className = `user-avatar ${user.online ? "online" : "offline"}`;
+        avatar.innerHTML = `
+          <img src="${avatarUrl}" alt="${user.displayName}" />
+          <span>${user.displayName}</span>
+        `;
+        userRow.appendChild(avatar);
+
+        // Log bawah
+        const logItem = document.createElement("div");
+        logItem.className = "log-item";
+        logItem.innerHTML = `
+          <img src="${avatarUrl}" alt="${user.displayName}" />
+          <div class="log-text">
+            <div class="log-name">${user.displayName}</div>
+            <div class="log-time">${user.lastActive?.toDate().toLocaleString("id-ID") || ""}</div>
+          </div>
+        `;
+        logList.appendChild(logItem);
+      });
     }
 
-    async function logout() {
-      const user = auth.currentUser;
-      if (user) {
-        await updateDoc(doc(db, "users", user.uid), {
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+      document.getElementById("overlay").classList.toggle("active");
+    }
+
+    document.getElementById("overlay").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("overlay").classList.remove("active");
+    });
+
+    function logout() {
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid);
+        updateDoc(userRef, {
           online: false,
           lastActive: serverTimestamp()
+        }).then(() => {
+          signOut(auth).then(() => {
+            window.location.href = "login.html";
+          });
         });
-        signOut(auth);
       }
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return (window.location.href = "login.html");
-
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+      loginAvatar.src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || user.email)}`;
       const userRef = doc(db, "users", user.uid);
-      await setDoc(
-        userRef,
-        {
-          online: true,
-          lastActive: serverTimestamp()
-        },
-        { merge: true }
-      );
+      updateDoc(userRef, {
+        online: true,
+        lastActive: serverTimestamp()
+      });
 
-      const name = user.displayName || user.email;
-      document.getElementById("my-avatar").src = avatarURL(name);
-
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const userList = document.getElementById("user-list");
-      const logList = document.getElementById("log-list");
-
-      userList.innerHTML = "";
-      logList.innerHTML = "";
-
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const nama = data.displayName || data.email;
-        const avatar = avatarURL(nama);
-        const online = data.online;
-        const last = data.lastActive?.toDate?.();
-        const time = last
-          ? last.toLocaleString("id-ID", {
-              dateStyle: "short",
-              timeStyle: "medium"
-            })
-          : "-";
-
-        // Horizontal user bar
-        const item = document.createElement("div");
-        item.className = "user-item";
-        item.innerHTML = `<img src="${avatar}" class="${
-          online ? "online" : "offline"
-        }"/><div>${nama}</div>`;
-        userList.appendChild(item);
-
-        // Log list
-        const log = document.createElement("div");
-        log.className = "log-item";
-        log.innerHTML = `<img src="${avatar}"/><div><strong>${nama}</strong><br>${time}</div>`;
-        logList.appendChild(log);
+      const usersCol = collection(db, "users");
+      onSnapshot(usersCol, snap => {
+        const users = [];
+        snap.forEach(doc => users.push(doc.data()));
+        renderUsers(users);
       });
     });
 
-    window.addEventListener("beforeunload", async () => {
-      const user = auth.currentUser;
-      if (user) {
-        await updateDoc(doc(db, "users", user.uid), {
+    window.addEventListener("beforeunload", () => {
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid);
+        updateDoc(userRef, {
           online: false,
           lastActive: serverTimestamp()
         });
