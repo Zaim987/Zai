@@ -125,6 +125,76 @@
   </div>  <div class="input-bar">
     <input type="text" id="messageInput" placeholder="Ketik pesan..." />
     <button id="sendBtn">➤</button>
-  </div>
-</body>
+  </div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+      measurementId: "G-E9L012VH32"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const uidTarget = new URLSearchParams(location.search).get('uid');
+    const avatarEl = document.getElementById('avatar');
+    const nameEl = document.getElementById('chatName');
+    const msgInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const msgList = document.getElementById('messageList');
+
+    let currentUser;
+
+    onAuthStateChanged(auth, async user => {
+      if (!user || !uidTarget) return location.href = "login.html";
+      currentUser = user;
+
+      const targetRef = doc(db, "users", uidTarget);
+      const targetSnap = await getDoc(targetRef);
+      const targetData = targetSnap.data();
+      const name = targetData?.displayName || uidTarget;
+      const avatar = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
+      nameEl.textContent = name;
+      avatarEl.src = avatar;
+
+      const chatId = [user.uid, uidTarget].sort().join('_');
+      const msgRef = collection(db, "chats", chatId, "messages");
+      const q = query(msgRef, orderBy("timestamp"));
+
+      onSnapshot(q, snap => {
+        msgList.innerHTML = '';
+        snap.forEach(doc => {
+          const d = doc.data();
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble ' + (d.from === user.uid ? 'from-me' : 'from-them');
+          bubble.innerHTML = `${d.text}<time>${d.timestamp?.toDate().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) ?? ''}</time>`;
+          msgList.appendChild(bubble);
+        });
+        msgList.scrollTop = msgList.scrollHeight;
+      });
+
+      sendBtn.onclick = async () => {
+        const text = msgInput.value.trim();
+        if (!text) return;
+        await addDoc(msgRef, {
+          from: user.uid,
+          text,
+          timestamp: serverTimestamp()
+        });
+        msgInput.value = '';
+      };
+
+      msgInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendBtn.click();
+      });
+    });
+  </script></body>
 </html>
