@@ -95,7 +95,7 @@
     <h2 id="form-title">Login</h2>
     <form id="auth-form">
       <div class="form-group" id="name-group" style="display: none;">
-        <input type="text" id="name" placeholder="Nama Lengkap" />
+        <input type="text" id="name" placeholder="Nama Lengkap" required />
       </div>
       <div class="form-group">
         <input type="email" id="email" placeholder="Email" required />
@@ -115,7 +115,7 @@
     <circle cx="50" cy="50" r="40" stroke="#00f0ff" stroke-width="2" fill="none" />
   </svg>
 
-  <!-- Firebase modular SDK -->
+  <!-- Firebase SDK Modular -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
@@ -150,36 +150,49 @@
 
     document.getElementById("auth-form").addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const name = document.getElementById("name").value.trim();
 
+      if (isRegister && !name) {
+        alert("Nama lengkap wajib diisi.");
+        return;
+      }
+
       try {
         let userCredential;
+
         if (isRegister) {
           userCredential = await createUserWithEmailAndPassword(auth, email, password);
           const uid = userCredential.user.uid;
+
           await setDoc(doc(db, "users", uid), {
-            name,
-            email,
+            name: name,
+            email: email,
             online: true,
             lastActive: serverTimestamp()
           });
+
         } else {
           userCredential = await signInWithEmailAndPassword(auth, email, password);
           const uid = userCredential.user.uid;
+
           await updateDoc(doc(db, "users", uid), {
             online: true,
             lastActive: serverTimestamp()
           });
         }
+
         window.location.href = "dashboard.html";
+
       } catch (error) {
+        console.error("Auth error:", error);
         alert("Gagal: " + error.message);
       }
     });
 
-    // Status online: false saat keluar
+    // Set online: false saat keluar dari halaman
     window.addEventListener("beforeunload", async () => {
       const user = auth.currentUser;
       if (user) {
@@ -190,7 +203,7 @@
       }
     });
 
-    // Auto redirect jika sudah login
+    // Jika sudah login, langsung redirect ke dashboard
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         await updateDoc(doc(db, "users", user.uid), {
