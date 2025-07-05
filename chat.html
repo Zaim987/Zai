@@ -1,181 +1,135 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Chat - QuantechApp</title>
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  html, body {
-    margin: 0; padding: 0;
-    height: 100vh;
-    background: #0f111a;
-    color: #e0e0e0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow: hidden; /* Disable page scroll */
-    display: flex;
-    flex-direction: column;
-  }
-  header, footer {
-    position: fixed;
-    left: 0; right: 0;
-    background: #121620;
-    border-bottom: 1px solid #222734;
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    z-index: 10;
-  }
-  header {
-    top: 0;
-    height: 56px;
-    gap: 1rem;
-  }
-  footer {
-    bottom: 0;
-    height: 56px;
-    border-top: 1px solid #222734;
-    justify-content: center;
-    gap: 2rem;
-  }
-  header img.avatar {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: 2px solid #4caf50;
-  }
-  header .name {
-    font-weight: 600; font-size: 1.1rem;
-    flex-grow: 1;
-    user-select: none;
-  }
-  header button.back-btn {
-    background: none;
-    border: none;
-    color: #4caf50;
-    font-size: 1.5rem;
-    cursor: pointer;
-    user-select: none;
-  }
-  #chat-container {
-    flex-grow: 1;
-    margin-top: 56px; /* header height */
-    margin-bottom: 56px; /* footer height */
-    overflow-y: auto;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  .message {
-    max-width: 70%;
-    padding: 0.6rem 1rem;
-    border-radius: 1rem;
-    line-height: 1.3;
-    font-size: 1rem;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    animation: fadeIn 0.3s ease;
-  }
-  .message.sent {
-    background: #4caf50;
-    color: #0f111a;
-    align-self: flex-end;
-    border-bottom-right-radius: 0.25rem;
-  }
-  .message.received {
-    background: #212835;
-    border: 1px solid #4caf50;
-    align-self: flex-start;
-    border-bottom-left-radius: 0.25rem;
-  }
-  @keyframes fadeIn {
-    from {opacity: 0; transform: translateY(5px);}
-    to {opacity: 1; transform: translateY(0);}
-  }
-  #input-bar {
-    position: fixed;
-    bottom: 56px; /* above footer */
-    left: 0; right: 0;
-    background: #121620;
-    display: flex;
-    padding: 0.5rem 1rem;
-    gap: 0.5rem;
-    border-top: 1px solid #222734;
-    z-index: 10;
-  }
-  #input-bar input[type="text"] {
-    flex-grow: 1;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    border: none;
-    background: #212835;
-    color: #e0e0e0;
-    font-size: 1rem;
-  }
-  #input-bar input:focus {
-    outline: none;
-    background: #2a3245;
-  }
-  #input-bar button {
-    background: #4caf50;
-    border: none;
-    border-radius: 20px;
-    padding: 0 1rem;
-    color: #0f111a;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  #input-bar button:disabled {
-    background: #2a3245;
-    cursor: not-allowed;
-  }
-  #input-bar button:hover:not(:disabled) {
-    background: #43a047;
-  }
-  footer nav {
-    display: flex;
-    gap: 2rem;
-  }
-  footer nav button {
-    background: none;
-    border: none;
-    color: #4caf50;
-    font-size: 1.2rem;
-    cursor: pointer;
-    user-select: none;
-  }
-  footer nav button:focus {
-    outline: 2px solid #4caf50;
-    outline-offset: 2px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Chat - QuantechApp</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      height: 100vh; overflow: hidden;
+      background: #0f111a; color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      display: flex; flex-direction: column;
+    }
+    header {
+      position: fixed; top: 0; left: 0; width: 100%;
+      background: #121620;
+      border-bottom: 1px solid #222734;
+      padding: 0.75rem 1rem;
+      display: flex; align-items: center;
+      gap: 1rem; z-index: 1000;
+    }
+    header .back-btn {
+      background: none; border: none;
+      color: #4caf50; font-size: 1.5rem;
+      cursor: pointer;
+    }
+    header img.avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid #4caf50;
+    }
+    header .name {
+      font-weight: 600; font-size: 1.1rem;
+      flex-grow: 1;
+      overflow: hidden; white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    #chat-container {
+      flex-grow: 1;
+      margin-top: 60px; /* header */
+      margin-bottom: 64px; /* input bar */
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex; flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 0.6rem 1rem;
+      border-radius: 1rem;
+      line-height: 1.3;
+      font-size: 1rem;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      animation: fadeIn 0.3s ease;
+    }
+    .message.sent {
+      background: #4caf50; color: #0f111a;
+      align-self: flex-end;
+      border-bottom-right-radius: 0.25rem;
+    }
+    .message.received {
+      background: #212835;
+      border: 1px solid #4caf50;
+      align-self: flex-start;
+      border-bottom-left-radius: 0.25rem;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #input-bar {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      background: #121620;
+      padding: 0.5rem 1rem;
+      border-top: 1px solid #222734;
+      display: flex; gap: 0.5rem;
+      z-index: 1000;
+    }
+    #input-bar input {
+      flex-grow: 1;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: none;
+      background: #212835;
+      color: #e0e0e0;
+      font-size: 1rem;
+    }
+    #input-bar input:focus {
+      outline: none; background: #2a3245;
+    }
+    #input-bar button {
+      background: #4caf50;
+      border: none;
+      border-radius: 20px;
+      padding: 0 1rem;
+      color: #0f111a;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #input-bar button:disabled {
+      background: #2a3245; cursor: not-allowed;
+    }
+    #input-bar button:hover:not(:disabled) {
+      background: #43a047;
+    }
+  </style>
 </head>
 <body>
 
 <header>
   <button class="back-btn" aria-label="Kembali">&larr;</button>
-  <img class="avatar" src="" alt="Avatar User" id="chatAvatar" />
+  <img class="avatar" id="chatAvatar" />
   <div class="name" id="chatName">Nama User</div>
 </header>
 
-<div id="chat-container" role="log" aria-live="polite" aria-relevant="additions"></div>
+<div id="chat-container"></div>
 
 <form id="input-bar" autocomplete="off">
   <input type="text" id="messageInput" placeholder="Ketik pesan..." required maxlength="500" />
   <button type="submit" id="sendBtn" disabled>Kirim</button>
 </form>
 
-<footer>
-  <nav>
-    <button aria-label="Messages">💬</button>
-    <button aria-label="Kontak">👥</button>
-    <button aria-label="Seting">⚙️</button>
-  </nav>
-</footer>
-
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -187,44 +141,35 @@
     projectId: "quantechapp",
     storageBucket: "quantechapp.firebasestorage.app",
     messagingSenderId: "825384610343",
-    appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
-    measurementId: "G-E9L012VH32"
+    appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
   };
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  const params = new URLSearchParams(window.location.search);
-  const otherUid = params.get('uid');
-  if (!otherUid) {
-    alert('UID tidak ditemukan!');
-    window.location.href = 'dashboard.html';
-  }
+  const otherUid = new URLSearchParams(location.search).get("uid");
+  if (!otherUid) location.href = "dashboard.html";
 
   let currentUser = null;
   let chatId = null;
   const container = document.getElementById('chat-container');
 
-  function generateChatId(uid1, uid2) {
-    return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
-  }
-
-  async function getUserData(uid) {
-    const doc = await db.collection('users').doc(uid).get();
-    return doc.exists ? doc.data() : null;
+  function generateChatId(a, b) {
+    return a < b ? `${a}_${b}` : `${b}_${a}`;
   }
 
   async function updateHeader() {
-    const user = await getUserData(otherUid);
-    if (user) {
-      document.getElementById('chatName').textContent = user.displayName || 'User';
-      document.getElementById('chatAvatar').src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || otherUid)}`;
+    const doc = await db.collection('users').doc(otherUid).get();
+    if (doc.exists) {
+      const user = doc.data();
+      document.getElementById("chatName").textContent = user.displayName || "User";
+      document.getElementById("chatAvatar").src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || otherUid)}`;
     }
   }
 
   function renderMessage(msg, isSent) {
     const div = document.createElement('div');
-    div.classList.add('message', isSent ? 'sent' : 'received');
+    div.className = `message ${isSent ? 'sent' : 'received'}`;
     div.textContent = msg.text;
     return div;
   }
@@ -234,11 +179,11 @@
   }
 
   function setupChatListener() {
-    let initialLoad = true;
-    db.collection('chats').doc(chatId).collection('messages')
-      .orderBy('createdAt')
+    let init = true;
+    db.collection("chats").doc(chatId).collection("messages")
+      .orderBy("createdAt")
       .onSnapshot(snapshot => {
-        if (initialLoad) {
+        if (init) {
           container.innerHTML = '';
           snapshot.forEach(doc => {
             const data = doc.data();
@@ -246,7 +191,7 @@
             container.appendChild(renderMessage(data, isSent));
           });
           setTimeout(scrollToBottom, 100);
-          initialLoad = false;
+          init = false;
         } else {
           snapshot.docChanges().forEach(change => {
             if (change.type === "added") {
@@ -262,33 +207,33 @@
 
   async function sendMessage(text) {
     if (!text.trim()) return;
-    await db.collection('chats').doc(chatId).collection('messages').add({
+    await db.collection("chats").doc(chatId).collection("messages").add({
       sender: currentUser.uid,
       text: text.trim(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
 
-  document.getElementById('input-bar').addEventListener('submit', async e => {
+  document.getElementById("input-bar").addEventListener("submit", async e => {
     e.preventDefault();
-    const input = document.getElementById('messageInput');
+    const input = document.getElementById("messageInput");
     if (input.value.trim()) {
       await sendMessage(input.value);
       input.value = '';
-      input.dispatchEvent(new Event('input'));
+      input.dispatchEvent(new Event("input"));
     }
   });
 
-  document.getElementById('messageInput').addEventListener('input', e => {
-    document.getElementById('sendBtn').disabled = !e.target.value.trim();
+  document.getElementById("messageInput").addEventListener("input", e => {
+    document.getElementById("sendBtn").disabled = !e.target.value.trim();
   });
 
-  document.querySelector('.back-btn').addEventListener('click', () => {
-    window.location.href = 'dashboard.html';
+  document.querySelector(".back-btn").addEventListener("click", () => {
+    location.href = "dashboard.html";
   });
 
   auth.onAuthStateChanged(async user => {
-    if (!user) return location.href = 'login.html';
+    if (!user) return location.href = "login.html";
     currentUser = user;
     chatId = generateChatId(currentUser.uid, otherUid);
     await updateHeader();
