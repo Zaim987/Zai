@@ -1,63 +1,125 @@
-<!-- login.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - QuanTech</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Quantech</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: #0f0f0f;
       font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background: radial-gradient(circle at top, #0f0f1b, #000010);
       color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
     }
-    .login-container {
-      background: #1a1a1a;
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 0 20px #00ffff44;
-      width: 300px;
+
+    .container {
+      background: rgba(30, 30, 50, 0.95);
+      border-radius: 1rem;
+      box-shadow: 0 0 20px #00f0ff44;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      animation: fadeIn 1s ease;
     }
-    .login-container h2 {
-      margin-bottom: 1em;
+
+    h2 {
       text-align: center;
+      margin-bottom: 1.5rem;
+      color: #00f0ff;
     }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
     input {
       width: 100%;
-      margin: 0.5em 0;
-      padding: 0.7em;
+      padding: 0.75rem;
       border: none;
-      border-radius: 5px;
+      border-radius: 0.5rem;
+      background: #222;
+      color: #fff;
     }
+
     button {
       width: 100%;
-      padding: 0.7em;
-      margin-top: 1em;
-      background: #00ffff;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
       border: none;
-      border-radius: 5px;
+      border-radius: 0.5rem;
+      background: #00f0ff;
+      color: #000;
       font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #00c3d6;
+    }
+
+    .toggle {
+      text-align: center;
+      margin-top: 1rem;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    svg {
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      opacity: 0.1;
+      height: 200px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button id="loginBtn">Masuk</button>
+  <div class="container" id="auth-container">
+    <h2 id="form-title">Login</h2>
+    <form id="auth-form">
+      <div class="form-group" id="name-group" style="display: none;">
+        <input type="text" id="name" placeholder="Nama Lengkap" />
+      </div>
+      <div class="form-group">
+        <input type="email" id="email" placeholder="Email" required />
+      </div>
+      <div class="form-group">
+        <input type="password" id="password" placeholder="Password" required />
+      </div>
+      <button type="submit" id="submit-btn">Masuk</button>
+    </form>
+    <div class="toggle" onclick="toggleMode()">
+      Belum punya akun? <span style="color:#00f0ff">Daftar</span>
+    </div>
   </div>
 
+  <!-- SVG dekoratif -->
+  <svg viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" stroke="#00f0ff" stroke-width="2" fill="none" />
+  </svg>
+
+  <!-- Firebase modular SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
@@ -74,23 +136,68 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+    let isRegister = false;
+
+    function toggleMode() {
+      isRegister = !isRegister;
+      document.getElementById("form-title").innerText = isRegister ? "Daftar" : "Login";
+      document.getElementById("submit-btn").innerText = isRegister ? "Daftar" : "Masuk";
+      document.querySelector(".toggle").innerHTML = isRegister ?
+        'Sudah punya akun? <span style="color:#00f0ff">Login</span>' :
+        'Belum punya akun? <span style="color:#00f0ff">Daftar</span>';
+      document.getElementById("name-group").style.display = isRegister ? "block" : "none";
+    }
+
+    document.getElementById("auth-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const name = document.getElementById("name").value.trim();
 
       try {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        const uid = result.user.uid;
+        let userCredential;
+        if (isRegister) {
+          userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const uid = userCredential.user.uid;
+          await setDoc(doc(db, "users", uid), {
+            name,
+            email,
+            online: true,
+            lastActive: serverTimestamp()
+          });
+        } else {
+          userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const uid = userCredential.user.uid;
+          await updateDoc(doc(db, "users", uid), {
+            online: true,
+            lastActive: serverTimestamp()
+          });
+        }
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        alert("Gagal: " + error.message);
+      }
+    });
 
-        await setDoc(doc(db, "users", uid), {
-          email: email,
+    // Status online: false saat keluar
+    window.addEventListener("beforeunload", async () => {
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, "users", user.uid), {
+          online: false,
+          lastActive: serverTimestamp()
+        });
+      }
+    });
+
+    // Auto redirect jika sudah login
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await updateDoc(doc(db, "users", user.uid), {
           online: true,
           lastActive: serverTimestamp()
-        }, { merge: true });
-
-        location.href = "dashboard.html";
-      } catch (err) {
-        alert("Login gagal: " + err.message);
+        });
+        window.location.href = "dashboard.html";
       }
     });
   </script>
