@@ -60,15 +60,18 @@
       animation: fadeIn 0.3s ease;
     }
     .message.sent {
-      background: #4caf50; color: #0f111a;
+      background: #2196F3; /* biru */
+      color: #fff;
       align-self: flex-end;
       border-bottom-right-radius: 0.25rem;
+      border: none;
     }
     .message.received {
-      background: #212835;
-      border: 1px solid #4caf50;
+      background: #555; /* abu2 */
+      color: #eee;
       align-self: flex-start;
-      border-bottom-left-radius: 0.25rem;
+      border: none;
+      border-radius: 1rem 1rem 1rem 1rem;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
@@ -129,7 +132,6 @@
   <button type="submit" id="sendBtn" disabled>Kirim</button>
 </form>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
