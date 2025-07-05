@@ -48,6 +48,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+      padding-bottom: 80px; /* agar tidak tertutup input bar */
     }
 
     .message {
@@ -70,7 +71,6 @@
       background: #555;
       color: #eee;
       align-self: flex-start;
-      border-radius: 1rem;
     }
 
     @keyframes fadeIn {
@@ -252,22 +252,24 @@
     setupChatListener();
   });
 
-  // === FIX: Adjust input bar saat keyboard muncul di Android ===
+  // === Keyboard Fix (Android) ===
   if (window.visualViewport) {
-    const adjustForKeyboard = () => {
-      const viewport = window.visualViewport;
-      const inputBar = document.getElementById("input-bar");
+    const inputBar = document.getElementById("input-bar");
 
-      const keyboardVisible = viewport.height < window.innerHeight;
-      if (keyboardVisible) {
+    function adjustForKeyboard() {
+      const viewport = window.visualViewport;
+      const heightDiff = window.innerHeight - viewport.height;
+
+      if (heightDiff > 150) {
         inputBar.style.position = "absolute";
-        inputBar.style.bottom = `${window.innerHeight - viewport.height}px`;
+        inputBar.style.bottom = `${heightDiff}px`;
         setTimeout(scrollToBottom, 50);
       } else {
         inputBar.style.position = "fixed";
         inputBar.style.bottom = "0";
       }
-    };
+    }
+
     window.visualViewport.addEventListener("resize", adjustForKeyboard);
     window.visualViewport.addEventListener("scroll", adjustForKeyboard);
   }
