@@ -7,14 +7,18 @@
     * {
       box-sizing: border-box;
     }
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #0a0a12;
       color: #fff;
+      height: 100%;
+      overflow: hidden;
+    }
+    body {
       display: flex;
       flex-direction: column;
-      height: 100vh;
     }
     header {
       display: flex;
@@ -22,6 +26,7 @@
       padding: 1rem;
       background: #111;
       border-bottom: 1px solid #222;
+      flex-shrink: 0;
     }
     .back {
       font-size: 1.5rem;
@@ -83,6 +88,7 @@
       padding: 0.75rem;
       background: #111;
       border-top: 1px solid #222;
+      flex-shrink: 0;
     }
     .input-bar input {
       flex: 1;
