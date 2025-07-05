@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Chat - QuantechApp</title>
   <style>
-    * { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
       height: 100vh; overflow: hidden;
@@ -21,7 +20,9 @@
       border-bottom: 1px solid #222734;
       padding: 0.75rem 1rem;
       display: flex; align-items: center;
-     -btn {
+      gap: 1rem; z-index: 1000;
+    }
+    header .back-btn {
       background: none; border: none;
       color: #4caf50; font-size: 1.5rem;
       cursor: pointer;
@@ -36,7 +37,6 @@
       overflow: hidden; white-space: nowrap;
       text-overflow: ellipsis;
     }
-
     #chat-container {
       flex-grow: 1;
       margin-top: 60px;
@@ -46,9 +46,8 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      padding-bottom: 80px; /* agar tidak tertutup input bar */
+      padding-bottom: 80px;
     }
-
     .message {
       max-width: 70%;
       padding: 0.6rem 1rem;
@@ -70,12 +69,10 @@
       color: #eee;
       align-self: flex-start;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     #input-bar {
       position: fixed;
       bottom: 0;
@@ -89,7 +86,6 @@
       gap: 0.5rem;
       transition: transform 0.2s;
     }
-
     #input-bar input {
       flex-grow: 1;
       padding: 0.5rem 1rem;
@@ -99,19 +95,33 @@
       color: #e0e0e0;
       font-size: 1rem;
     }
-
     #input-bar input:focus {
       outline: none;
       background: #2a3245;
     }
-
     #input-bar button {
       background: #4caf50;
       border: none;
       border-radius: 20px;
       padding: 0 1rem;
       color: #0f111a;
-      font-weight: 600" />
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #input-bar button:disabled {
+      background: #2a3245;
+      cursor: not-allowed;
+    }
+    #input-bar button:hover:not(:disabled) {
+      background: #43a047;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" aria-label="Kembali">&larr;</button>
+  <img class="avatar" id="chatAvatar" />
   <div class="name" id="chatName">Nama User</div>
 </header>
 
@@ -128,6 +138,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
     authDomain: "quantechapp.firebaseapp.com",
@@ -143,7 +154,7 @@
   const otherUid = new URLSearchParams(location.search).get("uid");
   if (!otherUid) {
     location.href = "dashboard.html";
-    return;
+    throw new Error("UID tidak ditemukan");
   }
 
   let currentUser = null;
@@ -163,7 +174,8 @@
         document.getElementById("chatAvatar").src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || otherUid)}`;
       }
     } catch (err) {
-      alert("Gagal memuat user!");
+      document.getElementById("chatName").textContent = "User";
+      document.getElementById("chatAvatar").src = "";
     }
   }
 
@@ -240,13 +252,12 @@
     setupChatListener();
   });
 
-  // === Keyboard & Scroll Fix: Input bar selalu di atas keyboard dan tidak pernah turun ke belakang keyboard ===
+  // === Fix keyboard behavior for input bar ===
   if (window.visualViewport) {
     const inputBar = document.getElementById("input-bar");
     let lastHeightDiff = 0;
 
     function adjustForKeyboard() {
-      // Hitung selisih tinggi viewport akibat keyboard
       const heightDiff = window.innerHeight - window.visualViewport.height;
       if (heightDiff > 80) {
         inputBar.style.transform = `translateY(-${heightDiff}px)`;
@@ -258,7 +269,7 @@
     }
 
     function keepInputBarPosition() {
-      // Saat scroll di Android (keyboard aktif), ulangi posisi transform agar input bar tetap di atas keyboard
+      // Ensure input bar stays right above keyboard when scrolling
       if (lastHeightDiff > 80) {
         inputBar.style.transform = `translateY(-${lastHeightDiff}px)`;
       } else {
@@ -271,9 +282,7 @@
     adjustForKeyboard();
   }
 
-  // Scroll chat otomatis ke bawah saat input fokus
   document.getElementById("messageInput").addEventListener("focus", scrollToBottom);
 </script>
-
 </body>
 </html>
