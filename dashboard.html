@@ -140,13 +140,12 @@
   <header>
     <div class="hamburger" id="menuBtn">☰</div>
     <h1>MESSAGES</h1>
-    <img src="default-avatar.png" alt="avatar" class="user-avatar" id="currentAvatar">
+    <img src="" alt="avatar" class="user-avatar" id="currentAvatar">
   </header>
 
   <div class="user-list" id="userList"></div>
   <div class="log-list" id="logList"></div>
 
-  <!-- Firebase & Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
@@ -197,16 +196,19 @@
       if (!user) {
         window.location.href = "login.html";
       } else {
+        const displayName = user.displayName || user.email;
+        const avatarUrl = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(displayName)}`;
+
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: user.email,
           online: true,
           lastActive: serverTimestamp(),
-          avatar: user.photoURL || "default-avatar.png",
-          displayName: user.displayName || "User"
+          avatar: avatarUrl,
+          displayName: displayName
         }, { merge: true });
 
-        currentAvatar.src = user.photoURL || "default-avatar.png";
+        currentAvatar.src = avatarUrl;
 
         onSnapshot(collection(db, "users"), (snapshot) => {
           userList.innerHTML = "";
@@ -215,10 +217,10 @@
             const u = docSnap.data();
             if (!u.uid) return;
             const isOnline = u.online;
-            const avatar = u.avatar || "default-avatar.png";
             const displayName = u.displayName || u.email || "Unknown";
+            const avatar = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(displayName)}`;
 
-            // horizontal user
+            // Horizontal user
             const userCard = document.createElement("div");
             userCard.className = "user-card " + (isOnline ? "online" : "offline");
             userCard.innerHTML = `
@@ -227,7 +229,7 @@
             `;
             userList.appendChild(userCard);
 
-            // vertical log
+            // Vertical log
             const log = document.createElement("div");
             log.className = "log-entry";
             log.innerHTML = `
