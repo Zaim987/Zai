@@ -3,165 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Login | Quantech</title>
+  <title>Login</title>
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    html {
-      font-size: 14px;
-    }
-
-    @media (max-width: 360px) {
-      html {
-        font-size: 13px;
-      }
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      overscroll-behavior: none;
-      height: 100dvh;
-      width: 100vw;
-      max-width: 100vw;
-      max-height: 100dvh;
-      font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at top, #0f0f1b, #000010);
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0e0e1f;
       color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100dvh;
+      overflow: hidden;
       display: flex;
-      align-items: center;
       justify-content: center;
-      touch-action: none;
+      align-items: center;
+      padding: 0 2rem;
     }
-
     .container {
-      background: rgba(30, 30, 50, 0.95);
-      border-radius: 1rem;
-      box-shadow: 0 0 24px rgba(0, 240, 255, 0.12);
-      padding: 1.5rem;
       width: 100%;
       max-width: 320px;
-      animation: fadeIn 0.8s ease;
+      padding: 2rem;
+      background: #1a1a2e;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+      animation: fadeIn 0.5s ease;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 1rem;
-      color: #00f0ff;
-      font-size: 1.5rem;
     }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
     input {
       width: 100%;
-      padding: 0.6rem;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
       border: none;
-      border-radius: 0.5rem;
-      background: #222;
+      border-radius: 10px;
+      background: #2d2d44;
       color: #fff;
-      font-size: 0.95rem;
     }
-
     button {
       width: 100%;
-      padding: 0.65rem;
-      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background: #00bcd4;
       border: none;
-      border-radius: 0.5rem;
-      background: #00f0ff;
-      color: #000;
+      border-radius: 10px;
+      color: #fff;
       font-weight: bold;
-      font-size: 1rem;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-
-    button:hover {
-      background: #00c3d6;
-    }
-
-    .toggle {
-      text-align: center;
+    .switch {
       margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
       color: #aaa;
       cursor: pointer;
-      font-size: 0.9rem;
     }
-
     .hidden {
       display: none;
     }
-
-    svg {
-      position: absolute;
-      top: -40px;
-      right: -40px;
-      opacity: 0.08;
-      height: 200px;
-    }
-
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2 id="form-title">Login</h2>
-    <form id="auth-form">
-      <div class="form-group hidden" id="name-group">
-        <input type="text" id="name" name="name" placeholder="Nama Lengkap" />
-      </div>
-      <div class="form-group">
-        <input type="email" id="email" name="email" placeholder="Email" required />
-      </div>
-      <div class="form-group">
-        <input type="password" id="password" name="password" placeholder="Password" required />
-      </div>
-      <button type="submit" id="submit-btn">Masuk</button>
-    </form>
-    <div class="toggle">
-      Belum punya akun? <span style="color:#00f0ff">Daftar</span>
-    </div>
+    <h2 id="formTitle">Login</h2>
+    <input type="text" id="nama" placeholder="Nama Lengkap" class="hidden" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="actionBtn">Login</button>
+    <div class="switch" id="switchForm">Belum punya akun? Daftar</div>
   </div>
-
-  <svg viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="40" stroke="#00f0ff" stroke-width="2" fill="none" />
-  </svg>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      updateDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
       authDomain: "quantechapp.firebaseapp.com",
-      databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
       projectId: "quantechapp",
       storageBucket: "quantechapp.firebasestorage.app",
       messagingSenderId: "825384610343",
@@ -173,75 +94,56 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const nama = document.getElementById('nama');
+    const actionBtn = document.getElementById('actionBtn');
+    const switchForm = document.getElementById('switchForm');
+    const formTitle = document.getElementById('formTitle');
+
     let isRegister = false;
 
-    function toggleMode() {
+    switchForm.addEventListener('click', () => {
       isRegister = !isRegister;
-      document.getElementById("form-title").innerText = isRegister ? "Daftar" : "Login";
-      document.getElementById("submit-btn").innerText = isRegister ? "Daftar" : "Masuk";
-      document.querySelector(".toggle").innerHTML = isRegister
-        ? 'Sudah punya akun? <span style="color:#00f0ff">Login</span>'
-        : 'Belum punya akun? <span style="color:#00f0ff">Daftar</span>';
-      document.getElementById("name-group").classList.toggle("hidden", !isRegister);
-    }
+      nama.classList.toggle('hidden', !isRegister);
+      formTitle.textContent = isRegister ? "Daftar" : "Login";
+      actionBtn.textContent = isRegister ? "Daftar" : "Login";
+      switchForm.textContent = isRegister ? "Sudah punya akun? Login" : "Belum punya akun? Daftar";
+    });
 
-    document.querySelector(".toggle").addEventListener("click", toggleMode);
+    actionBtn.addEventListener('click', async () => {
+      const mail = email.value.trim();
+      const pass = password.value.trim();
+      const name = nama.value.trim();
 
-    document.getElementById("auth-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const name = document.getElementById("name").value.trim();
-
-      if (isRegister && !name) {
-        alert("Nama lengkap wajib diisi.");
-        return;
-      }
+      if (!mail || !pass || (isRegister && !name)) return alert("Lengkapi semua data!");
 
       try {
-        let userCredential;
         if (isRegister) {
-          userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          const uid = userCredential.user.uid;
-          await setDoc(doc(db, "users", uid), {
-            name,
-            email,
+          const res = await createUserWithEmailAndPassword(auth, mail, pass);
+          await updateProfile(res.user, { displayName: name });
+
+          await setDoc(doc(db, "users", res.user.uid), {
+            uid: res.user.uid,
+            email: res.user.email,
+            displayName: name,
             online: true,
-            lastActive: serverTimestamp()
+            lastActive: serverTimestamp(),
+            avatar: `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(name)}`
           });
+
         } else {
-          userCredential = await signInWithEmailAndPassword(auth, email, password);
-          const uid = userCredential.user.uid;
-          await updateDoc(doc(db, "users", uid), {
-            online: true,
-            lastActive: serverTimestamp()
-          });
+          await signInWithEmailAndPassword(auth, mail, pass);
         }
 
         window.location.href = "dashboard.html";
-      } catch (err) {
-        console.error("Auth error:", err);
-        alert("Gagal: " + err.message);
+      } catch (e) {
+        alert("Error: " + e.message);
       }
     });
 
-    window.addEventListener("beforeunload", async () => {
-      const user = auth.currentUser;
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        await updateDoc(doc(db, "users", user.uid), {
-          online: false,
-          lastActive: serverTimestamp()
-        });
-      }
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        await updateDoc(doc(db, "users", user.uid), {
-          online: true,
-          lastActive: serverTimestamp()
-        });
         window.location.href = "dashboard.html";
       }
     });
