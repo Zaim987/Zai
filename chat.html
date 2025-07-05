@@ -254,7 +254,7 @@
     setupChatListener();
   });
 
-  // === MOBILE KEYBOARD & SCROLL FIX (100% WORKING) ===
+  // === MOBILE KEYBOARD & SCROLL FIX (FINAL) ===
   if (window.visualViewport) {
     const inputBar = document.getElementById("input-bar");
     let lastHeightDiff = 0;
@@ -282,12 +282,11 @@
     window.visualViewport.addEventListener("scroll", keepInputBarPosition);
     adjustForKeyboard();
 
-    // === FORCE SCROLL TO BOTTOM WHEN KEYBOARD APPEARS OR INPUT FOCUS ===
+    // === Hanya scroll chat-container, tidak pernah window/body ===
     function forceScrollToBottom() {
       setTimeout(() => {
-        window.scrollTo(0, document.body.scrollHeight);
         if (container) container.scrollTop = container.scrollHeight;
-      }, 300);
+      }, 100);
     }
     document.getElementById("messageInput").addEventListener("focus", forceScrollToBottom);
     window.visualViewport.addEventListener("resize", forceScrollToBottom);
