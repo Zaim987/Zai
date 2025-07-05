@@ -1,1 +1,177 @@
-l
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat - MeuChat</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0e0e16;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #111;
+  padding: 0.75rem;
+  flex-shrink: 0;
+}
+
+header img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+header .name {
+  font-weight: bold;
+}
+
+header .status {
+  font-size: 0.8rem;
+  color: #0f0;
+  margin-left: 0.5rem;
+}
+
+#chat-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 0.5rem 1rem;
+}
+
+.message {
+  max-width: 70%;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem 0;
+  border-radius: 1rem;
+  word-wrap: break-word;
+}
+
+.sent {
+  align-self: flex-end;
+  background-color: #007bff;
+}
+
+.received {
+  align-self: flex-start;
+  background-color: #333;
+}
+
+#chat-footer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: #111;
+  flex-shrink: 0;
+}
+
+#messageInput {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: none;
+}
+
+#sendButton {
+  background-color: #00bfff;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <a href="dashboard.html" style="color:white;text-decoration:none;font-size:1.5rem;">←</a>
+    <img id="chatAvatar" src="" alt="avatar">
+    <div>
+      <div class="name" id="chatName">Nama</div>
+      <div class="status" id="chatStatus">Online</div>
+    </div>
+  </header>  <div id="chat-container"></div>  <div id="chat-footer">
+    <input type="text" id="messageInput" placeholder="Ketik pesan...">
+    <button id="sendButton">Kirim</button>
+  </div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, collection, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+      measurementId: "G-E9L012VH32"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const chatContainer = document.getElementById('chat-container');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const otherUid = urlParams.get("uid");
+
+    let me, chatId;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = 'login.html';
+      me = user;
+      chatId = [user.uid, otherUid].sort().join('_');
+
+      const otherRef = doc(db, "users", otherUid);
+      onSnapshot(otherRef, (snap) => {
+        const data = snap.data();
+        document.getElementById('chatName').textContent = data.displayName || data.email;
+        document.getElementById('chatAvatar').src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(data.displayName || data.email)}`;
+        document.getElementById('chatStatus').textContent = data.online ? 'Online' : 'Offline';
+        document.getElementById('chatStatus').style.color = data.online ? '#0f0' : '#aaa';
+      });
+
+      const messagesRef = collection(db, "chats", chatId, "messages");
+      const q = query(messagesRef, orderBy("timestamp"));
+      onSnapshot(q, (snap) => {
+        chatContainer.innerHTML = '';
+        snap.forEach(doc => {
+          const d = doc.data();
+          const div = document.createElement('div');
+          div.className = 'message ' + (d.sender === me.uid ? 'sent' : 'received');
+          div.textContent = d.text;
+          chatContainer.appendChild(div);
+        });
+      });
+    });
+
+    sendButton.onclick = async () => {
+      const text = messageInput.value.trim();
+      if (!text || !chatId) return;
+      const messagesRef = collection(db, "chats", chatId, "messages");
+      await addDoc(messagesRef, {
+        text,
+        sender: me.uid,
+        timestamp: serverTimestamp()
+      });
+      messageInput.value = '';
+    };
+
+    messageInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") sendButton.click();
+    });
+  </script></body>
+</html>
