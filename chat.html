@@ -1,222 +1,189 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat</title>
+  <title>Chat - MeuChat</title>
   <style>
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
-    }body {
-  background-color: #0e0e16;
-  color: white;
-  font-family: 'Segoe UI', sans-serif;
-  height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-#chat-header {
-  background-color: #111;
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  border-bottom: 1px solid #222;
-}
-
-#chat-header img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  margin-right: 0.75rem;
-}
-
-#chat-header .back-button {
-  margin-right: 0.75rem;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-#chat-body {
-  flex: 1;
-  margin-top: 60px;
-  margin-bottom: 64px;
-  overflow-y: auto;
-  padding: 0.75rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.bubble {
-  max-width: 70%;
-  padding: 0.5rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  word-wrap: break-word;
-}
-
-.from-me {
-  align-self: flex-end;
-  background-color: #007bff;
-  color: white;
-  border-bottom-right-radius: 0;
-}
-
-.from-other {
-  align-self: flex-start;
-  background-color: #222;
-  color: white;
-  border-bottom-left-radius: 0;
-}
-
-#chat-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #111;
-  padding: 0.5rem 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-top: 1px solid #222;
-}
-
-#message-input {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  border-radius: 999px;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-}
-
-#send-button {
-  background-color: #00aaff;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a12;
+      color: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background: #111;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 1rem;
+    }
+    .chat-header {
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header .name {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .chat-header .status {
+      font-size: 0.8rem;
+      color: #8f8;
+    }
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .bubble {
+      max-width: 80%;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      background: #1a1a2e;
+      align-self: flex-start;
+    }
+    .bubble.me {
+      background: #007bff;
+      align-self: flex-end;
+    }
+    footer {
+      display: flex;
+      padding: 0.5rem;
+      background: #111;
+    }
+    footer input {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 1rem;
+      border: none;
+      margin-right: 0.5rem;
+    }
+    footer button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 1rem;
+      background: #00bfff;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
-  <div id="chat-header">
-    <div class="back-button" onclick="window.history.back()">←</div>
-    <img id="receiver-avatar" src="" alt="avatar" />
-    <div>
-      <div id="receiver-name">Nama</div>
-      <div id="receiver-status" style="font-size: 0.8rem; color: lime">Online</div>
+  <header>
+    <img id="userAvatar" class="avatar" src="" alt="avatar" />
+    <div class="chat-header">
+      <div class="name" id="userName">...</div>
+      <div class="status" id="userStatus">Offline</div>
     </div>
-  </div>  <div id="chat-body"></div>  <div id="chat-footer">
-    <input type="text" id="message-input" placeholder="Ketik pesan..." />
-    <button id="send-button">Kirim</button>
-  </div>  <script type="module">
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      updateDoc,
-      addDoc,
-      collection,
-      onSnapshot,
-      serverTimestamp,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { app } from "./firebase.js";
+  </header>
+  <div id="messages"></div>
+  <footer>
+    <input id="messageInput" type="text" placeholder="Ketik pesan..." />
+    <button onclick="sendMessage()">Kirim</button>
+  </footer>
 
-    const auth = getAuth(app);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+      measurementId: "G-E9L012VH32"
+    };
+
+    const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth();
 
-    let currentUser;
-    let otherUserId;
-    let chatId;
+    const urlParams = new URLSearchParams(window.location.search);
+    const otherUID = urlParams.get('uid');
+
+    const userName = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    const userStatus = document.getElementById('userStatus');
+    const messageInput = document.getElementById('messageInput');
+    const messagesContainer = document.getElementById('messages');
+
+    let currentUID;
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) return location.href = 'login.html';
-      currentUser = user;
-      updateOnlineStatus(true);
+      if (!user) return location.href = "login.html";
 
-      window.addEventListener("beforeunload", () => {
-        updateOnlineStatus(false);
-      });
+      currentUID = user.uid;
 
-      otherUserId = new URLSearchParams(location.search).get("uid");
-      chatId = [user.uid, otherUserId].sort().join("_");
+      const meRef = doc(db, "users", currentUID);
+      await setDoc(meRef, {
+        online: true,
+        lastActive: serverTimestamp()
+      }, { merge: true });
 
-      const otherUserDoc = await getDoc(doc(db, "users", otherUserId));
-      if (otherUserDoc.exists()) {
-        const data = otherUserDoc.data();
-        document.getElementById("receiver-name").textContent = data.displayName;
-        document.getElementById("receiver-avatar").src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${data.displayName}`;
-        document.getElementById("receiver-status").textContent = data.online ? "Online" : "Offline";
-        document.getElementById("receiver-status").style.color = data.online ? "lime" : "gray";
-      }
+      const userRef = doc(db, "users", otherUID);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.data();
 
+      userName.textContent = userData.displayName || userData.email;
+      userAvatar.src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(userName.textContent)}`;
+      userStatus.textContent = userData.online ? "Online" : "Offline";
+
+      const chatId = [currentUID, otherUID].sort().join('_');
       const chatRef = collection(db, "chats", chatId, "messages");
       const q = query(chatRef, orderBy("timestamp"));
-      onSnapshot(q, (snapshot) => {
-        const chatBody = document.getElementById("chat-body");
-        chatBody.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const msg = doc.data();
-          const div = document.createElement("div");
-          div.className = "bubble " + (msg.sender === user.uid ? "from-me" : "from-other");
-          div.textContent = msg.text;
-          chatBody.appendChild(div);
+
+      onSnapshot(q, (snap) => {
+        messagesContainer.innerHTML = '';
+        snap.forEach(doc => {
+          const d = doc.data();
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble' + (d.sender === currentUID ? ' me' : '');
+          bubble.textContent = d.text;
+          messagesContainer.appendChild(bubble);
         });
-        chatBody.scrollTop = chatBody.scrollHeight;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      });
+
+      window.addEventListener("beforeunload", () => {
+        updateDoc(meRef, {
+          online: false,
+          lastActive: serverTimestamp()
+        });
       });
     });
 
-    document.getElementById("send-button").onclick = sendMessage;
-    document.getElementById("message-input").addEventListener("keypress", e => {
-      if (e.key === "Enter") sendMessage();
-    });
-
-    async function sendMessage() {
-      const input = document.getElementById("message-input");
-      const text = input.value.trim();
+    window.sendMessage = async () => {
+      const text = messageInput.value.trim();
       if (!text) return;
-      input.value = "";
-      await addDoc(collection(db, "chats", chatId, "messages"), {
-        sender: currentUser.uid,
+
+      const chatId = [currentUID, otherUID].sort().join('_');
+      const chatRef = collection(db, "chats", chatId, "messages");
+      await addDoc(chatRef, {
+        sender: currentUID,
         text,
         timestamp: serverTimestamp()
       });
-    }
 
-    function updateOnlineStatus(state) {
-      if (currentUser?.uid) {
-        updateDoc(doc(db, "users", currentUser.uid), {
-          online: state,
-          lastActive: serverTimestamp()
-        });
-      }
+      messageInput.value = '';
     }
-
-    // Auto-scroll when keyboard resizes viewport
-    window.addEventListener("resize", () => {
-      const chatBody = document.getElementById("chat-body");
-      chatBody.scrollTop = chatBody.scrollHeight;
-    });
-  </script></body>
+  </script>
+</body>
 </html>
