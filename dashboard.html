@@ -44,7 +44,6 @@
     .user-bubble {
       text-align: center;
       font-size: 0.8rem;
-      cursor: pointer;
     }
     .user-bubble img {
       width: 56px;
@@ -67,6 +66,7 @@
       background: #1a1a2e;
       padding: 0.75rem;
       border-radius: 1rem;
+      cursor: pointer;
     }
     .log-item img {
       width: 48px;
@@ -203,12 +203,12 @@
           const bubble = document.createElement('div');
           bubble.className = 'user-bubble' + (online ? ' online' : '');
           bubble.innerHTML = `<img src="${avatar}" alt="${name}" /><div>${name}</div>`;
-          bubble.onclick = () => location.href = `chat.html?uid=${doc.id}`;
           userList.appendChild(bubble);
 
-          // Vertical log list
+          // Vertical log list with redirect
           const item = document.createElement('div');
           item.className = 'log-item';
+          item.onclick = () => location.href = `chat.html?uid=${doc.id}`;
           item.innerHTML = `
             <img src="${avatar}" />
             <div class="info">
