@@ -21,9 +21,7 @@
       border-bottom: 1px solid #222734;
       padding: 0.75rem 1rem;
       display: flex; align-items: center;
-      gap: 1rem; z-index: 1000;
-    }
-    header .back-btn {
+     -btn {
       background: none; border: none;
       color: #4caf50; font-size: 1.5rem;
       cursor: pointer;
@@ -113,25 +111,7 @@
       border-radius: 20px;
       padding: 0 1rem;
       color: #0f111a;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    #input-bar button:disabled {
-      background: #2a3245;
-      cursor: not-allowed;
-    }
-
-    #input-bar button:hover:not(:disabled) {
-      background: #43a047;
-    }
-  </style>
-</head>
-<body>
-
-<header>
-  <button class="back-btn" aria-label="Kembali">&larr;</button>
-  <img class="avatar" id="chatAvatar" />
+      font-weight: 600" />
   <div class="name" id="chatName">Nama User</div>
 </header>
 
@@ -152,7 +132,7 @@
     apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
     authDomain: "quantechapp.firebaseapp.com",
     projectId: "quantechapp",
-    storageBucket: "quantechapp.appspot.com", // pastikan benar
+    storageBucket: "quantechapp.appspot.com",
     messagingSenderId: "825384610343",
     appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
   };
@@ -260,25 +240,38 @@
     setupChatListener();
   });
 
-  // === Keyboard Fix: Input bar tetap fixed di bawah, lalu naik ke atas keyboard saat keyboard muncul ===
+  // === Keyboard & Scroll Fix: Input bar selalu di atas keyboard dan tidak pernah turun ke belakang keyboard ===
   if (window.visualViewport) {
     const inputBar = document.getElementById("input-bar");
+    let lastHeightDiff = 0;
+
     function adjustForKeyboard() {
-      // Selisih tinggi viewport dan innerHeight (karena keyboard)
+      // Hitung selisih tinggi viewport akibat keyboard
       const heightDiff = window.innerHeight - window.visualViewport.height;
       if (heightDiff > 80) {
         inputBar.style.transform = `translateY(-${heightDiff}px)`;
+        lastHeightDiff = heightDiff;
+      } else {
+        inputBar.style.transform = "translateY(0)";
+        lastHeightDiff = 0;
+      }
+    }
+
+    function keepInputBarPosition() {
+      // Saat scroll di Android (keyboard aktif), ulangi posisi transform agar input bar tetap di atas keyboard
+      if (lastHeightDiff > 80) {
+        inputBar.style.transform = `translateY(-${lastHeightDiff}px)`;
       } else {
         inputBar.style.transform = "translateY(0)";
       }
     }
+
     window.visualViewport.addEventListener("resize", adjustForKeyboard);
-    window.visualViewport.addEventListener("scroll", adjustForKeyboard);
-    // Panggil sekali saat awal
+    window.visualViewport.addEventListener("scroll", keepInputBarPosition);
     adjustForKeyboard();
   }
 
-  // Agar otomatis scroll ke bawah saat input fokus
+  // Scroll chat otomatis ke bawah saat input fokus
   document.getElementById("messageInput").addEventListener("focus", scrollToBottom);
 </script>
 
