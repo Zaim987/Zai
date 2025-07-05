@@ -23,6 +23,7 @@
     .hamburger {
       font-size: 24px;
       cursor: pointer;
+      z-index: 11;
     }
     .user-avatar {
       width: 36px;
@@ -114,12 +115,27 @@
       margin-top: 2rem;
       cursor: pointer;
     }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 5;
+      display: none;
+    }
+    .sidebar.show + #overlay {
+      display: block;
+    }
   </style>
 </head>
 <body>
   <div class="sidebar" id="sidebar">
     <button id="logoutBtn">Logout</button>
   </div>
+  <div id="overlay"></div>
 
   <header>
     <div class="hamburger" id="menuBtn">☰</div>
@@ -153,12 +169,17 @@
     const sidebar = document.getElementById('sidebar');
     const menuBtn = document.getElementById('menuBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const overlay = document.getElementById('overlay');
     const userList = document.getElementById('userList');
     const logList = document.getElementById('logList');
     const currentAvatar = document.getElementById('currentAvatar');
 
     menuBtn.addEventListener('click', () => {
       sidebar.classList.toggle('show');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('show');
     });
 
     logoutBtn.addEventListener('click', async () => {
@@ -176,7 +197,6 @@
       if (!user) {
         window.location.href = "login.html";
       } else {
-        // set status online
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: user.email,
@@ -188,7 +208,6 @@
 
         currentAvatar.src = user.photoURL || "default-avatar.png";
 
-        // show user list
         onSnapshot(collection(db, "users"), (snapshot) => {
           userList.innerHTML = "";
           logList.innerHTML = "";
@@ -199,7 +218,7 @@
             const avatar = u.avatar || "default-avatar.png";
             const displayName = u.displayName || u.email || "Unknown";
 
-            // horizontal card
+            // horizontal user
             const userCard = document.createElement("div");
             userCard.className = "user-card " + (isOnline ? "online" : "offline");
             userCard.innerHTML = `
@@ -222,7 +241,6 @@
           });
         });
 
-        // offline saat keluar
         window.addEventListener("beforeunload", async () => {
           await setDoc(doc(db, "users", user.uid), {
             online: false,
