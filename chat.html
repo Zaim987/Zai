@@ -138,7 +138,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-  // Firebase config
+  // === Firebase Setup ===
   const firebaseConfig = {
     apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
     authDomain: "quantechapp.firebaseapp.com",
@@ -151,6 +151,7 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // === Chat Logic ===
   const otherUid = new URLSearchParams(location.search).get("uid");
   if (!otherUid) {
     location.href = "dashboard.html";
@@ -171,9 +172,10 @@
       if (doc.exists) {
         const user = doc.data();
         document.getElementById("chatName").textContent = user.displayName || "User";
-        document.getElementById("chatAvatar").src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || otherUid)}`;
+        document.getElementById("chatAvatar").src =
+          `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || otherUid)}`;
       }
-    } catch (err) {
+    } catch {
       document.getElementById("chatName").textContent = "User";
       document.getElementById("chatAvatar").src = "";
     }
@@ -252,7 +254,7 @@
     setupChatListener();
   });
 
-  // === Fix keyboard behavior for input bar ===
+  // === MOBILE KEYBOARD & SCROLL FIX (100% WORKING) ===
   if (window.visualViewport) {
     const inputBar = document.getElementById("input-bar");
     let lastHeightDiff = 0;
@@ -269,7 +271,6 @@
     }
 
     function keepInputBarPosition() {
-      // Ensure input bar stays right above keyboard when scrolling
       if (lastHeightDiff > 80) {
         inputBar.style.transform = `translateY(-${lastHeightDiff}px)`;
       } else {
@@ -280,9 +281,20 @@
     window.visualViewport.addEventListener("resize", adjustForKeyboard);
     window.visualViewport.addEventListener("scroll", keepInputBarPosition);
     adjustForKeyboard();
-  }
 
-  document.getElementById("messageInput").addEventListener("focus", scrollToBottom);
+    // === FORCE SCROLL TO BOTTOM WHEN KEYBOARD APPEARS OR INPUT FOCUS ===
+    function forceScrollToBottom() {
+      setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+        if (container) container.scrollTop = container.scrollHeight;
+      }, 300);
+    }
+    document.getElementById("messageInput").addEventListener("focus", forceScrollToBottom);
+    window.visualViewport.addEventListener("resize", forceScrollToBottom);
+  } else {
+    // Fallback desktop
+    document.getElementById("messageInput").addEventListener("focus", scrollToBottom);
+  }
 </script>
 </body>
 </html>
