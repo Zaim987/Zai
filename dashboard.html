@@ -1,80 +1,144 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - QuanTech</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dashboard</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0 }
     body {
-      margin: 0;
-      background-color: #0d0d0d;
-      color: white;
+      background: #0d0f1a;
+      color: #fff;
       font-family: 'Segoe UI', sans-serif;
+      padding: 0 1.5rem;
+      overflow: hidden;
     }
-    .topbar {
+    header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1em;
-      background: #1a1a1a;
-      border-bottom: 1px solid #222;
+      height: 60px;
+      margin-top: 1rem;
     }
-    .user-status {
+    .hamburger {
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+    h1 {
+      font-size: 1.4rem;
+      text-align: center;
+      flex: 1;
+    }
+
+    .user-list {
       display: flex;
-      gap: 1em;
-      padding: 1em;
       overflow-x: auto;
+      gap: 1rem;
+      padding: 1rem 0;
     }
     .user-card {
       text-align: center;
     }
-    .avatar {
-      width: 50px;
-      height: 50px;
+    .user-card img {
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       border: 2px solid gray;
     }
-    .online {
+    .user-card.online img {
       border-color: lime;
+      box-shadow: 0 0 10px lime;
     }
-    .logs {
-      padding: 1em;
+    .user-card.offline img {
+      border-color: gray;
     }
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #1a1a1a;
+    .user-card span {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.75rem;
+    }
+
+    .log-list {
+      height: 55vh;
+      overflow-y: auto;
+      margin-top: 1rem;
+    }
+    .log-entry {
       display: flex;
-      justify-content: space-around;
-      padding: 1em 0;
+      align-items: center;
+      margin-bottom: 1rem;
     }
-    .footer button {
-      background: none;
+    .log-entry img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 0.75rem;
+    }
+    .log-info {
+      flex: 1;
+    }
+    .log-info strong {
+      display: block;
+    }
+    .log-info small {
+      color: #aaa;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -200px;
+      width: 200px;
+      height: 100%;
+      background: #1a1d2b;
+      padding: 1rem;
+      transition: left 0.3s ease;
+      z-index: 10;
+    }
+    .sidebar.show {
+      left: 0;
+    }
+    .sidebar button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #ff4444;
       border: none;
       color: white;
+      font-weight: bold;
+      border-radius: 6px;
+      margin-top: 2rem;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div><strong>MESSAGES</strong></div>
-    <div id="avatar"></div>
+  <div class="sidebar" id="sidebar">
+    <button id="logoutBtn">Logout</button>
   </div>
-  <div class="user-status" id="userStatus"></div>
-  <div class="logs" id="logs"></div>  <div class="footer">
-    <button>Messages</button>
-    <button>Kontak</button>
-    <button onclick="logout()">Logout</button>
-  </div>  <script type="module">
+
+  <header>
+    <div class="hamburger" id="menuBtn">☰</div>
+    <h1>MESSAGES</h1>
+    <img src="default-avatar.png" alt="avatar" class="user-avatar" id="currentAvatar">
+  </header>
+
+  <div class="user-list" id="userList"></div>
+  <div class="log-list" id="logList"></div>
+
+  <!-- Firebase & Logic -->
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
       authDomain: "quantechapp.firebaseapp.com",
-      databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
       projectId: "quantechapp",
       storageBucket: "quantechapp.firebasestorage.app",
       messagingSenderId: "825384610343",
@@ -86,52 +150,87 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) return (location.href = "login.html");
-      const uid = user.uid;
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userList = document.getElementById('userList');
+    const logList = document.getElementById('logList');
+    const currentAvatar = document.getElementById('currentAvatar');
 
-      await updateDoc(doc(db, "users", uid), {
-        online: true,
-        lastActive: serverTimestamp(),
-      });
-
-      window.addEventListener("beforeunload", async () => {
-        await updateDoc(doc(db, "users", uid), {
-          online: false,
-          lastActive: serverTimestamp(),
-        });
-      });
-
-      const snapshot = await getDocs(collection(db, "users"));
-      const userStatus = document.getElementById("userStatus");
-      const logs = document.getElementById("logs");
-
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const div = document.createElement("div");
-        div.className = "user-card";
-        div.innerHTML = `
-          <img class="avatar ${data.online ? 'online' : ''}" src="https://api.dicebear.com/6.x/icons/svg?seed=${data.email}" />
-          <div style="font-size: 0.8em;">${data.email}</div>
-        `;
-        userStatus.appendChild(div);
-
-        const log = document.createElement("div");
-        log.innerText = `${data.email} - Last active: ${data.lastActive?.toDate?.().toLocaleString?.() || "-"}`;
-        logs.appendChild(log);
-      });
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
     });
 
-    window.logout = async () => {
+    logoutBtn.addEventListener('click', async () => {
       const user = auth.currentUser;
       if (user) {
-        await updateDoc(doc(db, "users", user.uid), {
+        await setDoc(doc(db, "users", user.uid), {
           online: false,
-          lastActive: serverTimestamp(),
-        });
+          lastActive: serverTimestamp()
+        }, { merge: true });
         await signOut(auth);
-        location.href = "login.html";
       }
-    };
-  </script></body>
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        // set status online
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          online: true,
+          lastActive: serverTimestamp(),
+          avatar: user.photoURL || "default-avatar.png",
+          displayName: user.displayName || "User"
+        }, { merge: true });
+
+        currentAvatar.src = user.photoURL || "default-avatar.png";
+
+        // show user list
+        onSnapshot(collection(db, "users"), (snapshot) => {
+          userList.innerHTML = "";
+          logList.innerHTML = "";
+          snapshot.forEach(docSnap => {
+            const u = docSnap.data();
+            if (!u.uid) return;
+            const isOnline = u.online;
+            const avatar = u.avatar || "default-avatar.png";
+            const displayName = u.displayName || u.email || "Unknown";
+
+            // horizontal card
+            const userCard = document.createElement("div");
+            userCard.className = "user-card " + (isOnline ? "online" : "offline");
+            userCard.innerHTML = `
+              <img src="${avatar}" alt="avatar">
+              <span>${displayName}</span>
+            `;
+            userList.appendChild(userCard);
+
+            // vertical log
+            const log = document.createElement("div");
+            log.className = "log-entry";
+            log.innerHTML = `
+              <img src="${avatar}" />
+              <div class="log-info">
+                <strong>${displayName}</strong>
+                <small>${u.lastActive?.toDate().toLocaleString() || '-'}</small>
+              </div>
+            `;
+            logList.appendChild(log);
+          });
+        });
+
+        // offline saat keluar
+        window.addEventListener("beforeunload", async () => {
+          await setDoc(doc(db, "users", user.uid), {
+            online: false,
+            lastActive: serverTimestamp()
+          }, { merge: true });
+        });
+      }
+    });
+  </script>
+</body>
 </html>
