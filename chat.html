@@ -89,6 +89,7 @@
       border-top: 1px solid #222734;
       display: flex;
       gap: 0.5rem;
+      transition: transform 0.2s;
     }
 
     #input-bar input {
@@ -151,7 +152,7 @@
     apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
     authDomain: "quantechapp.firebaseapp.com",
     projectId: "quantechapp",
-    storageBucket: "quantechapp.firebasestorage.app",
+    storageBucket: "quantechapp.appspot.com", // PERBAIKAN STORAGE BUCKET!
     messagingSenderId: "825384610343",
     appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
   };
@@ -160,7 +161,10 @@
   const db = firebase.firestore();
 
   const otherUid = new URLSearchParams(location.search).get("uid");
-  if (!otherUid) location.href = "dashboard.html";
+  if (!otherUid) {
+    location.href = "dashboard.html";
+    return;
+  }
 
   let currentUser = null;
   let chatId = null;
@@ -171,11 +175,15 @@
   }
 
   async function updateHeader() {
-    const doc = await db.collection('users').doc(otherUid).get();
-    if (doc.exists) {
-      const user = doc.data();
-      document.getElementById("chatName").textContent = user.displayName || "User";
-      document.getElementById("chatAvatar").src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || otherUid)}`;
+    try {
+      const doc = await db.collection('users').doc(otherUid).get();
+      if (doc.exists) {
+        const user = doc.data();
+        document.getElementById("chatName").textContent = user.displayName || "User";
+        document.getElementById("chatAvatar").src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(user.displayName || otherUid)}`;
+      }
+    } catch (err) {
+      alert("Gagal memuat user!");
     }
   }
 
@@ -252,27 +260,25 @@
     setupChatListener();
   });
 
-  // === Keyboard Fix (Android) ===
+  // === Keyboard Fix (Android/Realme/Chrome) ===
   if (window.visualViewport) {
     const inputBar = document.getElementById("input-bar");
-
     function adjustForKeyboard() {
       const viewport = window.visualViewport;
       const heightDiff = window.innerHeight - viewport.height;
-
-      if (heightDiff > 150) {
-        inputBar.style.position = "absolute";
-        inputBar.style.bottom = `${heightDiff}px`;
-        setTimeout(scrollToBottom, 50);
+      if (heightDiff > 80) { // Lebih peka untuk Android/Realme
+        inputBar.style.transform = `translateY(-${heightDiff}px)`;
       } else {
-        inputBar.style.position = "fixed";
-        inputBar.style.bottom = "0";
+        inputBar.style.transform = "translateY(0)";
       }
+      setTimeout(scrollToBottom, 100);
     }
-
     window.visualViewport.addEventListener("resize", adjustForKeyboard);
     window.visualViewport.addEventListener("scroll", adjustForKeyboard);
   }
+
+  // Scroll otomatis ke bawah saat input fokus (opsional, sangat disarankan)
+  document.getElementById("messageInput").addEventListener("focus", scrollToBottom);
 </script>
 
 </body>
