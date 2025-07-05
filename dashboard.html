@@ -154,7 +154,7 @@
     <button>⚙️</button>
   </div>  <!-- Firebase App -->  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -179,17 +179,19 @@
       if (!user) return location.href = "login.html";
 
       const meRef = doc(db, "users", user.uid);
-      await updateDoc(meRef, {
+      await setDoc(meRef, {
+        displayName: user.displayName || user.email,
+        email: user.email,
         online: true,
         lastActive: serverTimestamp()
-      });
+      }, { merge: true });
 
       const meSnap = await getDocs(collection(db, "users"));
       const meData = meSnap.docs.find(d => d.id === user.uid)?.data();
       const meName = meData?.displayName || user.email;
       avatarImg.src = `https://api.dicebear.com/6.x/adventurer/svg?seed=${encodeURIComponent(meName)}`;
 
-      const unsubscribe = onSnapshot(collection(db, "users"), (snap) => {
+      onSnapshot(collection(db, "users"), (snap) => {
         userList.innerHTML = '';
         logList.innerHTML = '';
         snap.forEach(doc => {
@@ -199,16 +201,13 @@
           const online = d.online;
           const time = d.lastActive?.toDate().toLocaleString('id-ID') ?? '-';
 
-          // Horizontal user list
           const bubble = document.createElement('div');
           bubble.className = 'user-bubble' + (online ? ' online' : '');
           bubble.innerHTML = `<img src="${avatar}" alt="${name}" /><div>${name}</div>`;
           userList.appendChild(bubble);
 
-          // Vertical log list with redirect
           const item = document.createElement('div');
           item.className = 'log-item';
-          item.onclick = () => location.href = `chat.html?uid=${doc.id}`;
           item.innerHTML = `
             <img src="${avatar}" />
             <div class="info">
@@ -216,15 +215,16 @@
               <div class="time">${time}</div>
             </div>
           `;
+          item.onclick = () => location.href = `chat.html?uid=${doc.id}`;
           logList.appendChild(item);
         });
       });
 
       window.addEventListener("beforeunload", () => {
-        updateDoc(meRef, {
+        setDoc(meRef, {
           online: false,
           lastActive: serverTimestamp()
-        });
+        }, { merge: true });
       });
     });
 
