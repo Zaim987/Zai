@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QuantumX - Portal Futuristik</title>
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
   <style>
     html, body {
@@ -17,7 +16,6 @@
       perspective: 1000px;
     }
 
-    /* Background animasi radial */
     body::before {
       content: '';
       position: fixed;
@@ -33,7 +31,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Bintang */
     .stars {
       position: fixed;
       width: 100%;
@@ -60,9 +57,16 @@
       padding: 0 1rem;
     }
 
-    /* ==== HOLOGRAM GLITCH ==== */
+    /* ==== LOGO HOLOGRAM GLITCH ==== */
     .hologram-glitch {
-      font-size: 3rem;
+      font-size: clamp(2rem, 7vw, 3rem); /* Otomatis menyesuaikan layar */
+      max-width: 90vw; /* Tidak mepet ke kanan kiri */
+      padding: 0 1rem;
+      box-sizing: border-box;
+      text-align: center;
+      margin-bottom: 2rem;
+
+      font-family: 'Audiowide', sans-serif;
       font-weight: bold;
       color: #00f6ff;
       position: relative;
@@ -74,7 +78,6 @@
         0 0 20px #00caff;
       animation: flicker 4s infinite ease-in-out;
       overflow: hidden;
-      margin-bottom: 2rem;
     }
 
     .hologram-glitch::before,
@@ -127,7 +130,6 @@
       51% { opacity: 1; }
     }
 
-    /* ==== Teks & Tombol Muncul Bertahap ==== */
     .hidden {
       opacity: 0;
       transform: scale(0.8) translateZ(-200px);
@@ -217,5 +219,6 @@
       }, 2800);
     });
   </script>
+
 </body>
 </html>
