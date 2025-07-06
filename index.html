@@ -57,10 +57,10 @@
       padding: 0 1rem;
     }
 
-    /* ==== LOGO HOLOGRAM GLITCH ==== */
+    /* ==== LOGO ==== */
     .hologram-glitch {
-      font-size: clamp(2rem, 7vw, 3rem); /* Otomatis menyesuaikan layar */
-      max-width: 90vw; /* Tidak mepet ke kanan kiri */
+      font-size: clamp(2rem, 7vw, 3rem);
+      max-width: 90vw;
       padding: 0 1rem;
       box-sizing: border-box;
       text-align: center;
@@ -78,6 +78,9 @@
         0 0 20px #00caff;
       animation: flicker 4s infinite ease-in-out;
       overflow: hidden;
+      opacity: 0;
+      transform: scale(0.8) translateZ(-100px);
+      filter: blur(12px);
     }
 
     .hologram-glitch::before,
@@ -130,27 +133,37 @@
       51% { opacity: 1; }
     }
 
-    .hidden {
-      opacity: 0;
-      transform: scale(0.8) translateZ(-200px);
-      filter: blur(12px);
+    /* Animasi muncul & hilang */
+    .fade-in {
+      animation: appear 1.2s forwards ease-out;
     }
 
-    .fade-in {
-      animation: appear 1.6s ease-out forwards;
+    .fade-out {
+      animation: disappear 0.8s forwards ease-in;
     }
 
     @keyframes appear {
-      0% {
-        opacity: 0;
-        transform: scale(0.8) translateZ(-200px);
-        filter: blur(12px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateZ(0);
-        filter: blur(0);
-      }
+      from { opacity: 0; transform: scale(0.8) translateZ(-100px); filter: blur(12px); }
+      to   { opacity: 1; transform: scale(1) translateZ(0); filter: blur(0); }
+    }
+
+    @keyframes disappear {
+      from { opacity: 1; transform: scale(1); filter: blur(0); }
+      to   { opacity: 0; transform: scale(0.8) translateZ(-200px); filter: blur(12px); }
+    }
+
+    h1, p, button {
+      opacity: 0;
+      transform: scale(0.8) translateZ(-100px);
+      filter: blur(12px);
+    }
+
+    h1.fade-in, p.fade-in, button.fade-in {
+      animation: appear 1.2s forwards ease-out;
+    }
+
+    h1.fade-out, p.fade-out, button.fade-out {
+      animation: disappear 0.8s forwards ease-in;
     }
 
     h1 {
@@ -187,38 +200,48 @@
 </head>
 <body>
 
-  <!-- Background bintang -->
   <div class="stars"></div>
 
-  <!-- Konten -->
   <div class="container">
     <div class="hologram-glitch" id="logo" data-text="QuantumX">QuantumX</div>
-    <h1 class="hidden" id="title">Masuki Dunia Digitalmu</h1>
-    <p class="hidden" id="desc">Ini bukan masa depan — ini sekarang.</p>
-    <button class="hidden" id="startBtn" onclick="location.href='login.html'">Mulai Sekarang</button>
+    <h1 id="title">Masuki Dunia Digitalmu</h1>
+    <p id="desc">Ini bukan masa depan — ini sekarang.</p>
+    <button id="startBtn">Mulai Sekarang</button>
   </div>
 
-  <!-- Efek Suara -->
-  <audio id="sfx-title" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav" preload="auto"></audio>
-  <audio id="sfx-desc" src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.wav" preload="auto"></audio>
-  <audio id="sfx-btn" src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.wav" preload="auto"></audio>
-
   <script>
+    // Efek muncul bertahap
     window.addEventListener('load', () => {
       setTimeout(() => {
-        document.getElementById('title').classList.add('fade-in');
-        document.getElementById('sfx-title').play();
-      }, 1200);
+        logo.classList.add('fade-in');
+      }, 600);
       setTimeout(() => {
-        document.getElementById('desc').classList.add('fade-in');
-        document.getElementById('sfx-desc').play();
-      }, 2000);
+        title.classList.add('fade-in');
+      }, 1500);
       setTimeout(() => {
-        document.getElementById('startBtn').classList.add('fade-in');
-        document.getElementById('sfx-btn').play();
-      }, 2800);
+        desc.classList.add('fade-in');
+      }, 2300);
+      setTimeout(() => {
+        startBtn.classList.add('fade-in');
+      }, 3000);
+    });
+
+    // Efek keluar saat tombol diklik
+    const logo = document.getElementById('logo');
+    const title = document.getElementById('title');
+    const desc = document.getElementById('desc');
+    const startBtn = document.getElementById('startBtn');
+
+    startBtn.addEventListener('click', () => {
+      logo.classList.replace('fade-in', 'fade-out');
+      title.classList.replace('fade-in', 'fade-out');
+      desc.classList.replace('fade-in', 'fade-out');
+      startBtn.classList.replace('fade-in', 'fade-out');
+
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 900); // delay agar animasi selesai
     });
   </script>
-
 </body>
 </html>
