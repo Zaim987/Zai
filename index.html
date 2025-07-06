@@ -1,149 +1,160 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Circular Panels</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuantumX - Dunia Digitalmu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     html, body {
+      height: 100%;
+      background: #0a0a0a;
+      font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, #0ff2, #00f1, #000 90%);
+      z-index: -3;
+      animation: rotateBG 60s linear infinite;
+    }
+
+    @keyframes rotateBG {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .stars {
+      position: fixed;
       width: 100%;
       height: 100%;
-      overflow: hidden;
-      background: #000;
-      touch-action: pan-y;
+      background: url('https://www.transparenttextures.com/patterns/stardust.png');
+      opacity: 0.06;
+      z-index: -2;
+      animation: starsMove 60s linear infinite;
     }
-    canvas { display: block; }
+
+    @keyframes starsMove {
+      from { background-position: 0 0; }
+      to { background-position: 1000px 1000px; }
+    }
+
+    header {
+      width: 100%;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #00f2ff;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-shadow: 0 0 8px #00f2ff;
+    }
+
+    main {
+      height: calc(100% - 80px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+      transition: transform 0.6s ease;
+    }
+
+    .card:hover {
+      transform: perspective(600px) rotateY(6deg) translateY(-4px);
+      box-shadow: 0 0 32px rgba(0, 255, 255, 0.35);
+    }
+
+    .card h1 {
+      font-size: 2rem;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 6px #0ff;
+    }
+
+    .card p {
+      color: #aaa;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .cta-btn {
+      padding: 0.9rem 2rem;
+      font-size: 1rem;
+      background: #00f2ff;
+      color: #000;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 15px #00f2ff;
+      transition: all 0.3s ease;
+    }
+
+    .cta-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 25px #00f2ff;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 2rem 1.5rem;
+      }
+
+      .card h1 {
+        font-size: 1.6rem;
+      }
+
+      .cta-btn {
+        font-size: 0.95rem;
+        padding: 0.8rem 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
-  <script>
-    let scene, camera, renderer, panelGroup;
-    let isDragging = false, lastX = 0, velocity = 0;
-    const panelCount = 8;
-    const radius = 4;
-    const panels = [];
-    let currentIndex = 0;
-    let isZoomed = false;init();
-animate();
 
-function init() {
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 5);
+  <div class="stars"></div>
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  document.body.appendChild(renderer.domElement);
+  <header>
+    <div class="logo">QuantumX</div>
+    <div></div> <!-- Optional: tambahkan navigasi -->
+  </header>
 
-  panelGroup = new THREE.Group();
-  scene.add(panelGroup);
+  <main>
+    <div class="card">
+      <h1>Masuki Dunia Digitalmu</h1>
+      <p>Jelajahi teknologi futuristik yang menghubungkan Anda dengan masa depan. Semuanya dimulai di sini.</p>
+      <button class="cta-btn" onclick="location.href='login.html'">Mulai Sekarang</button>
+    </div>
+  </main>
 
-  const loader = new THREE.TextureLoader();
-  for (let i = 0; i < panelCount; i++) {
-    const geometry = new THREE.PlaneGeometry(2.2, 3.2);
-    const material = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      map: loader.load(`https://picsum.photos/300/450?random=${i+1}`),
-      side: THREE.DoubleSide
-    });
-    const panel = new THREE.Mesh(geometry, material);
-
-    const angle = (i / panelCount) * Math.PI * 2;
-    panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
-    panel.lookAt(0, 0, 0);
-
-    panelGroup.add(panel);
-    panels.push(panel);
-  }
-
-  renderer.domElement.addEventListener('touchstart', onTouchStart);
-  renderer.domElement.addEventListener('touchmove', onTouchMove);
-  renderer.domElement.addEventListener('touchend', onTouchEnd);
-
-  renderer.domElement.addEventListener('mousedown', onTouchStart);
-  renderer.domElement.addEventListener('mousemove', onTouchMove);
-  renderer.domElement.addEventListener('mouseup', onTouchEnd);
-
-  renderer.domElement.addEventListener('click', onClick);
-  renderer.domElement.addEventListener('dblclick', onDoubleClick);
-
-  window.addEventListener('resize', onWindowResize);
-}
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function onTouchStart(e) {
-  if (isZoomed) return;
-  isDragging = true;
-  lastX = getX(e);
-  velocity = 0;
-}
-
-function onTouchMove(e) {
-  if (!isDragging || isZoomed) return;
-  const x = getX(e);
-  const dx = x - lastX;
-  panelGroup.rotation.y += dx * 0.005;
-  velocity = dx * 0.005;
-  lastX = x;
-}
-
-function onTouchEnd(e) {
-  if (isZoomed) return;
-  isDragging = false;
-
-  // Snap to nearest panel
-  const anglePerPanel = (2 * Math.PI) / panelCount;
-  let rawIndex = -panelGroup.rotation.y / anglePerPanel;
-  currentIndex = Math.round(rawIndex) % panelCount;
-  if (currentIndex < 0) currentIndex += panelCount;
-
-  const targetRotation = -currentIndex * anglePerPanel;
-  velocity = (targetRotation - panelGroup.rotation.y) * 0.1;
-}
-
-function onClick(e) {
-  if (isZoomed || isDragging) return;
-  const anglePerPanel = (2 * Math.PI) / panelCount;
-  const targetRotation = -currentIndex * anglePerPanel;
-  const diff = Math.abs(panelGroup.rotation.y - targetRotation);
-  if (diff > 0.01) return; // prevent click if not aligned
-
-  // Zoom in
-  const target = panels[currentIndex];
-  camera.position.set(target.position.x * 0.2, target.position.y, target.position.z * 0.2);
-  camera.lookAt(target.position);
-  isZoomed = true;
-}
-
-function onDoubleClick(e) {
-  // Reset zoom
-  camera.position.set(0, 0, 5);
-  camera.lookAt(0, 0, 0);
-  isZoomed = false;
-}
-
-function getX(e) {
-  return e.touches ? e.touches[0].clientX : e.clientX;
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  if (!isDragging && !isZoomed) {
-    panelGroup.rotation.y += velocity;
-    velocity *= 0.9;
-  }
-
-  renderer.render(scene, camera);
-}
-
-  </script>
 </body>
 </html>
