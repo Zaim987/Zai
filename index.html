@@ -36,5 +36,28 @@
     }
     animate();
   </script>
+// Parameter panel
+const jumlahPanel = 8; // jumlah panel di lingkaran
+const radius = 3; // radius lingkaran
+
+const panels = [];
+for(let i=0; i<jumlahPanel; i++) {
+  // Buat geometri panel (persegi panjang datar)
+  const geometry = new THREE.BoxGeometry(1, 1.5, 0.1);
+  const material = new THREE.MeshPhongMaterial({
+    color: 0xffffff * Math.random(),
+    side: THREE.DoubleSide,
+  });
+  const panel = new THREE.Mesh(geometry, material);
+
+  // Posisi panel secara melingkar
+  const angle = (i / jumlahPanel) * Math.PI * 2;
+  panel.position.x = radius * Math.cos(angle);
+  panel.position.z = radius * Math.sin(angle);
+  panel.lookAt(0, 0, 0); // Panel menghadap ke pusat
+
+  scene.add(panel);
+  panels.push(panel);
+}
 </body>
 </html>
