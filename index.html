@@ -20,10 +20,11 @@
   <script>
     let scene, camera, renderer, panelGroup;
     let isDragging = false, lastX = 0, velocity = 0;
-    let zoomedPanel = null, isSnapping = false;
     const panelCount = 8;
-    const radius = 5;
-    const panels = [];init();
+    const radius = 4;
+    const panels = [];
+    let currentIndex = 0;
+    let isZoomed = false;init();
 animate();
 
 function init() {
@@ -41,17 +42,18 @@ function init() {
 
   const loader = new THREE.TextureLoader();
   for (let i = 0; i < panelCount; i++) {
-    const angle = (i / panelCount) * Math.PI * 2;
-    const geometry = new THREE.PlaneGeometry(2, 3);
+    const geometry = new THREE.PlaneGeometry(2.2, 3.2);
     const material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
       map: loader.load(`https://picsum.photos/300/450?random=${i+1}`),
       side: THREE.DoubleSide
     });
     const panel = new THREE.Mesh(geometry, material);
-    panel.userData.angle = angle;
+
+    const angle = (i / panelCount) * Math.PI * 2;
     panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
     panel.lookAt(0, 0, 0);
-    panel.rotateY(Math.PI);
+
     panelGroup.add(panel);
     panels.push(panel);
   }
@@ -64,8 +66,8 @@ function init() {
   renderer.domElement.addEventListener('mousemove', onTouchMove);
   renderer.domElement.addEventListener('mouseup', onTouchEnd);
 
-  renderer.domElement.addEventListener('click', onClickPanel);
-  window.addEventListener('dblclick', onDoubleClick);
+  renderer.domElement.addEventListener('click', onClick);
+  renderer.domElement.addEventListener('dblclick', onDoubleClick);
 
   window.addEventListener('resize', onWindowResize);
 }
@@ -77,14 +79,14 @@ function onWindowResize() {
 }
 
 function onTouchStart(e) {
-  if (zoomedPanel || isSnapping) return;
+  if (isZoomed) return;
   isDragging = true;
   lastX = getX(e);
   velocity = 0;
 }
 
 function onTouchMove(e) {
-  if (!isDragging || zoomedPanel || isSnapping) return;
+  if (!isDragging || isZoomed) return;
   const x = getX(e);
   const dx = x - lastX;
   panelGroup.rotation.y += dx * 0.005;
@@ -92,93 +94,51 @@ function onTouchMove(e) {
   lastX = x;
 }
 
-function onTouchEnd() {
-  if (zoomedPanel || isSnapping) return;
+function onTouchEnd(e) {
+  if (isZoomed) return;
   isDragging = false;
-  snapToNearestPanel();
+
+  // Snap to nearest panel
+  const anglePerPanel = (2 * Math.PI) / panelCount;
+  let rawIndex = -panelGroup.rotation.y / anglePerPanel;
+  currentIndex = Math.round(rawIndex) % panelCount;
+  if (currentIndex < 0) currentIndex += panelCount;
+
+  const targetRotation = -currentIndex * anglePerPanel;
+  velocity = (targetRotation - panelGroup.rotation.y) * 0.1;
+}
+
+function onClick(e) {
+  if (isZoomed || isDragging) return;
+  const anglePerPanel = (2 * Math.PI) / panelCount;
+  const targetRotation = -currentIndex * anglePerPanel;
+  const diff = Math.abs(panelGroup.rotation.y - targetRotation);
+  if (diff > 0.01) return; // prevent click if not aligned
+
+  // Zoom in
+  const target = panels[currentIndex];
+  camera.position.set(target.position.x * 0.2, target.position.y, target.position.z * 0.2);
+  camera.lookAt(target.position);
+  isZoomed = true;
+}
+
+function onDoubleClick(e) {
+  // Reset zoom
+  camera.position.set(0, 0, 5);
+  camera.lookAt(0, 0, 0);
+  isZoomed = false;
 }
 
 function getX(e) {
   return e.touches ? e.touches[0].clientX : e.clientX;
 }
 
-function getActivePanelIndex() {
-  const step = (Math.PI * 2) / panelCount;
-  const angle = ((-panelGroup.rotation.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-  const index = Math.round(angle / step);
-  return index % panelCount;
-}
-
-function snapToNearestPanel() {
-  const step = (Math.PI * 2) / panelCount;
-  const targetIndex = getActivePanelIndex();
-  const targetRotation = -targetIndex * step;
-  isSnapping = true;
-
-  const animateSnap = () => {
-    const diff = targetRotation - panelGroup.rotation.y;
-    if (Math.abs(diff) > 0.001) {
-      panelGroup.rotation.y += diff * 0.1;
-      requestAnimationFrame(animateSnap);
-    } else {
-      panelGroup.rotation.y = targetRotation;
-      isSnapping = false;
-    }
-  };
-  animateSnap();
-}
-
-function onClickPanel(event) {
-  if (zoomedPanel || isSnapping) return;
-
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2(
-    (event.clientX / window.innerWidth) * 2 - 1,
-    -(event.clientY / window.innerHeight) * 2 + 1
-  );
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(panels);
-
-  if (intersects.length > 0) {
-    const clicked = intersects[0].object;
-    const activeIndex = getActivePanelIndex();
-    const clickedIndex = panels.indexOf(clicked);
-    if (clickedIndex === activeIndex) {
-      zoomedPanel = clicked;
-    }
-  }
-}
-
-function onDoubleClick() {
-  if (zoomedPanel) {
-    zoomedPanel.scale.set(1, 1, 1);
-    zoomedPanel.position.set(
-      Math.sin(zoomedPanel.userData.angle) * radius,
-      0,
-      Math.cos(zoomedPanel.userData.angle) * radius
-    );
-    zoomedPanel.lookAt(0, 0, 0);
-    zoomedPanel.rotateY(Math.PI);
-    zoomedPanel = null;
-  }
-}
-
 function animate() {
   requestAnimationFrame(animate);
 
-  if (!isDragging && !zoomedPanel && !isSnapping) {
+  if (!isDragging && !isZoomed) {
     panelGroup.rotation.y += velocity;
-    velocity *= 0.95;
-  }
-
-  if (zoomedPanel) {
-    const targetScale = 2.8;
-    zoomedPanel.scale.lerp(new THREE.Vector3(targetScale, targetScale, 1), 0.1);
-
-    const targetZ = camera.position.z - 2.2;
-    zoomedPanel.position.z += (targetZ - zoomedPanel.position.z) * 0.1;
-
-    velocity = 0;
+    velocity *= 0.9;
   }
 
   renderer.render(scene, camera);
