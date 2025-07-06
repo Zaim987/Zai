@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>3D Carousel + Audio + Parallax</title>
+  <title>3D Carousel - Immersive Panels</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
     * {
@@ -35,8 +35,6 @@
       justify-content: center;
       touch-action: none;
       background: radial-gradient(circle at center, #0a0f2c, #000);
-      background-size: cover;
-      background-repeat: no-repeat;
       transition: background-position 0.1s linear;
     }
 
@@ -52,31 +50,57 @@
       position: absolute;
       width: 280px;
       height: 180px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 1rem;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 0 20px #00f2ff33;
+      left: 50%;
+      top: 50%;
+      transform-style: preserve-3d;
+      transform: translate(-50%, -50%) rotateY(0deg) translateZ(320px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      left: 50%;
-      top: 50%;
       padding: 1rem;
-      transform-style: preserve-3d;
+      color: #fff;
       opacity: 0.3;
       scale: 0.9;
-      transition: transform 0.6s ease, opacity 0.5s ease, scale 0.4s ease;
+      transition: transform 0.5s ease, opacity 0.4s ease, scale 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 1rem;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(
+        rgba(255, 255, 255, 0.05),
+        rgba(255, 255, 255, 0.08)
+      );
+      box-shadow: 0 0 16px #00f2ff33;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
       cursor: pointer;
-      color: #fff;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 1rem;
+      background: radial-gradient(circle at center, #00f2ff22, transparent 60%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .panel * {
+      position: relative;
+      z-index: 1;
     }
 
     .panel.active {
       opacity: 1;
       scale: 1.05;
-      box-shadow: 0 0 30px #00ffffaa;
+      box-shadow: 0 0 32px #00ffffaa;
+    }
+
+    .panel.zooming {
+      transform: scale(1.15) translate(-50%, -50%) rotateY(var(--angle, 0deg)) translateZ(320px);
+      box-shadow: 0 0 40px #00f2ffcc;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .panel h2 {
@@ -118,13 +142,16 @@
     <div class="carousel" id="carousel"></div>
   </div>
 
-  <!-- 🔉 Audio preload -->
+  <!-- Audio -->
   <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9b6c6249ca.mp3" preload="auto"></audio>
   <audio id="swipeSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_264f655bde.mp3" preload="auto"></audio>
 
   <script>
     const carousel = document.getElementById('carousel');
     const scene = document.getElementById('scene');
+    const clickSound = document.getElementById('clickSound');
+    const swipeSound = document.getElementById('swipeSound');
+
     const panelsData = [
       { title: "📅 Schedule", content: `<ul><li>08:00 – Belanja</li><li>09:30 – Meeting</li></ul><button onclick="alert('Tambah jadwal')">+ Add Task</button>` },
       { title: "❄️ AC", content: `<h2>❄️ Control</h2><label>Temp: <input type="range" min="16" max="30" value="22"></label>` },
@@ -132,9 +159,6 @@
       { title: "🎵 Music", content: `<h2>🎵 Music</h2><audio controls style="width:100%"><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>` },
       { title: "⚙️ Settings", content: `<h2>⚙️ Settings</h2><label><input type="checkbox" checked> Dark Mode</label><br/><label><input type="checkbox"> Notifications</label>` },
     ];
-
-    const clickSound = document.getElementById('clickSound');
-    const swipeSound = document.getElementById('swipeSound');
 
     let angle = 0;
     let radius = 320;
@@ -153,13 +177,23 @@
         const deg = i * (360 / count);
         const panel = document.createElement('div');
         panel.className = 'panel';
+        panel.style.setProperty('--angle', `${deg}deg`);
         panel.style.transform = `translate(-50%, -50%) rotateY(${deg}deg) translateZ(${radius}px)`;
         panel.dataset.index = i;
         panel.innerHTML = `<h2>${data.title}</h2>${data.content}`;
+
         panel.addEventListener('click', () => {
           rotateToPanel(i);
           clickSound.play();
         });
+
+        // Zoom animation on press
+        panel.addEventListener('mousedown', () => panel.classList.add('zooming'));
+        panel.addEventListener('mouseup', () => panel.classList.remove('zooming'));
+        panel.addEventListener('mouseleave', () => panel.classList.remove('zooming'));
+        panel.addEventListener('touchstart', () => panel.classList.add('zooming'));
+        panel.addEventListener('touchend', () => panel.classList.remove('zooming'));
+
         carousel.appendChild(panel);
       });
 
@@ -216,7 +250,7 @@
     scene.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onEnd);
 
-    // Pinch Zoom
+    // Pinch Zoom (Radius control)
     scene.addEventListener('touchmove', e => {
       if (e.touches.length === 2) {
         const dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -226,7 +260,7 @@
           initialDistance = dist;
         } else {
           const diff = dist - initialDistance;
-          radius = Math.max(180, Math.min(500, radius - diff * 0.05));
+          radius = Math.max(200, Math.min(500, radius - diff * 0.05));
           renderPanels();
           carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle}deg)`;
           initialDistance = dist;
@@ -235,13 +269,13 @@
     }, { passive: false });
 
     scene.addEventListener('touchend', () => {
-      if (event.touches.length < 2) initialDistance = null;
+      if (event.touches?.length < 2) initialDistance = null;
     });
 
-    // Ambient parallax
+    // Parallax Ambient
     document.addEventListener('mousemove', e => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 30;
-      const y = (e.clientY / window.innerHeight - 0.5) * 30;
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
       scene.style.backgroundPosition = `${50 + x}% ${50 + y}%`;
     });
 
