@@ -117,10 +117,8 @@
 </head>
 <body>
 
-  <!-- Overlay -->
   <div id="overlay"></div>
 
-  <!-- Splash screen -->
   <div id="splash">
     <div class="logo">QuantumX</div>
     <div class="headline">Masuki Dunia Digitalmu</div>
@@ -128,7 +126,6 @@
     <button onclick="startApp()">Mulai Sekarang</button>
   </div>
 
-  <!-- Konten partial -->
   <div id="app"></div>
 
   <script>
@@ -210,11 +207,10 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       const current = location.pathname.replace("/", "");
-      const isReload = performance.navigation.type === 1;
+      const isFirstVisit = !window.history.state;
 
       if (current && current !== "") {
-        if (!isReload) {
-          // Pertama kali akses langsung ke /login misalnya → splash dulu
+        if (isFirstVisit) {
           showSplash();
           setTimeout(() => {
             document.getElementById("splash").style.opacity = 0;
@@ -224,17 +220,16 @@
             }, 1000);
           }, 500);
         } else {
-          // Reload → langsung masuk ke page tanpa splash
           document.getElementById("splash").style.display = "none";
           loadPage(current);
         }
       } else {
-        // Akses ke root (/) → splash muncul normal
         setTimeout(() => {
           document.getElementById("overlay").style.opacity = 0;
         }, 300);
       }
     });
   </script>
+
 </body>
 </html>
