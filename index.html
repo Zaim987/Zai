@@ -60,9 +60,9 @@
     .start-button:hover {
       transform: scale(1.05);
     }
+
     #app {
-      opacity: 0;
-      animation: fadeIn 1s forwards;
+      display: none;
       padding: 2rem;
       max-width: 100%;
     }
@@ -88,8 +88,8 @@
     <button class="start-button" onclick="startApp()">Mulai Sekarang</button>
   </div>
 
-  <!-- Tempat load partial -->
-  <div id="app" style="display: none;"></div>
+  <!-- Tempat konten SPA -->
+  <div id="app"></div>
 
   <script>
     const app = document.getElementById("app");
@@ -105,13 +105,16 @@
     }
 
     function loadPage(page) {
-      app.style.animation = "fadeOut 0.5s ease";
+      app.style.animation = "fadeOut 0.3s ease";
       setTimeout(() => {
         fetch(`partials/${page}.html`)
           .then(res => res.text())
           .then(html => {
             app.innerHTML = html;
-            app.style.animation = "fadeIn 0.8s ease";
+            app.style.animation = "none";       // Reset animasi
+            void app.offsetWidth;               // Trigger reflow
+            app.style.animation = "fadeIn 0.6s ease";
+            app.style.opacity = "1";
             history.pushState({}, "", "/" + page);
           });
       }, 300);
@@ -134,5 +137,6 @@
       }
     });
   </script>
+
 </body>
 </html>
