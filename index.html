@@ -7,26 +7,32 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       background: #0d1117;
       color: white;
       font-family: 'Rajdhani', sans-serif;
       overflow-x: hidden;
     }
+
     #overlay {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      width: 100vw;
+      height: 100vh;
       background: #000;
       opacity: 1;
       z-index: 100;
       pointer-events: none;
       transition: opacity 0.8s ease;
     }
+
     #splash {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       background: linear-gradient(160deg, #000000, #050b1e);
       display: flex;
       flex-direction: column;
@@ -37,6 +43,7 @@
       transition: opacity 1s ease;
       animation: fadeIn 1.5s ease;
     }
+
     .logo {
       font-family: 'Orbitron', sans-serif;
       font-size: 2.8rem;
@@ -45,6 +52,7 @@
       margin-bottom: 1.5rem;
       animation: zoomIn 1s ease forwards;
     }
+
     .headline {
       font-size: 1.8rem;
       color: #ffffff;
@@ -53,6 +61,7 @@
       animation: slideUp 1s ease 0.5s forwards;
       opacity: 0;
     }
+
     .subtext {
       font-size: 1rem;
       color: #cccccc;
@@ -60,6 +69,7 @@
       animation: slideUp 1s ease 0.8s forwards;
       opacity: 0;
     }
+
     button {
       padding: 0.75rem 2rem;
       font-size: 1.05rem;
@@ -73,16 +83,36 @@
       animation: fadeIn 1s ease 1.2s forwards;
       opacity: 0;
     }
+
     #app {
       padding: 2rem;
       opacity: 0;
       transition: opacity 0.4s ease;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes zoomIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-    .fade-out { animation: fadeOut 0.6s ease forwards; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.6s ease forwards;
+    }
   </style>
 </head>
 <body>
@@ -98,19 +128,32 @@
 
   <div id="app"></div>
 
-  <script>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.firebasestorage.app",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+      measurementId: "G-E9L012VH32"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
     async function loadPage(page) {
-      try {
-        const res = await fetch(`partials/${page}.html`);
-        if (!res.ok) throw new Error("Halaman tidak ditemukan");
-        const html = await res.text();
-        document.getElementById("app").innerHTML = html;
-        document.getElementById("app").style.opacity = 1;
-        document.getElementById("splash").style.display = "none";
-        window.history.pushState({ page }, "", `/${page}`);
-      } catch (e) {
-        document.getElementById("app").innerHTML = "<p style='color:red'>Gagal memuat halaman.</p>";
-      }
+      const res = await fetch(`partials/${page}.html`);
+      const html = await res.text();
+      const appDiv = document.getElementById("app");
+      appDiv.innerHTML = html;
+      appDiv.style.opacity = 1;
+      window.history.pushState({ page }, "", `/${page}`);
     }
 
     function startApp() {
@@ -124,7 +167,9 @@
       setTimeout(() => headline.classList.add("fade-out"), 200);
       setTimeout(() => subtext.classList.add("fade-out"), 400);
       setTimeout(() => button.classList.add("fade-out"), 600);
-      setTimeout(() => { splash.style.opacity = 0; }, 1000);
+      setTimeout(() => {
+        splash.style.opacity = 0;
+      }, 1000);
       setTimeout(() => {
         splash.style.display = "none";
         loadPage("login");
@@ -157,7 +202,9 @@
       button.style.animation = "fadeIn 1s ease 1.2s forwards";
 
       overlay.style.opacity = 1;
-      setTimeout(() => { overlay.style.opacity = 0; }, 100);
+      setTimeout(() => {
+        overlay.style.opacity = 0;
+      }, 100);
     }
 
     function showSplash() {
@@ -177,22 +224,32 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
-      const current = location.pathname.replace("/", "") || "";
-      if (current && current !== "") {
-        showSplash();
-        setTimeout(() => {
-          document.getElementById("splash").style.opacity = 0;
-          setTimeout(() => {
-            document.getElementById("splash").style.display = "none";
-            loadPage(current);
-          }, 1000);
-        }, 500);
-      } else {
-        setTimeout(() => {
-          document.getElementById("overlay").style.opacity = 0;
-        }, 300);
-      }
+      const path = location.pathname.replace("/", "") || "";
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // ✅ Langsung ke dashboard jika user login
+          loadPage("dashboard");
+        } else {
+          // ⛔ Belum login
+          if (path && path !== "") {
+            showSplash();
+            setTimeout(() => {
+              document.getElementById("splash").style.opacity = 0;
+              setTimeout(() => {
+                document.getElementById("splash").style.display = "none";
+                loadPage(path);
+              }, 1000);
+            }, 500);
+          } else {
+            setTimeout(() => {
+              document.getElementById("overlay").style.opacity = 0;
+            }, 300);
+          }
+        }
+      });
     });
   </script>
+
 </body>
 </html>
