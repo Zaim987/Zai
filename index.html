@@ -33,20 +33,21 @@
       z-index: 10;
       transition: opacity 1s ease;
     }
-    #splash h1 {
-      font-size: 3rem;
+    #splash .logo {
+      font-size: 2.5rem;
+      font-weight: bold;
       color: #00ffff;
       text-shadow: 0 0 10px #00ffff;
+      margin-bottom: 1.5rem;
     }
-    #splash h2 {
-      font-size: 2rem;
-      margin: 1rem 0;
-      color: #00ffff;
-      text-shadow: 0 0 8px #00ffff;
+    #splash .headline {
+      font-size: 1.6rem;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
     }
-    #splash p {
+    #splash .subtext {
       font-size: 1rem;
-      color: #ccc;
+      color: #aaa;
       margin-bottom: 2rem;
     }
     #splash button {
@@ -60,7 +61,6 @@
       box-shadow: 0 0 10px #00ffff;
     }
 
-    /* Navigasi */
     nav {
       display: none;
       background: #161b22;
@@ -76,7 +76,6 @@
       cursor: pointer;
     }
 
-    /* App Content */
     #app {
       padding: 2rem;
       opacity: 0;
@@ -88,23 +87,22 @@
 
   <!-- Splash screen -->
   <div id="splash">
-    <h1>QuantumX</h1>
-    <h2>Masuki Dunia Digitalmu</h2>
-    <p>Ini bukan masa depan — ini sekarang.</p>
+    <div class="logo">QuantumX</div>
+    <div class="headline">Masuki Dunia Digitalmu Sekarang</div>
+    <div class="subtext">Ini bukan masa depan — ini sekarang.</div>
     <button onclick="startApp()">Mulai Sekarang</button>
   </div>
 
-  <!-- Navigation -->
+  <!-- Navigasi -->
   <nav id="mainNav">
     <a onclick="loadPage('login')">Login</a>
     <a onclick="loadPage('dashboard')">Dashboard</a>
     <a onclick="loadPage('chat')">Chat</a>
   </nav>
 
-  <!-- Main content -->
+  <!-- Konten halaman -->
   <div id="app"></div>
 
-  <!-- Script SPA logic -->
   <script>
     async function loadPage(page) {
       const res = await fetch(`partials/${page}.html`);
@@ -130,14 +128,11 @@
         document.getElementById("mainNav").style.display = "flex";
         loadPage("login");
       }, 1000);
-
-      // Tambahkan splash ke history agar bisa dikembalikan dengan tombol back
       window.history.pushState({ page: "splash" }, "", "/");
     }
 
     window.addEventListener("popstate", (event) => {
       const state = event.state;
-
       if (!state || state.page === "splash") {
         showSplash();
       } else if (state.page) {
@@ -147,7 +142,6 @@
       }
     });
 
-    // Auto-load jika langsung ke /chat atau /dashboard
     window.addEventListener("DOMContentLoaded", () => {
       const current = location.pathname.replace("/", "") || "";
       if (current && current !== "") {
