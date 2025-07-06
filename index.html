@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Interaktif Mobile</title>
+  <title>3D Interaktif Mobile dengan Panel Melingkar</title>
   <style>
-    body { margin: 0; overflow: hidden; }
+    body { margin: 0; overflow: hidden; touch-action: none; }
     canvas { display: block; }
   </style>
 </head>
 <body>
-  <!-- Konten akan ada di sini -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
   <script>
-    // Membuat scene, camera, dan renderer
+    // --- Setup Scene, Camera, Renderer ---
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 
@@ -21,43 +20,90 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Menambahkan lampu
-    const light = new THREE.PointLight(0xffffff, 1, 100);
-    light.position.set(0, 10, 10);
-    scene.add(light);
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
 
-    // Mengatur posisi kamera
-    camera.position.z = 5;
+    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    pointLight.position.set(0, 10, 10);
+    scene.add(pointLight);
 
-    // Render loop
+    // --- Panel Setup ---
+    const jumlahPanel = 8;
+    const radius = 3;
+    const panels = [];
+    const panelGroup = new THREE.Group();
+
+    for(let i=0; i<jumlahPanel; i++) {
+      const geometry = new THREE.BoxGeometry(1, 1.5, 0.1);
+      const material = new THREE.MeshPhongMaterial({
+        color: 0xffffff * Math.random(),
+        side: THREE.DoubleSide,
+      });
+      const panel = new THREE.Mesh(geometry, material);
+
+      // Circular arrangement
+      const angle = (i / jumlahPanel) * Math.PI * 2;
+      panel.position.x = radius * Math.cos(angle);
+      panel.position.z = radius * Math.sin(angle);
+      panel.lookAt(0, 0, 0);
+
+      panelGroup.add(panel);
+      panels.push(panel);
+    }
+    scene.add(panelGroup);
+
+    // Camera position
+    camera.position.set(0, 0, 0);
+
+    // --- Gesture / Touch Controls ---
+    let lastX = 0;
+    let isDragging = false;
+    let rotationY = 0;
+
+    // For mobile & desktop
+    function onPointerDown(event) {
+      isDragging = true;
+      lastX = event.touches ? event.touches[0].clientX : event.clientX;
+    }
+
+    function onPointerMove(event) {
+      if (!isDragging) return;
+      let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      let deltaX = clientX - lastX;
+      lastX = clientX;
+      // Adjust rotation speed as desired
+      rotationY += deltaX * 0.01;
+    }
+
+    function onPointerUp(event) {
+      isDragging = false;
+    }
+
+    // Add listeners
+    renderer.domElement.addEventListener('mousedown', onPointerDown);
+    renderer.domElement.addEventListener('mousemove', onPointerMove);
+    renderer.domElement.addEventListener('mouseup', onPointerUp);
+
+    renderer.domElement.addEventListener('touchstart', onPointerDown, {passive: false});
+    renderer.domElement.addEventListener('touchmove', onPointerMove, {passive: false});
+    renderer.domElement.addEventListener('touchend', onPointerUp);
+
+    // --- Responsive Resize ---
+    window.addEventListener('resize', function() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // --- Animate Loop ---
     function animate() {
       requestAnimationFrame(animate);
+      // Rotasi panel secara horizontal
+      panelGroup.rotation.y = rotationY;
       renderer.render(scene, camera);
     }
     animate();
   </script>
-// Parameter panel
-const jumlahPanel = 8; // jumlah panel di lingkaran
-const radius = 3; // radius lingkaran
-
-const panels = [];
-for(let i=0; i<jumlahPanel; i++) {
-  // Buat geometri panel (persegi panjang datar)
-  const geometry = new THREE.BoxGeometry(1, 1.5, 0.1);
-  const material = new THREE.MeshPhongMaterial({
-    color: 0xffffff * Math.random(),
-    side: THREE.DoubleSide,
-  });
-  const panel = new THREE.Mesh(geometry, material);
-
-  // Posisi panel secara melingkar
-  const angle = (i / jumlahPanel) * Math.PI * 2;
-  panel.position.x = radius * Math.cos(angle);
-  panel.position.z = radius * Math.sin(angle);
-  panel.lookAt(0, 0, 0); // Panel menghadap ke pusat
-
-  scene.add(panel);
-  panels.push(panel);
-}
 </body>
 </html>
