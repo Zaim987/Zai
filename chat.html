@@ -29,13 +29,54 @@
 
     header {
       background-color: #111;
-      padding: 1rem;
+      padding: 0.5rem 1rem;
       font-weight: bold;
       border-bottom: 1px solid #333;
       flex-shrink: 0;
       position: sticky;
       top: 0;
       z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-height: 56px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.7rem;
+      cursor: pointer;
+      padding: 0.3rem 0.7rem 0.3rem 0.2rem;
+      border-radius: 50%;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .back-btn:active, .back-btn:focus {
+      background: #232323;
+      outline: none;
+    }
+
+    .profile-pic {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #555;
+      background-color: #222;
+      display: inline-block;
+    }
+
+    .contact-name {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .chat-body {
@@ -86,7 +127,7 @@
       color: white;
     }
 
-    button {
+    button#sendBtn {
       width: 42px;
       height: 42px;
       border-radius: 50%;
@@ -96,12 +137,35 @@
       font-size: 1.2rem;
       cursor: pointer;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 400px) {
+      .contact-name {
+        font-size: 1rem;
+        margin-left: 0.3rem;
+      }
+      .profile-pic {
+        width: 30px;
+        height: 30px;
+      }
+      header {
+        gap: 0.4rem;
+        padding: 0.5rem 0.4rem;
+        min-height: 46px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="chat-container">
-    <header>👑💝 Nama Kontak</header>
+    <header>
+      <button class="back-btn" id="backBtn" aria-label="Kembali">←</button>
+      <img src="https://ui-avatars.com/api/?name=NK&background=0b93f6&color=fff" alt="Foto Profil" class="profile-pic" />
+      <span class="contact-name">👑💝 Nama Kontak</span>
+    </header>
 
     <div class="chat-body" id="chatBody">
       <div class="message received">Halo!</div>
@@ -110,7 +174,7 @@
     </div>
 
     <footer>
-      <input type="text" id="chatInput" placeholder="Ketik pesan..." />
+      <input type="text" id="chatInput" placeholder="Ketik pesan..." autocomplete="off" />
       <button id="sendBtn">➤</button>
     </footer>
   </div>
@@ -119,6 +183,7 @@
     const chatBody = document.getElementById('chatBody');
     const input = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
+    const backBtn = document.getElementById('backBtn');
 
     // Scroll ke bawah saat pesan baru
     function scrollToBottom() {
@@ -149,6 +214,11 @@
 
     // Pertama kali buka scroll ke bawah
     scrollToBottom();
+
+    // Fungsi tombol kembali - redirect ke dashboard.html
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
   </script>
 </body>
 </html>
