@@ -1,5 +1,4 @@
 <style>
-  /* Gunakan style animasi dan input yang sama seperti login.html */
   @keyframes fadeSlideUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
@@ -14,7 +13,6 @@
   .fade-delay-2 { animation-delay: 0.6s; }
   .fade-delay-3 { animation-delay: 0.9s; }
   .fade-delay-4 { animation-delay: 1.2s; }
-  .fade-delay-5 { animation-delay: 1.5s; }
 
   input {
     width: 100%;
@@ -106,7 +104,7 @@
     <button type="submit">Daftar</button>
     <div id="error" class="error"></div>
   </form>
-  <div class="fade-in fade-delay-5">
+  <div class="fade-in fade-delay-4">
     <a href="/login" onclick="loadPage('login'); return false;">Sudah punya akun? Login</a>
   </div>
 </div>
@@ -114,7 +112,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  import { getFirestore, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
@@ -138,20 +136,22 @@
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
     const errorDiv = document.getElementById("error");
+    const button = this.querySelector("button");
 
     if (!name || !email || !password) {
       errorDiv.textContent = "Semua field wajib diisi.";
       return;
     }
 
+    button.disabled = true;
+    button.textContent = "⏳ Mendaftarkan...";
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Tambahkan nama ke profil Auth
       await updateProfile(user, { displayName: name });
 
-      // Simpan data ke Firestore
       await setDoc(doc(db, "users", user.uid), {
         displayName: name,
         email: user.email,
@@ -159,11 +159,19 @@
         online: true
       });
 
-      document.getElementById("app").innerHTML = `
-        <div class="success">✅ Akun berhasil dibuat!<br>Selamat datang, ${name}.</div>
+      // Ganti isi form dengan pesan sukses
+      document.querySelector(".register-container").innerHTML = `
+        <div class="success fade-in">✅ Akun berhasil dibuat!<br>Selamat datang, ${name}.</div>
       `;
+
+      setTimeout(() => {
+        loadPage("dashboard");
+      }, 1000);
+
     } catch (error) {
       errorDiv.textContent = error.message.replace("Firebase:", "").trim();
+      button.disabled = false;
+      button.textContent = "Daftar";
     }
   });
 </script>
