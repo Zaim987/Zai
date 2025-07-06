@@ -3,54 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Parallax Bedroom UI</title>
+    <title>Immersive 3D Parallax UI</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="parallax-container">
-        <div class="parallax-layer" data-depth="0.1">
-            <div class="scene-bg"></div>
-        </div>
-
-        <div class="parallax-layer" data-depth="0.3">
-            <div class="light-panel left"></div>
-            <div class="light-panel right"></div>
-        </div>
-
-        <div class="parallax-layer ui-layer" data-depth="0.8">
-            <div class="ui-card card-alarm">
-                <h3>Alarm</h3>
-                <div class="alarm-item">
-                    <span>07:00 AM</span>
-                    <div class="toggle-switch on"></div>
-                </div>
-                <div class="alarm-item">
-                    <span>08:00 AM</span>
-                    <div class="toggle-switch"></div>
-                </div>
-                 <button>ADD</button>
+    <div id="scene-container">
+        <div id="scene">
+            <div class="layer background-layer">
+                <div class="scene-bg"></div>
             </div>
 
-            <div class="ui-card card-ac">
-                <h3>AC Control</h3>
-                <div class="control-item">
-                    <span>AC ON</span>
-                    <div class="toggle-switch on"></div>
+            <div class="layer ui-layer-left">
+                <div class="ui-card card-alarm">
+                    <h3>Alarm</h3>
+                    <div class="alarm-item"><span>07:00 AM</span><div class="toggle-switch on"></div></div>
+                    <div class="alarm-item"><span>08:30 AM</span><div class="toggle-switch"></div></div>
+                    <button>ADD</button>
                 </div>
-                <label>Temperature: 20°C</label>
-                <input type="range" min="16" max="30" value="20">
-                <label>Fan Speed: 80%</label>
-                <input type="range" min="0" max="100" value="80">
             </div>
 
-            <div class="ui-card card-music">
-                <img src="https://i.ibb.co/b3hX3fK/meditation-icon.png" alt="Meditation Icon" class="music-icon">
-                <h4>Meditation Soft Music</h4>
-                <div class="music-controls">
-                    <button>&#9664;&#9664;</button>
-                    <button class="play-btn">&#9658;</button>
-                    <button>&#9654;&#9654;</button>
+            <div class="layer ui-layer-center">
+                 <div class="ui-card card-ac">
+                    <h3>AC Control</h3>
+                    <div class="control-item"><span>AC ON</span><div class="toggle-switch on"></div></div>
+                    <label>Temp: 20°C</label><input type="range" min="16" max="30" value="20">
+                    <label>Fan: 80%</label><input type="range" min="0" max="100" value="80">
+                </div>
+            </div>
+            
+            <div class="layer ui-layer-right">
+                <div class="ui-card card-music">
+                    <img src="https://i.ibb.co/b3hX3fK/meditation-icon.png" alt="Meditation Icon">
+                    <h4>Meditation Music</h4>
+                    <div class="music-controls">
+                        <button>&#9664;&#9664;</button>
+                        <button class="play-btn">&#9658;</button>
+                        <button>&#9654;&#9654;</button>
+                    </div>
                 </div>
             </div>
         </div>
