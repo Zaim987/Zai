@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>3D Carousel with Interactive Panels</title>
+  <title>3D Carousel - Full Gesture & Animasi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0;
       padding: 0;
@@ -60,21 +56,17 @@
       padding: 1rem;
       transform-style: preserve-3d;
       transform: translate(-50%, -50%) rotateY(0deg) translateZ(320px);
-      transition: transform 0.6s ease, opacity 0.6s ease;
       opacity: 0.3;
       scale: 0.9;
       cursor: pointer;
+      transition: transform 0.6s ease, opacity 0.6s ease;
     }
     .panel.active {
       opacity: 1;
       scale: 1.05;
       box-shadow: 0 0 30px #00ffffaa;
     }
-    .panel h2 {
-      margin: 0 0 0.5rem;
-      font-size: 1.2rem;
-      color: #fff;
-    }
+    .panel h2 { margin: 0 0 0.5rem; font-size: 1.2rem; color: #fff; }
     .panel ul {
       list-style: none;
       padding: 0;
@@ -93,152 +85,72 @@
       font-weight: bold;
       cursor: pointer;
     }
-
     @media (max-width: 400px) {
-      .panel {
-        width: 240px;
-        height: 160px;
-        font-size: 0.9rem;
-      }
+      .panel { width: 240px; height: 160px; font-size: 0.9rem; }
     }
   </style>
 </head>
 <body>
-  <div class="scene">
-    <div class="carousel" id="carousel"></div>
-  </div>
+<div class="scene">
+  <div class="carousel" id="carousel"></div>
+</div>
+<script>
+  const carousel = document.getElementById('carousel');
+  const radius = 320;
+  const panelsData = [
+    { title: "\uD83D\uDCC5 Schedule", content: `<ul><li>08:00 AM – Shopping</li><li>09:30 AM – Meeting</li></ul><button onclick=\"alert('Tambah jadwal')\">+ Add Task</button>` },
+    { title: "❄️ AC", content: `<h2>❄️ AC Control</h2><label>Temp: <input type=\"range\" min=\"16\" max=\"30\" value=\"22\"></label>` },
+    { title: "⏰ Alarm", content: `<h2>⏰ Alarm</h2><label><input type=\"checkbox\" checked> 06:00 AM</label><br/><label><input type=\"checkbox\"> 08:00 AM</label>` },
+    { title: "🎵 Music", content: `<h2>🎵 Meditation</h2><audio controls style=\"width: 100%;\"><source src=\"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3\" type=\"audio/mpeg\"></audio>` },
+    { title: "⚙️ Settings", content: `<h2>⚙️ Settings</h2><label><input type=\"checkbox\" checked> Dark Mode</label><br/><label><input type=\"checkbox\"> Notifications</label>` },
+  ];let angle = 0; let isDragging = false; let startX = 0; let currentX = 0; let lastAngle = 0; let activeIndex = 0; let pinchStartDist = null;
 
-  <script>
-    const carousel = document.getElementById('carousel');
-    const radius = 320;
-    const panelsData = [
-      {
-        title: "📅 Schedule",
-        content: `
-          <ul>
-            <li>08:00 AM – Shopping</li>
-            <li>09:30 AM – Meeting</li>
-          </ul>
-          <button onclick="alert('Tambah jadwal')">+ Add Task</button>
-        `
-      },
-      {
-        title: "❄️ AC",
-        content: `
-          <h2>❄️ AC Control</h2>
-          <label>Temp: <input type="range" min="16" max="30" value="22"></label>
-        `
-      },
-      {
-        title: "⏰ Alarm",
-        content: `
-          <h2>⏰ Alarm</h2>
-          <label><input type="checkbox" checked> 06:00 AM</label><br/>
-          <label><input type="checkbox"> 08:00 AM</label>
-        `
-      },
-      {
-        title: "🎵 Music",
-        content: `
-          <h2>🎵 Meditation</h2>
-          <audio controls style="width: 100%;">
-            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-          </audio>
-        `
-      },
-      {
-        title: "⚙️ Settings",
-        content: `
-          <h2>⚙️ Settings</h2>
-          <label><input type="checkbox" checked> Dark Mode</label><br/>
-          <label><input type="checkbox"> Notifications</label>
-        `
-      },
-    ];
+const sensitivity = 0.35;
 
-    let angle = 0;
-    let isDragging = false;
-    let startX = 0;
-    let currentX = 0;
-    const sensitivity = 0.35;
-    let activeIndex = 0;
+function renderPanels() { carousel.innerHTML = ''; const count = panelsData.length;
 
-    function renderPanels() {
-      carousel.innerHTML = '';
-      const count = panelsData.length;
+panelsData.forEach((data, i) => {
+  const deg = i * (360 / count);
+  const panel = document.createElement('div');
+  panel.className = 'panel';
+  panel.style.transform = `translate(-50%, -50%) rotateY(${deg}deg) translateZ(${radius}px)`;
+  panel.dataset.index = i;
+  panel.innerHTML = `<h2>${data.title}</h2>${data.content}`;
+  panel.addEventListener('click', () => rotateToPanel(i));
+  carousel.appendChild(panel);
+});
+updateActivePanel();
 
-      panelsData.forEach((data, i) => {
-        const deg = i * (360 / count);
-        const panel = document.createElement('div');
-        panel.className = 'panel';
-        panel.style.transform = `translate(-50%, -50%) rotateY(${deg}deg) translateZ(${radius}px)`;
-        panel.dataset.index = i;
+}
 
-        panel.innerHTML = `<h2>${data.title}</h2>${data.content}`;
-        panel.addEventListener('click', () => rotateToPanel(i));
-        carousel.appendChild(panel);
-      });
+function rotateToPanel(index) { const step = 360 / panelsData.length; angle = -index * step; carousel.style.transform = translateZ(-${radius}px) rotateY(${angle}deg); activeIndex = index; updateActivePanel(); }
 
-      updateActivePanel();
-    }
+function updateActivePanel() { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); const panels = document.querySelectorAll('.panel'); if (panels[activeIndex]) panels[activeIndex].classList.add('active'); }
 
-    function updateRotation() {
-      const delta = currentX - startX;
-      const rotateBy = delta * sensitivity;
-      carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle + rotateBy}deg)`;
-    }
+function normalizeAngle(a) { return a % 360; }
 
-    function onStart(e) {
-      isDragging = true;
-      startX = e.touches ? e.touches[0].clientX : e.clientX;
-      currentX = startX;
-    }
+function onStart(e) { isDragging = true; startX = e.touches ? e.touches[0].clientX : e.clientX; currentX = startX; }
 
-    function onMove(e) {
-      if (!isDragging) return;
-      currentX = e.touches ? e.touches[0].clientX : e.clientX;
-      updateRotation();
-    }
+function onMove(e) { if (!isDragging) return; currentX = e.touches ? e.touches[0].clientX : e.clientX; const delta = currentX - startX; const rotateBy = delta * sensitivity; carousel.style.transform = translateZ(-${radius}px) rotateY(${angle + rotateBy}deg); }
 
-    function onEnd() {
-      if (!isDragging) return;
-      const delta = currentX - startX;
-      angle += delta * sensitivity;
-      angle = normalizeAngle(angle);
-      isDragging = false;
-      carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle}deg)`;
-      updateActivePanel();
-    }
+function onEnd() { if (!isDragging) return; const delta = currentX - startX; angle += delta * sensitivity; angle = normalizeAngle(angle); isDragging = false; carousel.style.transform = translateZ(-${radius}px) rotateY(${angle}deg);
 
-    function rotateToPanel(index) {
-      const step = 360 / panelsData.length;
-      angle = -index * step;
-      carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle}deg)`;
-      activeIndex = index;
-      updateActivePanel();
-    }
+// Update activeIndex
+const step = 360 / panelsData.length;
+let index = Math.round(-angle / step);
+if (index < 0) index += panelsData.length;
+activeIndex = index % panelsData.length;
+updateActivePanel();
 
-    function updateActivePanel() {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      const panels = document.querySelectorAll('.panel');
-      if (panels[activeIndex]) panels[activeIndex].classList.add('active');
-    }
+}
 
-    function normalizeAngle(a) {
-      return a % 360;
-    }
+function getPinchDistance(e) { const dx = e.touches[0].clientX - e.touches[1].clientX; const dy = e.touches[0].clientY - e.touches[1].clientY; return Math.sqrt(dx * dx + dy * dy); }
 
-    // Event listeners
-    carousel.addEventListener('touchstart', onStart);
-    carousel.addEventListener('touchmove', onMove);
-    carousel.addEventListener('touchend', onEnd);
-    carousel.addEventListener('mousedown', onStart);
-    carousel.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onEnd);
+function onTouchMove(e) { if (e.touches.length === 2) { const dist = getPinchDistance(e); if (pinchStartDist === null) pinchStartDist = dist; const diff = dist - pinchStartDist; if (Math.abs(diff) > 40) { if (diff > 0) { alert('Zoom In (future use: masuk panel)'); } else { alert('Zoom Out (future use: keluar panel)'); } pinchStartDist = null; } } }
 
-    // Initialize
-    renderPanels();
-    rotateToPanel(0);
-  </script>
+carousel.addEventListener('touchstart', onStart); carousel.addEventListener('touchmove', onMove); carousel.addEventListener('touchend', onEnd); carousel.addEventListener('touchmove', onTouchMove); carousel.addEventListener('mousedown', onStart); carousel.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd);
+
+renderPanels(); rotateToPanel(0); </script>
+
 </body>
 </html>
