@@ -1,13 +1,17 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Circular Panels - Enhanced</title>
+  <title>3D Circular Panels</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      width: 100%; height: 100%; overflow: hidden;
-      background: #000; touch-action: pan-y;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      touch-action: pan-y;
     }
     canvas { display: block; }
   </style>
@@ -17,154 +21,146 @@
   <script>
     let scene, camera, renderer, panelGroup;
     let isDragging = false, lastX = 0, velocity = 0;
-    const radius = 5;
-    const panelWidth = 1.5;
-    const panelHeight = 2.2;
-    const panelCount = Math.floor((2 * Math.PI * radius) / panelWidth);
-    const panels = [];init();
-animate();
+    const panelCount = 8;
+    const radius = 6;
+    const panels = [];
 
-function init() {
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 0);
+    init();
+    animate();
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  document.body.appendChild(renderer.domElement);
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 0, 5);
 
-  panelGroup = new THREE.Group();
-  scene.add(panelGroup);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      document.body.appendChild(renderer.domElement);
 
-  const loader = new THREE.TextureLoader();
+      panelGroup = new THREE.Group();
+      scene.add(panelGroup);
 
-  for (let i = 0; i < panelCount; i++) {
-    const geometry = new THREE.PlaneGeometry(panelWidth, panelHeight);
-    const material = new THREE.MeshBasicMaterial({
-      map: loader.load(`https://picsum.photos/300/450?random=${i + 1}`),
-      transparent: true,
-      opacity: 0.6,
-      side: THREE.FrontSide,
-      depthTest: true
-    });
-    const panel = new THREE.Mesh(geometry, material);
-    panel.userData.index = i;
+      const loader = new THREE.TextureLoader();
 
-    const angle = (i / panelCount) * Math.PI * 2;
-    panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
-    panel.lookAt(0, 0, 0);
+      for (let i = 0; i < panelCount; i++) {
+        const angle = (i / panelCount) * Math.PI * 2;
+        const geometry = new THREE.PlaneGeometry(1.8, 2.8);
+        const material = new THREE.MeshBasicMaterial({
+          map: loader.load(`https://picsum.photos/300/450?random=${i+1}`),
+          transparent: true,
+          opacity: 0.4,
+          side: THREE.DoubleSide
+        });
 
-    panelGroup.add(panel);
-    panels.push(panel);
-  }
+        const panel = new THREE.Mesh(geometry, material);
+        panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
+        panel.lookAt(0, 0, 0);
+        panel.rotateY(Math.PI); // agar tampak depan
+        panel.userData.angle = angle;
 
-  renderer.domElement.addEventListener('touchstart', onTouchStart);
-  renderer.domElement.addEventListener('touchmove', onTouchMove);
-  renderer.domElement.addEventListener('touchend', onTouchEnd);
+        panelGroup.add(panel);
+        panels.push(panel);
+      }
 
-  renderer.domElement.addEventListener('mousedown', onTouchStart);
-  renderer.domElement.addEventListener('mousemove', onTouchMove);
-  renderer.domElement.addEventListener('mouseup', onTouchEnd);
-  renderer.domElement.addEventListener('click', onClick);
+      renderer.domElement.addEventListener('touchstart', onTouchStart);
+      renderer.domElement.addEventListener('touchmove', onTouchMove);
+      renderer.domElement.addEventListener('touchend', onTouchEnd);
+      renderer.domElement.addEventListener('mousedown', onTouchStart);
+      renderer.domElement.addEventListener('mousemove', onTouchMove);
+      renderer.domElement.addEventListener('mouseup', onTouchEnd);
 
-  window.addEventListener('resize', onWindowResize);
-}
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function onTouchStart(e) {
-  isDragging = true;
-  lastX = getX(e);
-  velocity = 0;
-}
-
-function onTouchMove(e) {
-  if (!isDragging) return;
-  const x = getX(e);
-  const dx = x - lastX;
-  panelGroup.rotation.y += dx * 0.005;
-  velocity = dx * 0.005;
-  lastX = x;
-}
-
-function onTouchEnd() {
-  isDragging = false;
-  snapToNearestPanel();
-}
-
-function getX(e) {
-  return e.touches ? e.touches[0].clientX : e.clientX;
-}
-
-function getActivePanelIndex() {
-  const angle = panelGroup.rotation.y % (Math.PI * 2);
-  const step = (Math.PI * 2) / panelCount;
-  const index = Math.round(-angle / step) % panelCount;
-  return (index + panelCount) % panelCount;
-}
-
-function snapToNearestPanel() {
-  const step = (Math.PI * 2) / panelCount;
-  const targetAngle = -getActivePanelIndex() * step;
-  const snapTween = { y: panelGroup.rotation.y };
-  const animateSnap = () => {
-    const diff = targetAngle - snapTween.y;
-    if (Math.abs(diff) > 0.001) {
-      snapTween.y += diff * 0.15;
-      panelGroup.rotation.y = snapTween.y;
-      requestAnimationFrame(animateSnap);
-    } else {
-      panelGroup.rotation.y = targetAngle;
+      renderer.domElement.addEventListener('click', onClickPanel);
+      window.addEventListener('resize', onWindowResize);
     }
-  };
-  animateSnap();
-}
 
-function updatePanelAppearance() {
-  const activeIndex = getActivePanelIndex();
-  panels.forEach((panel, i) => {
-    const dist = Math.abs(i - activeIndex);
-    const scale = i === activeIndex ? 1.3 : 1.0;
-    const opacity = i === activeIndex ? 1.0 : 0.4;
-    panel.scale.set(scale, scale, 1);
-    panel.material.opacity = opacity;
-  });
-}
-
-function onClick(event) {
-  const mouse = new THREE.Vector2();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-  const raycaster = new THREE.Raycaster();
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(panels);
-
-  if (intersects.length > 0) {
-    const index = intersects[0].object.userData.index;
-    if (index === getActivePanelIndex()) {
-      alert(`Kamu memilih panel #${index + 1}`);
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     }
-  }
-}
 
-function animate() {
-  requestAnimationFrame(animate);
+    function getX(e) {
+      return e.touches ? e.touches[0].clientX : e.clientX;
+    }
 
-  if (!isDragging) {
-    panelGroup.rotation.y += velocity;
-    velocity *= 0.95;
-  }
+    function onTouchStart(e) {
+      isDragging = true;
+      lastX = getX(e);
+      velocity = 0;
+    }
 
-  updatePanelAppearance();
-  renderer.render(scene, camera);
-}
+    function onTouchMove(e) {
+      if (!isDragging) return;
+      const x = getX(e);
+      const dx = x - lastX;
+      panelGroup.rotation.y += dx * 0.005;
+      velocity = dx * 0.005;
+      lastX = x;
+    }
 
+    function onTouchEnd() {
+      isDragging = false;
+    }
+
+    function onClickPanel(event) {
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        -(event.clientY / window.innerHeight) * 2 + 1
+      );
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(panels);
+      if (intersects.length > 0) {
+        const clicked = intersects[0].object;
+        if (clicked.material.opacity >= 0.95) {
+          alert(`Kamu memilih panel #${panels.indexOf(clicked) + 1}`);
+        }
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (!isDragging) {
+        panelGroup.rotation.y += velocity;
+        velocity *= 0.95;
+
+        if (Math.abs(velocity) < 0.001) {
+          // Auto-snap to nearest panel
+          const step = (Math.PI * 2) / panelCount;
+          const currentAngle = ((panelGroup.rotation.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+          const snapped = Math.round(currentAngle / step) * step;
+          panelGroup.rotation.y += (snapped - currentAngle) * 0.1;
+        }
+      }
+
+      highlightActivePanel();
+      renderer.render(scene, camera);
+    }
+
+    function highlightActivePanel() {
+      let minDiff = Infinity;
+      let activeIndex = -1;
+
+      panels.forEach((panel, i) => {
+        const worldPos = new THREE.Vector3();
+        panel.getWorldPosition(worldPos);
+        const dir = worldPos.clone().sub(camera.position).normalize();
+        const angle = dir.angleTo(camera.getWorldDirection(new THREE.Vector3()));
+        if (angle < minDiff) {
+          minDiff = angle;
+          activeIndex = i;
+        }
+      });
+
+      panels.forEach((panel, i) => {
+        const targetOpacity = i === activeIndex ? 1.0 : 0.4;
+        const targetScale = i === activeIndex ? 1.3 : 1;
+        panel.material.opacity += (targetOpacity - panel.material.opacity) * 0.1;
+        panel.scale.lerp(new THREE.Vector3(targetScale, targetScale, 1), 0.1);
+      });
+    }
   </script>
 </body>
 </html>
