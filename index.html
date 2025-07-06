@@ -1,209 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>3D Carousel - 360° Interior Mode</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
-      background: radial-gradient(circle at center, #0a0f2c, #000);
-    }
-
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .scene {
-      width: 100vw;
-      height: 100vh;
-      perspective: 1600px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: none;
-    }
-
-    .carousel {
-      width: 100%;
-      height: 320px;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.5s ease;
-    }
-
-    .panel {
-      position: absolute;
-      width: 280px;
-      height: 180px;
-      transform-style: preserve-3d;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      color: #fff;
-      border-radius: 1rem;
-      backdrop-filter: blur(14px);
-      background: rgba(255,255,255,0.05);
-      box-shadow: 0 0 20px #00f2ff44;
-      border: 1px solid rgba(255,255,255,0.1);
-      text-align: center;
-      opacity: 0.3;
-      scale: 0.9;
-      transition: transform 0.5s, opacity 0.4s, scale 0.3s;
-      cursor: pointer;
-    }
-
-    .panel.active {
-      opacity: 1;
-      scale: 1.05;
-      box-shadow: 0 0 32px #00ffffaa;
-    }
-
-    .panel h2 {
-      margin: 0 0 0.5rem;
-      font-size: 1.2rem;
-    }
-
-    .panel ul {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 0.5rem;
-      color: #ccc;
-      font-size: 0.9rem;
-      max-height: 60px;
-      overflow-y: auto;
-    }
-
-    .panel button {
-      padding: 6px 14px;
-      border: none;
-      border-radius: 8px;
-      background: #00f2ff;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Parallax Bedroom UI</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="scene" id="scene">
-    <div class="carousel" id="carousel"></div>
-  </div>
 
-  <script>
-    const carousel = document.getElementById('carousel');
-    const radius = 320;
-    const panelsData = [
-      { title: "📅 Schedule", content: `<ul><li>08:00 – Belanja</li><li>09:30 – Meeting</li></ul><button onclick="alert('Tambah jadwal')">+ Add Task</button>` },
-      { title: "❄️ AC", content: `<h2>❄️ Control</h2><label>Temp: <input type="range" min="16" max="30" value="22"></label>` },
-      { title: "⏰ Alarm", content: `<h2>⏰ Alarm</h2><label><input type="checkbox" checked> 06:00</label><br/><label><input type="checkbox"> 08:00</label>` },
-      { title: "🎵 Music", content: `<h2>🎵 Music</h2><audio controls style="width:100%"><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>` },
-      { title: "⚙️ Settings", content: `<h2>⚙️ Settings</h2><label><input type="checkbox" checked> Dark Mode</label><br/><label><input type="checkbox"> Notifications</label>` },
-    ];
+    <div id="parallax-container">
+        <div class="parallax-layer" data-depth="0.1">
+            <div class="scene-bg"></div>
+        </div>
 
-    let angle = 0;
-    const sensitivity = 0.35;
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
-    let activeIndex = 0;
+        <div class="parallax-layer" data-depth="0.3">
+            <div class="light-panel left"></div>
+            <div class="light-panel right"></div>
+        </div>
 
-    function renderPanels() {
-      carousel.innerHTML = '';
-      const count = panelsData.length;
+        <div class="parallax-layer ui-layer" data-depth="0.8">
+            <div class="ui-card card-alarm">
+                <h3>Alarm</h3>
+                <div class="alarm-item">
+                    <span>07:00 AM</span>
+                    <div class="toggle-switch on"></div>
+                </div>
+                <div class="alarm-item">
+                    <span>08:00 AM</span>
+                    <div class="toggle-switch"></div>
+                </div>
+                 <button>ADD</button>
+            </div>
 
-      panelsData.forEach((data, i) => {
-        const deg = i * (360 / count);
-        const panel = document.createElement('div');
-        panel.className = 'panel';
+            <div class="ui-card card-ac">
+                <h3>AC Control</h3>
+                <div class="control-item">
+                    <span>AC ON</span>
+                    <div class="toggle-switch on"></div>
+                </div>
+                <label>Temperature: 20°C</label>
+                <input type="range" min="16" max="30" value="20">
+                <label>Fan Speed: 80%</label>
+                <input type="range" min="0" max="100" value="80">
+            </div>
 
-        // ⬇️ Rotasi menghadap ke dalam
-        panel.style.transform = `
-          translate(-50%, -50%) 
-          rotateY(${deg}deg) 
-          rotateY(180deg)
-          translateZ(-${radius}px)
-        `;
+            <div class="ui-card card-music">
+                <img src="https://i.ibb.co/b3hX3fK/meditation-icon.png" alt="Meditation Icon" class="music-icon">
+                <h4>Meditation Soft Music</h4>
+                <div class="music-controls">
+                    <button>&#9664;&#9664;</button>
+                    <button class="play-btn">&#9658;</button>
+                    <button>&#9654;&#9654;</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        panel.innerHTML = `<h2>${data.title}</h2>${data.content}`;
-        panel.dataset.index = i;
-        panel.addEventListener('click', () => rotateToPanel(i));
-        carousel.appendChild(panel);
-      });
-
-      updateActivePanel();
-    }
-
-    function rotateToPanel(index) {
-      const step = 360 / panelsData.length;
-      angle = -index * step;
-      carousel.style.transform = `rotateY(${angle}deg)`;
-      activeIndex = index;
-      updateActivePanel();
-    }
-
-    function updateActivePanel() {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      const panels = document.querySelectorAll('.panel');
-      if (panels[activeIndex]) panels[activeIndex].classList.add('active');
-    }
-
-    function updateRotation() {
-      const delta = currentX - startX;
-      const rotateBy = delta * sensitivity;
-      carousel.style.transform = `rotateY(${angle + rotateBy}deg)`;
-    }
-
-    function onStart(e) {
-      isDragging = true;
-      startX = e.touches ? e.touches[0].clientX : e.clientX;
-      currentX = startX;
-    }
-
-    function onMove(e) {
-      if (!isDragging) return;
-      currentX = e.touches ? e.touches[0].clientX : e.clientX;
-      updateRotation();
-    }
-
-    function onEnd() {
-      if (!isDragging) return;
-      const delta = currentX - startX;
-      angle += delta * sensitivity;
-      angle = angle % 360;
-      isDragging = false;
-      carousel.style.transform = `rotateY(${angle}deg)`;
-      updateActivePanel();
-    }
-
-    // Event listeners
-    const scene = document.getElementById('scene');
-    scene.addEventListener('touchstart', onStart);
-    scene.addEventListener('touchmove', onMove);
-    scene.addEventListener('touchend', onEnd);
-    scene.addEventListener('mousedown', onStart);
-    scene.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onEnd);
-
-    renderPanels();
-    rotateToPanel(0);
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
