@@ -3,26 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SPA Hybrid</title>
+  <title>QuantumX</title>
   <style>
-    body {
+    * {
       margin: 0;
-      background: #0d1117;
-      color: #c9d1d9;
-      font-family: sans-serif;
-      overflow-x: hidden;
+      padding: 0;
+      box-sizing: border-box;
     }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: white;
+      overflow: hidden;
+    }
+
+    /* SPLASH SCREEN */
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(160deg, #000000, #0a0f1e);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 10;
+      transition: opacity 1s ease;
+    }
+    #splash h1 {
+      font-size: 3rem;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+    #splash h2 {
+      font-size: 2rem;
+      margin: 1rem 0;
+      color: #00ffff;
+      text-shadow: 0 0 8px #00ffff;
+    }
+    #splash p {
+      font-size: 1rem;
+      color: #ccc;
+      margin-bottom: 2rem;
+    }
+    #splash button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 999px;
+      background: #00ffff;
+      color: black;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffff;
+    }
+
+    /* NAVIGASI */
     nav {
+      display: none;
       background: #161b22;
       padding: 1rem;
-      display: flex;
       gap: 1rem;
+      display: flex;
+      justify-content: center;
     }
     nav a {
       color: #58a6ff;
       text-decoration: none;
+      font-weight: bold;
       cursor: pointer;
     }
+
+    /* KONTEN APP */
     #app {
       padding: 2rem;
       opacity: 0;
@@ -31,11 +85,23 @@
   </style>
 </head>
 <body>
-  <nav>
+
+  <!-- Splash Screen -->
+  <div id="splash">
+    <h1>QuantumX</h1>
+    <h2>Masuki Dunia Digitalmu</h2>
+    <p>Ini bukan masa depan — ini sekarang.</p>
+    <button onclick="startApp()">Mulai Sekarang</button>
+  </div>
+
+  <!-- Navigasi -->
+  <nav id="mainNav">
     <a onclick="loadPage('login')">Login</a>
     <a onclick="loadPage('dashboard')">Dashboard</a>
     <a onclick="loadPage('chat')">Chat</a>
   </nav>
+
+  <!-- Konten Dinamis -->
   <div id="app"></div>
 
   <script>
@@ -43,7 +109,7 @@
       const res = await fetch(`partials/${page}.html`);
       const html = await res.text();
       document.getElementById("app").innerHTML = html;
-      window.history.pushState({}, "", `#${page}`);
+      window.history.pushState({}, "", `/${page}`);
       animatePage();
     }
 
@@ -55,13 +121,27 @@
       });
     }
 
+    function startApp() {
+      // Hilangkan splash screen
+      document.getElementById("splash").style.opacity = 0;
+      setTimeout(() => {
+        document.getElementById("splash").style.display = "none";
+        document.getElementById("mainNav").style.display = "flex";
+        loadPage("login");
+      }, 1000);
+    }
+
+    // Opsional: load ulang jika refresh langsung ke /chat misalnya
     window.addEventListener("DOMContentLoaded", () => {
-      const page = location.hash?.substring(1) || "login";
-      loadPage(page);
+      const current = location.pathname.split("/").pop();
+      if (current && current !== "") {
+        startApp(); // jalankan splash, lalu load halaman
+        setTimeout(() => loadPage(current), 1200);
+      }
     });
 
     window.addEventListener("popstate", () => {
-      const page = location.hash?.substring(1) || "login";
+      const page = location.pathname.split("/").pop() || "login";
       loadPage(page);
     });
   </script>
