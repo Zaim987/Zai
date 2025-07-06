@@ -9,14 +9,15 @@
     #overlayUI {
       position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
       pointer-events: none;
+      z-index: 10;
     }
     .panel {
       position: absolute;
-      width: 230px; height: 320px;
-      background: rgba(20,40,80,0.38);
-      border-radius: 24px;
+      width: 240px; height: 330px;
+      background: rgba(35,60,120,0.38);
+      border-radius: 28px;
       box-shadow: 0 4px 32px 0 rgba(0,0,0,0.18);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
       color: #fff;
       font-family: 'Segoe UI', Arial, sans-serif;
       padding: 24px 18px 16px 18px;
@@ -24,19 +25,23 @@
       display: flex;
       flex-direction: column;
       gap: 18px;
-      border: 1.5px solid rgba(255,255,255,0.12);
-      transition: box-shadow 0.3s;
+      border: 1.5px solid rgba(255,255,255,0.14);
+      transition: box-shadow 0.3s, background 0.3s;
     }
     .panel:hover {
       box-shadow: 0 8px 48px 0 rgba(0,0,0,0.28);
+      background: rgba(45,90,180,0.46);
     }
     .title { font-size: 1.18em; font-weight: 600; margin-bottom: 12px;}
-    .subtitle { font-size: 0.9em; color: #c3e0ff; margin-bottom: 4px;}
-    .slider-label { font-size: 0.85em; margin-bottom: 4px;}
+    .subtitle { font-size: 0.92em; color: #c3e0ff; margin-bottom: 4px;}
+    .slider-label { font-size: 0.87em; margin-bottom: 4px;}
     .slider { width: 100%; }
     .row { display: flex; justify-content: space-between; align-items: center; }
     .button { padding: 7px 18px; border-radius: 13px; background: #2196f3; color: #fff; border: none; cursor: pointer;}
     .avatar { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; margin-bottom: 12px;}
+    @media (max-width: 600px) {
+      .panel { width: 90vw; left: 5vw !important; }
+    }
   </style>
 </head>
 <body>
@@ -67,9 +72,9 @@
     roomMesh.position.y = 1.2;
     scene.add(roomMesh);
 
-    // Remove front wall
+    // Remove front wall (not rendered)
     roomMesh.geometry.groups.forEach((g,i)=>{
-      if(i===4) roomMesh.geometry.addGroup(g.start,g.count,0); // front wall not rendered
+      if(i===4) roomMesh.geometry.addGroup(g.start,g.count,0);
     });
 
     // Simple bed (cube)
@@ -80,7 +85,7 @@
     bed.position.set(0,0.31,-1.8);
     scene.add(bed);
 
-    // Simple pillow
+    // Simple pillows
     const pillow = new THREE.Mesh(
       new THREE.BoxGeometry(0.8,0.12,0.35),
       new THREE.MeshStandardMaterial({color:0x6db1ff, roughness:0.45, metalness:0.10})
@@ -89,7 +94,7 @@
     scene.add(pillow);
     const pillow2 = pillow.clone(); pillow2.position.x = 0.45; scene.add(pillow2);
 
-    // Side plants (cone + box)
+    // Side plant (cone + box)
     const plantStem = new THREE.Mesh(
       new THREE.CylinderGeometry(0.06,0.09,0.46,12),
       new THREE.MeshStandardMaterial({color:0x328066})
@@ -155,9 +160,9 @@
       const circleR = Math.min(centerX,centerY)-120;
 
       for(let i=0;i<n;i++) {
-        const angle = basePanelAngle + Math.PI/2 + (i-(n-1)/2)*(Math.PI/9); // spread horizontally
+        const angle = basePanelAngle + Math.PI/2 + (i-(n-1)/2)*(Math.PI/9);
         panelAngles[i] = angle;
-        const x = centerX + Math.cos(angle)*circleR - 115;
+        const x = centerX + Math.cos(angle)*circleR - 120;
         const y = centerY + Math.sin(angle)*circleR*0.22 - 160;
         const panel = document.createElement('div');
         panel.className = 'panel';
@@ -169,18 +174,53 @@
     }
     renderPanels();
 
-    // ---- Touch/Drag Interaction ----
-    let dragging = false, lastX = 0;
-    window.addEventListener('pointerdown',e=>{
-      dragging = true; lastX = e.clientX;
+    // ---- Touch/Drag Interaction (Mobile/Desktop, Smooth) ----
+    let dragging = false, lastX = 0, touchIdentifier = null;
+
+    // Touch events for mobile
+    function onTouchStart(e) {
+      if (e.touches.length !== 1) return;
+      dragging = true;
+      touchIdentifier = e.touches[0].identifier;
+      lastX = e.touches[0].clientX;
+      e.preventDefault();
+    }
+    function onTouchMove(e) {
+      if (!dragging) return;
+      let touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
+      if (!touch) return;
+      let dx = touch.clientX - lastX;
+      lastX = touch.clientX;
+      basePanelAngle += dx * 0.0085; // Adjust speed if needed
+      renderPanels();
+      e.preventDefault();
+    }
+    function onTouchEnd(e) {
+      dragging = false;
+      touchIdentifier = null;
+    }
+
+    overlayUI.addEventListener('touchstart', onTouchStart, {passive: false});
+    overlayUI.addEventListener('touchmove', onTouchMove, {passive: false});
+    overlayUI.addEventListener('touchend', onTouchEnd, {passive: false});
+
+    // Mouse events for desktop
+    let mouseDown = false;
+    overlayUI.addEventListener('mousedown', e => {
+      mouseDown = true;
+      lastX = e.clientX;
     });
-    window.addEventListener('pointermove',e=>{
-      if(!dragging) return;
-      let dx = e.clientX - lastX; lastX = e.clientX;
-      basePanelAngle += dx * 0.0063;
+    overlayUI.addEventListener('mousemove', e => {
+      if (!mouseDown) return;
+      let dx = e.clientX - lastX;
+      lastX = e.clientX;
+      basePanelAngle += dx * 0.0085;
       renderPanels();
     });
-    window.addEventListener('pointerup',()=>{ dragging = false; });
+    window.addEventListener('mouseup', () => {
+      mouseDown = false;
+    });
+
     window.addEventListener('resize',renderPanels);
 
     // ---- Animate (room subtle movement) ----
