@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -23,95 +22,98 @@
     let isDragging = false, lastX = 0, velocity = 0;
     const panelCount = 6;
     const radius = 4;
-    const panels = [];
+    const panels = [];init();
+animate();
 
-    init();
-    animate();
+function init() {
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 5);
 
-    function init() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.set(0, 0, 5);
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  document.body.appendChild(renderer.domElement);
 
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      document.body.appendChild(renderer.domElement);
+  panelGroup = new THREE.Group();
+  scene.add(panelGroup);
 
-      panelGroup = new THREE.Group();
-      scene.add(panelGroup);
+  const panelTexture = new THREE.TextureLoader();
 
-      const panelTexture = new THREE.TextureLoader();
+  for (let i = 0; i < panelCount; i++) {
+    const geometry = new THREE.PlaneGeometry(2.2, 3.2);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      map: panelTexture.load(`https://picsum.photos/300/450?random=${i+1}`),
+      side: THREE.FrontSide,
+      depthTest: true
+    });
+    const panel = new THREE.Mesh(geometry, material);
 
-      for (let i = 0; i < panelCount; i++) {
-        const geometry = new THREE.PlaneGeometry(2.2, 3.2);
-        const material = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          map: panelTexture.load(`https://picsum.photos/300/450?random=${i+1}`),
-          side: THREE.DoubleSide
-        });
-        const panel = new THREE.Mesh(geometry, material);
+    const angle = (i / panelCount) * Math.PI * 2;
+    panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
+    panel.lookAt(camera.position);
 
-        const angle = (i / panelCount) * Math.PI * 2;
-        panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
-        panel.lookAt(0, 0, 0);
+    panelGroup.add(panel);
+    panels.push(panel);
+  }
 
-        panelGroup.add(panel);
-        panels.push(panel);
-      }
+  // Event listeners
+  renderer.domElement.addEventListener('touchstart', onTouchStart);
+  renderer.domElement.addEventListener('touchmove', onTouchMove);
+  renderer.domElement.addEventListener('touchend', onTouchEnd);
 
-      // Event listeners
-      renderer.domElement.addEventListener('touchstart', onTouchStart);
-      renderer.domElement.addEventListener('touchmove', onTouchMove);
-      renderer.domElement.addEventListener('touchend', onTouchEnd);
+  renderer.domElement.addEventListener('mousedown', e => onTouchStart(e));
+  renderer.domElement.addEventListener('mousemove', e => onTouchMove(e));
+  renderer.domElement.addEventListener('mouseup', e => onTouchEnd(e));
 
-      renderer.domElement.addEventListener('mousedown', e => onTouchStart(e));
-      renderer.domElement.addEventListener('mousemove', e => onTouchMove(e));
-      renderer.domElement.addEventListener('mouseup', e => onTouchEnd(e));
+  window.addEventListener('resize', onWindowResize);
+}
 
-      window.addEventListener('resize', onWindowResize);
-    }
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+function onTouchStart(e) {
+  isDragging = true;
+  lastX = getX(e);
+  velocity = 0;
+}
 
-    function onTouchStart(e) {
-      isDragging = true;
-      lastX = getX(e);
-      velocity = 0;
-    }
+function onTouchMove(e) {
+  if (!isDragging) return;
+  const x = getX(e);
+  const dx = x - lastX;
+  panelGroup.rotation.y += dx * 0.005;
+  velocity = dx * 0.005;
+  lastX = x;
+}
 
-    function onTouchMove(e) {
-      if (!isDragging) return;
-      const x = getX(e);
-      const dx = x - lastX;
-      panelGroup.rotation.y += dx * 0.005;
-      velocity = dx * 0.005;
-      lastX = x;
-    }
+function onTouchEnd(e) {
+  isDragging = false;
+}
 
-    function onTouchEnd(e) {
-      isDragging = false;
-    }
+function getX(e) {
+  return e.touches ? e.touches[0].clientX : e.clientX;
+}
 
-    function getX(e) {
-      return e.touches ? e.touches[0].clientX : e.clientX;
-    }
+function animate() {
+  requestAnimationFrame(animate);
 
-    function animate() {
-      requestAnimationFrame(animate);
+  if (!isDragging) {
+    panelGroup.rotation.y += velocity;
+    velocity *= 0.95;
+  }
 
-      // Inertia effect
-      if (!isDragging) {
-        panelGroup.rotation.y += velocity;
-        velocity *= 0.95; // damping
-      }
+  panels.forEach(panel => {
+    panel.lookAt(camera.position);
+  });
 
-      renderer.render(scene, camera);
-    }
+  renderer.render(scene, camera);
+}
+
   </script>
 </body>
 </html>
