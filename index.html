@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,10 +14,10 @@
       font-family: 'Segoe UI', sans-serif;
       background: #0d1117;
       color: white;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
-    /* SPLASH SCREEN */
+    /* Splash Screen */
     #splash {
       position: fixed;
       top: 0;
@@ -60,7 +60,7 @@
       box-shadow: 0 0 10px #00ffff;
     }
 
-    /* NAVIGASI */
+    /* Navigasi */
     nav {
       display: none;
       background: #161b22;
@@ -76,7 +76,7 @@
       cursor: pointer;
     }
 
-    /* KONTEN APP */
+    /* App Content */
     #app {
       padding: 2rem;
       opacity: 0;
@@ -86,7 +86,7 @@
 </head>
 <body>
 
-  <!-- Splash Screen -->
+  <!-- Splash screen -->
   <div id="splash">
     <h1>QuantumX</h1>
     <h2>Masuki Dunia Digitalmu</h2>
@@ -94,55 +94,73 @@
     <button onclick="startApp()">Mulai Sekarang</button>
   </div>
 
-  <!-- Navigasi -->
+  <!-- Navigation -->
   <nav id="mainNav">
     <a onclick="loadPage('login')">Login</a>
     <a onclick="loadPage('dashboard')">Dashboard</a>
     <a onclick="loadPage('chat')">Chat</a>
   </nav>
 
-  <!-- Konten Dinamis -->
+  <!-- Main content -->
   <div id="app"></div>
 
+  <!-- Script SPA logic -->
   <script>
     async function loadPage(page) {
       const res = await fetch(`partials/${page}.html`);
       const html = await res.text();
       document.getElementById("app").innerHTML = html;
-      window.history.pushState({}, "", `/${page}`);
-      animatePage();
+      document.getElementById("app").style.opacity = 1;
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("mainNav").style.display = "flex";
+      window.history.pushState({ page }, "", `/${page}`);
     }
 
-    function animatePage() {
-      const app = document.getElementById("app");
-      app.style.opacity = 0;
-      requestAnimationFrame(() => {
-        app.style.opacity = 1;
-      });
+    function showSplash() {
+      document.getElementById("splash").style.display = "flex";
+      document.getElementById("splash").style.opacity = 1;
+      document.getElementById("app").style.opacity = 0;
+      document.getElementById("mainNav").style.display = "none";
     }
 
     function startApp() {
-      // Hilangkan splash screen
       document.getElementById("splash").style.opacity = 0;
       setTimeout(() => {
         document.getElementById("splash").style.display = "none";
         document.getElementById("mainNav").style.display = "flex";
         loadPage("login");
       }, 1000);
+
+      // Tambahkan splash ke history agar bisa dikembalikan dengan tombol back
+      window.history.pushState({ page: "splash" }, "", "/");
     }
 
-    // Opsional: load ulang jika refresh langsung ke /chat misalnya
-    window.addEventListener("DOMContentLoaded", () => {
-      const current = location.pathname.split("/").pop();
-      if (current && current !== "") {
-        startApp(); // jalankan splash, lalu load halaman
-        setTimeout(() => loadPage(current), 1200);
+    window.addEventListener("popstate", (event) => {
+      const state = event.state;
+
+      if (!state || state.page === "splash") {
+        showSplash();
+      } else if (state.page) {
+        loadPage(state.page);
+      } else {
+        loadPage("login");
       }
     });
 
-    window.addEventListener("popstate", () => {
-      const page = location.pathname.split("/").pop() || "login";
-      loadPage(page);
+    // Auto-load jika langsung ke /chat atau /dashboard
+    window.addEventListener("DOMContentLoaded", () => {
+      const current = location.pathname.replace("/", "") || "";
+      if (current && current !== "") {
+        showSplash();
+        setTimeout(() => {
+          document.getElementById("splash").style.opacity = 0;
+          setTimeout(() => {
+            document.getElementById("splash").style.display = "none";
+            document.getElementById("mainNav").style.display = "flex";
+            loadPage(current);
+          }, 1000);
+        }, 500);
+      }
     });
   </script>
 </body>
