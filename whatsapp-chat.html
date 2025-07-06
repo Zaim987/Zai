@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Chat</title>
+  <style>
+    /* Reset dan base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      background: #111b21;
+      font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+      color: #e9edef;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
+      background: #111b21;
+    }
+
+    /* Header WhatsApp */
+    header {
+      background: #202c33;
+      padding: 0.6rem 1rem 0.6rem 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      min-height: 60px;
+      border-left: 1px solid #222d34;
+      border-bottom: 1px solid #222d34;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      color: #aebac1;
+      font-size: 2.1rem;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 0.2rem 0.5rem 0.2rem 0.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .back-btn:active, .back-btn:focus {
+      background: #232d34;
+      outline: none;
+    }
+    .profile-pic {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: none;
+      background: #222d34;
+      display: inline-block;
+    }
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+    .contact-name {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #e9edef;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .contact-status {
+      font-size: 0.93rem;
+      color: #8696a0;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      margin-left: auto;
+    }
+    .header-icon-btn {
+      background: none;
+      border: none;
+      color: #aebac1;
+      font-size: 1.45rem;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 0.32rem;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .header-icon-btn:active, .header-icon-btn:focus {
+      background: #232d34;
+      outline: none;
+    }
+
+    /* Chat Body */
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 12px 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      background: url('https://i.ibb.co/6ZJTL2w/whatsapp-bg-light.png') repeat;
+      background-color: #0b141a;
+      position: relative;
+    }
+
+    /* Bubble pesan */
+    .message {
+      max-width: 75%;
+      padding: 0.62rem 1.15rem 0.7rem 1.1rem;
+      border-radius: 0.8rem;
+      border-bottom-left-radius: 0.22rem;
+      font-size: 1rem;
+      line-height: 1.4;
+      word-break: break-word;
+      margin-bottom: 2px;
+      box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+      position: relative;
+      display: inline-block;
+    }
+    .message.sent {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #005c4b 0%, #025144 100%);
+      color: #e9edef;
+      border-bottom-right-radius: 0.22rem;
+      border-bottom-left-radius: 0.8rem;
+      border-top-right-radius: 0.8rem;
+      border-top-left-radius: 0.8rem;
+    }
+    .message.received {
+      align-self: flex-start;
+      background: #202c33;
+      color: #e9edef;
+      border-bottom-left-radius: 0.22rem;
+      border-bottom-right-radius: 0.8rem;
+      border-top-right-radius: 0.8rem;
+      border-top-left-radius: 0.8rem;
+    }
+
+    /* Footer input */
+    footer {
+      background: #202c33;
+      border-top: 1px solid #222d34;
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 0.6rem 0.7rem 0.5rem;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      min-height: 60px;
+    }
+    .footer-icons {
+      display: flex;
+      gap: 0.18rem;
+      align-items: center;
+    }
+    .footer-icon-btn {
+      background: none;
+      border: none;
+      color: #aebac1;
+      font-size: 1.25rem;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 0.38rem;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .footer-icon-btn:active, .footer-icon-btn:focus {
+      background: #232d34;
+      outline: none;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.7rem 1.1rem;
+      border-radius: 9rem;
+      border: none;
+      outline: none;
+      font-size: 1.05rem;
+      background: #2a3942;
+      color: #e9edef;
+      margin: 0 0.25rem;
+      transition: background 0.15s;
+    }
+    input[type="text"]:focus {
+      background: #222d34;
+    }
+    button#sendBtn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: #005c4b;
+      color: #fff;
+      font-size: 1.48rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s;
+    }
+    button#sendBtn:active, button#sendBtn:focus {
+      background: #025144;
+      outline: none;
+    }
+
+    /* Scrollbar WhatsApp style */
+    ::-webkit-scrollbar {
+      width: 8px;
+      background: #111b21;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #222d34;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 400px) {
+      .contact-name {
+        font-size: 1rem;
+      }
+      .profile-pic {
+        width: 34px;
+        height: 34px;
+      }
+      header {
+        gap: 0.5rem;
+        padding: 0.5rem 0.35rem 0.5rem 0.25rem;
+        min-height: 46px;
+      }
+      .chat-body {
+        padding: 19px 4px 6px 4px;
+      }
+      input[type="text"] {
+        font-size: 0.98rem;
+        padding: 0.55rem 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <header>
+      <button class="back-btn" id="backBtn" aria-label="Kembali">&#8592;</button>
+      <img src="https://ui-avatars.com/api/?name=NK&background=0b93f6&color=fff" alt="Foto Profil" class="profile-pic" />
+      <div class="contact-info">
+        <span class="contact-name">Nama Kontak</span>
+        <span class="contact-status">online</span>
+      </div>
+      <div class="header-icons">
+        <button class="header-icon-btn" title="Panggilan suara" aria-label="Panggilan suara">&#128222;</button>
+        <button class="header-icon-btn" title="Panggilan video" aria-label="Panggilan video">&#128249;</button>
+        <button class="header-icon-btn" title="Lainnya" aria-label="Lainnya">&#8942;</button>
+      </div>
+    </header>
+
+    <div class="chat-body" id="chatBody">
+      <div class="message received">Halo!</div>
+      <div class="message sent">Hai juga!</div>
+      <div class="message received">Apa kabar?</div>
+    </div>
+
+    <footer>
+      <div class="footer-icons">
+        <button class="footer-icon-btn" title="Emoji">&#128515;</button>
+        <button class="footer-icon-btn" title="Lampirkan">&#128206;</button>
+      </div>
+      <input type="text" id="chatInput" placeholder="Ketik pesan" autocomplete="off" />
+      <button id="sendBtn" title="Kirim">&#10148;</button>
+    </footer>
+  </div>
+  <script>
+    const chatBody = document.getElementById('chatBody');
+    const input = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const backBtn = document.getElementById('backBtn');
+
+    function scrollToBottom() {
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const text = input.value.trim();
+      if (text !== "") {
+        const msg = document.createElement('div');
+        msg.classList.add('message', 'sent');
+        msg.textContent = text;
+        chatBody.appendChild(msg);
+        input.value = "";
+        scrollToBottom();
+      }
+    });
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        sendBtn.click();
+      }
+    });
+
+    window.addEventListener('resize', scrollToBottom);
+    scrollToBottom();
+
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>
