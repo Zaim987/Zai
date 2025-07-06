@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QuantumX - Portal Futuristik</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet" />
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
   <style>
     html, body {
       margin: 0;
@@ -12,10 +13,11 @@
       height: 100%;
       background-color: #000;
       overflow: hidden;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Audiowide', sans-serif;
       perspective: 1000px;
     }
 
+    /* Background animasi radial */
     body::before {
       content: '';
       position: fixed;
@@ -31,6 +33,7 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* Bintang */
     .stars {
       position: fixed;
       width: 100%;
@@ -54,44 +57,77 @@
       height: 100%;
       color: white;
       text-align: center;
+      padding: 0 1rem;
     }
 
-    .hologram {
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: #0ff;
-      text-shadow:
-        0 0 10px #0ff,
-        0 0 20px #0ff,
-        0 0 40px #0ff;
+    /* ==== HOLOGRAM GLITCH ==== */
+    .hologram-glitch {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #00f6ff;
       position: relative;
-      margin-bottom: 2rem;
-      animation: pulse 3s ease-in-out infinite;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-shadow:
+        0 0 5px #00f6ff,
+        0 0 10px #00eaff,
+        0 0 20px #00caff;
+      animation: flicker 4s infinite ease-in-out;
       overflow: hidden;
+      margin-bottom: 2rem;
     }
 
-    /* Garis scan vertikal */
-    .hologram::after {
-      content: '';
+    .hologram-glitch::before,
+    .hologram-glitch::after {
+      content: attr(data-text);
       position: absolute;
-      top: -100%;
       left: 0;
       width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0,255,255,0.3) 50%, transparent 100%);
-      animation: scan 4s infinite ease-in-out;
+      overflow: hidden;
+      color: #00f6ff;
+      background: transparent;
     }
 
-    @keyframes scan {
-      0% { top: -100%; }
-      100% { top: 100%; }
+    .hologram-glitch::before {
+      top: -1px;
+      animation: glitchTop 2s infinite linear;
+      clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
+    .hologram-glitch::after {
+      bottom: -1px;
+      animation: glitchBottom 2s infinite linear;
+      clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
     }
 
+    @keyframes glitchTop {
+      0%, 100% { transform: translate(0, 0); opacity: 0; }
+      10% { transform: translate(2px, -2px); opacity: 1; }
+      20% { transform: translate(-2px, 2px); }
+      30% { transform: translate(1px, -1px); }
+      40% { transform: translate(0, 0); opacity: 0; }
+    }
+
+    @keyframes glitchBottom {
+      0%, 100% { transform: translate(0, 0); opacity: 0; }
+      10% { transform: translate(-2px, 2px); opacity: 1; }
+      20% { transform: translate(2px, -2px); }
+      30% { transform: translate(-1px, 1px); }
+      40% { transform: translate(0, 0); opacity: 0; }
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      45% { opacity: 0.95; }
+      46% { opacity: 0.2; }
+      47% { opacity: 0.9; }
+      48% { opacity: 0.1; }
+      49% { opacity: 1; }
+      50% { opacity: 0.95; }
+      51% { opacity: 1; }
+    }
+
+    /* ==== Teks & Tombol Muncul Bertahap ==== */
     .hidden {
       opacity: 0;
       transform: scale(0.8) translateZ(-200px);
@@ -116,7 +152,7 @@
     }
 
     h1 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       text-shadow: 0 0 8px #00f2ff;
     }
 
@@ -149,18 +185,18 @@
 </head>
 <body>
 
-  <!-- Background -->
+  <!-- Background bintang -->
   <div class="stars"></div>
 
   <!-- Konten -->
   <div class="container">
-    <div class="hologram" id="logo">QuantumX</div>
+    <div class="hologram-glitch" id="logo" data-text="QuantumX">QuantumX</div>
     <h1 class="hidden" id="title">Masuki Dunia Digitalmu</h1>
     <p class="hidden" id="desc">Ini bukan masa depan — ini sekarang.</p>
     <button class="hidden" id="startBtn" onclick="location.href='login.html'">Mulai Sekarang</button>
   </div>
 
-  <!-- Suara -->
+  <!-- Efek Suara -->
   <audio id="sfx-title" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav" preload="auto"></audio>
   <audio id="sfx-desc" src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.wav" preload="auto"></audio>
   <audio id="sfx-btn" src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.wav" preload="auto"></audio>
@@ -181,6 +217,5 @@
       }, 2800);
     });
   </script>
-
 </body>
 </html>
