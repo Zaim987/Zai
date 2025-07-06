@@ -19,7 +19,6 @@
       overflow-x: hidden;
     }
 
-    /* Splash Screen */
     #splash {
       position: fixed;
       top: 0;
@@ -98,7 +97,6 @@
       transition: opacity 0.4s ease;
     }
 
-    /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -126,7 +124,7 @@
 </head>
 <body>
 
-  <!-- Splash -->
+  <!-- Splash screen -->
   <div id="splash">
     <div class="logo">QuantumX</div>
     <div class="headline">Masuki Dunia Digitalmu</div>
@@ -134,17 +132,16 @@
     <button onclick="startApp()">Mulai Sekarang</button>
   </div>
 
-  <!-- Navigation -->
+  <!-- Navigasi -->
   <nav id="mainNav">
     <a onclick="loadPage('login')">Login</a>
     <a onclick="loadPage('dashboard')">Dashboard</a>
     <a onclick="loadPage('chat')">Chat</a>
   </nav>
 
-  <!-- Halaman dinamis -->
+  <!-- Konten halaman -->
   <div id="app"></div>
 
-  <!-- Script -->
   <script>
     async function loadPage(page) {
       const res = await fetch(`partials/${page}.html`);
@@ -156,13 +153,6 @@
       window.history.pushState({ page }, "", `/${page}`);
     }
 
-    function showSplash() {
-      document.getElementById("splash").style.display = "flex";
-      document.getElementById("splash").style.opacity = 1;
-      document.getElementById("app").style.opacity = 0;
-      document.getElementById("mainNav").style.display = "none";
-    }
-
     function startApp() {
       const splash = document.getElementById("splash");
       const logo = splash.querySelector(".logo");
@@ -170,17 +160,10 @@
       const subtext = splash.querySelector(".subtext");
       const button = splash.querySelector("button");
 
-      // Urutan animasi keluar
       logo.classList.add("fade-out");
-      setTimeout(() => {
-        headline.classList.add("fade-out");
-      }, 200);
-      setTimeout(() => {
-        subtext.classList.add("fade-out");
-      }, 400);
-      setTimeout(() => {
-        button.classList.add("fade-out");
-      }, 600);
+      setTimeout(() => headline.classList.add("fade-out"), 200);
+      setTimeout(() => subtext.classList.add("fade-out"), 400);
+      setTimeout(() => button.classList.add("fade-out"), 600);
       setTimeout(() => {
         splash.style.opacity = 0;
       }, 1000);
@@ -191,6 +174,37 @@
       }, 1400);
 
       window.history.pushState({ page: "splash" }, "", "/");
+    }
+
+    function resetSplash() {
+      const splash = document.getElementById("splash");
+      splash.style.display = "flex";
+      splash.style.opacity = 1;
+
+      const logo = splash.querySelector(".logo");
+      const headline = splash.querySelector(".headline");
+      const subtext = splash.querySelector(".subtext");
+      const button = splash.querySelector("button");
+
+      // Reset fade-out dan animasi masuk
+      [logo, headline, subtext, button].forEach(el => {
+        el.classList.remove("fade-out");
+        el.style.opacity = 1;
+        el.style.animation = "none";
+        el.offsetHeight; // trigger reflow
+      });
+
+      // Set animasi masuk ulang
+      logo.style.animation = "zoomIn 1s ease forwards";
+      headline.style.animation = "slideUp 1s ease 0.5s forwards";
+      subtext.style.animation = "slideUp 1s ease 0.8s forwards";
+      button.style.animation = "fadeIn 1s ease 1.2s forwards";
+    }
+
+    function showSplash() {
+      resetSplash();
+      document.getElementById("app").style.opacity = 0;
+      document.getElementById("mainNav").style.display = "none";
     }
 
     window.addEventListener("popstate", (event) => {
