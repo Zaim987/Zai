@@ -2,29 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart Room 3D Swipe</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Room 3D - Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at center, #0a0f2c, #000);
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      touch-action: pan-y;
+    }
 
     body {
-      margin: 0;
-      background: radial-gradient(circle at center, #0a0f2c, #000);
-      overflow: hidden;
-      height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      perspective: 1200px;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-      touch-action: pan-y; /* allow horizontal swipe */
+      perspective: 1000px;
     }
 
     .carousel {
-      width: 100%;
-      max-width: 300px;
-      height: 300px;
+      width: 100vw;
+      height: 60vh;
+      max-width: 320px;
       position: relative;
       transform-style: preserve-3d;
       transition: transform 0.2s ease-out;
@@ -32,8 +40,8 @@
 
     .panel {
       position: absolute;
-      width: 260px;
-      height: 180px;
+      width: 90%;
+      height: 160px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 1rem;
@@ -42,13 +50,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       text-align: center;
+      left: 5%;
+      top: 20px;
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: 400px) {
       .panel {
-        width: 200px;
         height: 140px;
         font-size: 1rem;
       }
@@ -58,11 +67,11 @@
 <body>
 
   <div class="carousel" id="carousel">
-    <div class="panel" style="transform: rotateY(0deg) translateZ(400px);">📅 Schedule</div>
-    <div class="panel" style="transform: rotateY(72deg) translateZ(400px);">❄️ AC Control</div>
-    <div class="panel" style="transform: rotateY(144deg) translateZ(400px);">⏰ Alarm</div>
-    <div class="panel" style="transform: rotateY(216deg) translateZ(400px);">🎵 Music</div>
-    <div class="panel" style="transform: rotateY(288deg) translateZ(400px);">⚙️ Settings</div>
+    <div class="panel" style="transform: rotateY(0deg) translateZ(320px);">📅 Schedule</div>
+    <div class="panel" style="transform: rotateY(72deg) translateZ(320px);">❄️ AC Control</div>
+    <div class="panel" style="transform: rotateY(144deg) translateZ(320px);">⏰ Alarm</div>
+    <div class="panel" style="transform: rotateY(216deg) translateZ(320px);">🎵 Music</div>
+    <div class="panel" style="transform: rotateY(288deg) translateZ(320px);">⚙️ Settings</div>
   </div>
 
   <script>
@@ -71,11 +80,7 @@
     let isDragging = false;
     let startX = 0;
     let currentX = 0;
-    let velocity = 0;
-    let frame;
-
-    const panelCount = 5;
-    const sensitivity = 0.3; // adjust for faster or slower rotation
+    const sensitivity = 0.35;
 
     function updateRotation() {
       const delta = currentX - startX;
@@ -83,20 +88,19 @@
       carousel.style.transform = `rotateY(${angle + rotateBy}deg)`;
     }
 
-    function onTouchStart(e) {
+    function onStart(e) {
       isDragging = true;
       startX = e.touches ? e.touches[0].clientX : e.clientX;
       currentX = startX;
-      cancelAnimationFrame(frame);
     }
 
-    function onTouchMove(e) {
+    function onMove(e) {
       if (!isDragging) return;
       currentX = e.touches ? e.touches[0].clientX : e.clientX;
       updateRotation();
     }
 
-    function onTouchEnd(e) {
+    function onEnd() {
       if (!isDragging) return;
       const delta = currentX - startX;
       angle += delta * sensitivity;
@@ -104,14 +108,14 @@
       isDragging = false;
     }
 
-    // Support both touch and mouse
-    carousel.addEventListener('mousedown', onTouchStart);
-    carousel.addEventListener('mousemove', onTouchMove);
-    document.addEventListener('mouseup', onTouchEnd);
+    carousel.addEventListener('touchstart', onStart);
+    carousel.addEventListener('touchmove', onMove);
+    carousel.addEventListener('touchend', onEnd);
 
-    carousel.addEventListener('touchstart', onTouchStart);
-    carousel.addEventListener('touchmove', onTouchMove);
-    carousel.addEventListener('touchend', onTouchEnd);
+    // Optional mouse support (desktop testing)
+    carousel.addEventListener('mousedown', onStart);
+    carousel.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
   </script>
 </body>
 </html>
