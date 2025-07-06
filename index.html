@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="id" x-data="{ page: 'landing', transitioning: false }" x-cloak>
+<html lang="id" x-data="{ page: 'landing', step: 0 }" x-init="
+  setTimeout(() => step = 1, 1000);
+  setTimeout(() => step = 2, 2000);
+  setTimeout(() => step = 3, 3000);
+" x-cloak>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -181,19 +185,33 @@
 
   <!-- Landing Page -->
   <section class="page" :class="{ 'active': page === 'landing' }">
-    <div class="hologram-glitch" data-text="QuantumX">QuantumX</div>
-    <h1>Masuki Dunia Digitalmu</h1>
-    <p>Ini bukan masa depan — ini sekarang.</p>
-    <button @click="transitioning = true; setTimeout(() => { page = 'login'; transitioning = false }, 800)">Mulai Sekarang</button>
+    <template x-if="step >= 1">
+      <div class="hologram-glitch" data-text="QuantumX" x-transition.opacity.duration.800ms>QuantumX</div>
+    </template>
+
+    <template x-if="step >= 2">
+      <h1 x-transition.opacity.duration.800ms>Masuki Dunia Digitalmu</h1>
+    </template>
+
+    <template x-if="step >= 3">
+      <div x-transition.opacity.duration.800ms>
+        <p>Ini bukan masa depan — ini sekarang.</p>
+        <button @click="page = 'login'; step = 0">Mulai Sekarang</button>
+      </div>
+    </template>
   </section>
 
   <!-- Login Page -->
   <section class="page" :class="{ 'active': page === 'login' }">
-    <h1>Login</h1>
+    <h1 x-transition.opacity.duration.500ms>Login</h1>
     <input type="text" placeholder="Nama pengguna"><br>
     <input type="password" placeholder="Kata sandi"><br>
     <button @click="alert('Login berhasil')">Masuk</button>
-    <p><button @click="page = 'landing'">⬅ Kembali</button></p>
+    <p><button @click="page = 'landing'; step = 0;
+      setTimeout(() => step = 1, 1000);
+      setTimeout(() => step = 2, 2000);
+      setTimeout(() => step = 3, 3000);
+    ">⬅ Kembali</button></p>
   </section>
 
 </body>
