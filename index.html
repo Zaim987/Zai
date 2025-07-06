@@ -77,7 +77,6 @@
       opacity: 0;
     }
 
-    /* Nav & App */
     nav {
       display: none;
       justify-content: center;
@@ -114,6 +113,15 @@
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.6s ease forwards;
+    }
   </style>
 </head>
 <body>
@@ -126,14 +134,14 @@
     <button onclick="startApp()">Mulai Sekarang</button>
   </div>
 
-  <!-- Navigasi -->
+  <!-- Navigation -->
   <nav id="mainNav">
     <a onclick="loadPage('login')">Login</a>
     <a onclick="loadPage('dashboard')">Dashboard</a>
     <a onclick="loadPage('chat')">Chat</a>
   </nav>
 
-  <!-- Konten -->
+  <!-- Halaman dinamis -->
   <div id="app"></div>
 
   <!-- Script -->
@@ -156,12 +164,32 @@
     }
 
     function startApp() {
-      document.getElementById("splash").style.opacity = 0;
+      const splash = document.getElementById("splash");
+      const logo = splash.querySelector(".logo");
+      const headline = splash.querySelector(".headline");
+      const subtext = splash.querySelector(".subtext");
+      const button = splash.querySelector("button");
+
+      // Urutan animasi keluar
+      logo.classList.add("fade-out");
       setTimeout(() => {
-        document.getElementById("splash").style.display = "none";
+        headline.classList.add("fade-out");
+      }, 200);
+      setTimeout(() => {
+        subtext.classList.add("fade-out");
+      }, 400);
+      setTimeout(() => {
+        button.classList.add("fade-out");
+      }, 600);
+      setTimeout(() => {
+        splash.style.opacity = 0;
+      }, 1000);
+      setTimeout(() => {
+        splash.style.display = "none";
         document.getElementById("mainNav").style.display = "flex";
         loadPage("login");
-      }, 1000);
+      }, 1400);
+
       window.history.pushState({ page: "splash" }, "", "/");
     }
 
