@@ -1,48 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Smart Room 3D - Inside Mode</title>
+  <meta charset="UTF-8">
+  <title>Inside Ring Mode</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      overflow: hidden;
-      font-family: 'Segoe UI', sans-serif;
       background: radial-gradient(circle at center, #0a0f2c, #000);
-      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
     }
 
     body {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .scene {
+      width: 100vw;
+      height: 100vh;
       perspective: 1000px;
-      touch-action: pan-y;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .carousel {
-      width: 100vw;
-      max-width: 320px;
+      width: 100%;
       height: 300px;
       position: relative;
       transform-style: preserve-3d;
+      transform: translateZ(-320px) rotateY(0deg);
       transition: transform 0.2s ease-out;
     }
 
     .panel {
       position: absolute;
-      width: 90%;
+      width: 280px;
       height: 160px;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 1rem;
       backdrop-filter: blur(12px);
@@ -52,98 +55,80 @@
       justify-content: center;
       font-size: 1.2rem;
       text-align: center;
-      left: 5%;
-      top: 70px;
-      transform-origin: center center;
-    }
-
-    @media (max-height: 500px) {
-      .carousel {
-        height: 250px;
-      }
-      .panel {
-        height: 140px;
-        top: 50px;
-        font-size: 1rem;
-      }
+      left: 50%;
+      top: 50%;
+      transform-style: preserve-3d;
+      transform: translate(-50%, -50%) rotateY(0deg) translateZ(320px);
     }
 
     @media (max-width: 400px) {
       .panel {
-        height: 130px;
+        width: 240px;
+        height: 140px;
         font-size: 1rem;
-        top: 50px;
       }
     }
   </style>
 </head>
 <body>
 
+<div class="scene">
   <div class="carousel" id="carousel"></div>
+</div>
 
-  <script>
-    const carousel = document.getElementById('carousel');
-    let angle = 0;
-    let isDragging = false;
-    let startX = 0;
-    let currentX = 0;
-    const sensitivity = 0.35;
-    const radius = 320;
-    const panels = [
-      '📅 Schedule',
-      '❄️ AC Control',
-      '⏰ Alarm',
-      '🎵 Music',
-      '⚙️ Settings'
-    ];
+<script>
+  const carousel = document.getElementById('carousel');
+  const panels = ['📅 Schedule', '❄️ AC', '⏰ Alarm', '🎵 Music', '⚙️ Settings'];
+  const radius = 320;
+  let angle = 0;
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  const sensitivity = 0.35;
 
-    // Generate panels
-    panels.forEach((text, i) => {
-      const deg = i * (360 / panels.length);
-      const panel = document.createElement('div');
-      panel.className = 'panel';
-      // rotateY to place, then rotateY(180deg) to face inward
-      panel.style.transform = `rotateY(${deg}deg) translateZ(${radius}px) rotateY(180deg)`;
-      panel.textContent = text;
-      carousel.appendChild(panel);
-    });
+  panels.forEach((text, i) => {
+    const deg = i * (360 / panels.length);
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    panel.style.transform = `translate(-50%, -50%) rotateY(${deg}deg) translateZ(${radius}px)`;
+    panel.textContent = text;
+    carousel.appendChild(panel);
+  });
 
-    // Drag to rotate
-    function updateRotation() {
-      const delta = currentX - startX;
-      const rotateBy = delta * sensitivity;
-      carousel.style.transform = `rotateY(${angle + rotateBy}deg)`;
-    }
+  function updateRotation() {
+    const delta = currentX - startX;
+    const rotateBy = delta * sensitivity;
+    carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle + rotateBy}deg)`;
+  }
 
-    function onStart(e) {
-      isDragging = true;
-      startX = e.touches ? e.touches[0].clientX : e.clientX;
-      currentX = startX;
-    }
+  function onStart(e) {
+    isDragging = true;
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    currentX = startX;
+  }
 
-    function onMove(e) {
-      if (!isDragging) return;
-      currentX = e.touches ? e.touches[0].clientX : e.clientX;
-      updateRotation();
-    }
+  function onMove(e) {
+    if (!isDragging) return;
+    currentX = e.touches ? e.touches[0].clientX : e.clientX;
+    updateRotation();
+  }
 
-    function onEnd() {
-      if (!isDragging) return;
-      const delta = currentX - startX;
-      angle += delta * sensitivity;
-      carousel.style.transform = `rotateY(${angle}deg)`;
-      isDragging = false;
-    }
+  function onEnd() {
+    if (!isDragging) return;
+    const delta = currentX - startX;
+    angle += delta * sensitivity;
+    carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle}deg)`;
+    isDragging = false;
+  }
 
-    // Touch and mouse listeners
-    carousel.addEventListener('touchstart', onStart);
-    carousel.addEventListener('touchmove', onMove);
-    carousel.addEventListener('touchend', onEnd);
-
-    carousel.addEventListener('mousedown', onStart);
-    carousel.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onEnd);
-  </script>
+  // Event listeners
+  carousel.addEventListener('touchstart', onStart);
+  carousel.addEventListener('touchmove', onMove);
+  carousel.addEventListener('touchend', onEnd);
+  carousel.addEventListener('mousedown', onStart);
+  carousel.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+</script>
 
 </body>
 </html>
