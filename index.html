@@ -21,14 +21,14 @@
     let scene, camera, renderer, panelGroup;
     let isDragging = false, lastX = 0, velocity = 0;
     const panelCount = 6;
-    const radius = 4;
+    const radius = 5;
     const panels = [];init();
 animate();
 
 function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 5);
+  camera.position.set(0, 0, 0); // kamera di pusat lingkaran
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -52,13 +52,12 @@ function init() {
 
     const angle = (i / panelCount) * Math.PI * 2;
     panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
-    panel.lookAt(camera.position);
+    panel.lookAt(0, 0, 0); // hadap ke pusat
 
     panelGroup.add(panel);
     panels.push(panel);
   }
 
-  // Event listeners
   renderer.domElement.addEventListener('touchstart', onTouchStart);
   renderer.domElement.addEventListener('touchmove', onTouchMove);
   renderer.domElement.addEventListener('touchend', onTouchEnd);
@@ -106,10 +105,6 @@ function animate() {
     panelGroup.rotation.y += velocity;
     velocity *= 0.95;
   }
-
-  panels.forEach(panel => {
-    panel.lookAt(camera.position);
-  });
 
   renderer.render(scene, camera);
 }
