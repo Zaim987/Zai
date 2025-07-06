@@ -1,41 +1,159 @@
-/* === Global Reset === */
+/* General Styling */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d0f1a;
+    color: #fff;
+    overflow: hidden; /* Mencegah scroll */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-{ margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+/* Parallax Container */
+#parallax-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    perspective: 1000px; /* KEDALAMAN 3D */
+    transform-style: preserve-3d;
+}
+
+.parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.1s ease-out; /* Transisi halus */
+}
+
+/* Scene Elements Styling */
+.scene-bg {
+    width: 110%; /* Sedikit lebih besar agar tidak ada celah saat bergerak */
+    height: 110%;
+    background-image: url('https://i.ibb.co/y40kP5t/bedroom-bg.png'); /* Gambar kasur & dinding belakang */
+    background-size: cover;
+    background-position: center;
+    transform: translateZ(-150px) scale(1.15); /* Paling jauh */
+}
+
+.light-panel {
+    position: absolute;
+    width: 15%;
+    height: 70%;
+    background: linear-gradient(to bottom, rgba(100, 150, 255, 0.5), rgba(50, 100, 200, 0.3));
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(120, 180, 255, 0.4);
+    transform: translateZ(-50px); /* Di tengah */
+}
+
+.light-panel.left {
+    left: 10%;
+}
+.light-panel.right {
+    right: 10%;
+}
 
 
-body { background-color: #0a0f1c; color: #e0f0ff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; overflow-x: hidden; padding-bottom: 5rem; }
+/* UI Layer & Cards Styling (Glassmorphism) */
+.ui-layer {
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    transform: translateZ(50px); /* Paling depan */
+}
 
-h1, h2 { color: #4cf8ff; text-align: center; margin-bottom: 1rem; }
+.ui-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px); /* Untuk Safari */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
-p { max-width: 700px; margin: 0 auto 2rem; text-align: center; }
+/* UI Elements Specific Styling */
+h3, h4 {
+    margin: 0;
+    font-weight: 500;
+}
 
-section { padding: 4rem 2rem; opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out; }
+.alarm-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-section.visible { opacity: 1; transform: translateY(0); }
+.toggle-switch {
+    width: 44px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+}
+.toggle-switch::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+}
+.toggle-switch.on {
+    background-color: #4A90E2;
+}
+.toggle-switch.on::before {
+    transform: translateX(20px);
+    background-color: white;
+}
 
-/* === Hero Section === */ .hero { padding: 8rem 2rem 4rem; text-align: center; }
+input[type="range"] {
+    width: 100%;
+}
 
-.neon { color: #4cf8ff; text-shadow: 0 0 5px #4cf8ff, 0 0 10px #4cf8ff, 0 0 20px #4cf8ff; }
-
-.typing { display: inline-block; overflow: hidden; white-space: nowrap; border-right: 2px solid #4cf8ff; animation: typing 3s steps(30, end) infinite alternate, blink 0.7s step-end infinite; color: #88e3ff; font-size: 1.2rem; margin-top: 1rem; }
-
-@keyframes typing { from { width: 0; } to { width: 18ch; } }
-
-@keyframes blink { 50% { border-color: transparent; } }
-
-/* === Skill & Project Boxes === */ .skill-list, .project-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; }
-
-.skill, .project { background: #111827; border: 1px solid #4cf8ff33; padding: 1rem 2rem; border-radius: 8px; color: #e0f0ff; box-shadow: 0 0 12px rgba(76, 248, 255, 0.1); transition: all 0.3s ease; }
-
-.skill:hover, .project:hover { transform: scale(1.05); box-shadow: 0 0 20px #4cf8ff; }
-
-/* === Contact Links === */ .contact-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; }
-
-.neon-link { color: #4cf8ff; text-decoration: none; border-bottom: 1px solid transparent; transition: 0.3s ease; }
-
-.neon-link:hover { border-color: #4cf8ff; text-shadow: 0 0 6px #4cf8ff; }
-
-/* === Footer === */ footer { text-align: center; color: #8aaecf; font-size: 0.8rem; padding: 2rem 1rem; }
-
-/* === Grid Background === */ .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(#1a1f2b 1px, transparent 1px), linear-gradient(90deg, #1a1f2b 1px, transparent 1px); background-size: 40px 40px; opacity: 0.05; z-index: -1; }
-
+.card-music {
+    align-items: center;
+    text-align: center;
+}
+.music-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.1);
+    padding: 10px;
+}
+.music-controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.music-controls button {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.music-controls .play-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2em;
+}
