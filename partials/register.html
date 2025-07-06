@@ -1,0 +1,169 @@
+<style>
+  /* Gunakan style animasi dan input yang sama seperti login.html */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    animation: fadeSlideUp 0.8s ease forwards;
+  }
+
+  .fade-delay-1 { animation-delay: 0.3s; }
+  .fade-delay-2 { animation-delay: 0.6s; }
+  .fade-delay-3 { animation-delay: 0.9s; }
+  .fade-delay-4 { animation-delay: 1.2s; }
+  .fade-delay-5 { animation-delay: 1.5s; }
+
+  input {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background: #0d1117;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+  }
+
+  input:focus {
+    border-color: #00f0ff;
+    box-shadow: 0 0 8px #00f0ff;
+  }
+
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background: #00f0ff;
+    color: black;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+    transition: transform 0.2s ease;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
+
+  .register-container {
+    max-width: 320px;
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 5vh;
+  }
+
+  .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    color: #00f0ff;
+    text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+    margin-bottom: 1.5rem;
+  }
+
+  .headline {
+    font-size: 1.2rem;
+    color: white;
+    margin-bottom: 2rem;
+  }
+
+  .error {
+    margin-top: 0.75rem;
+    color: #ff4444;
+    font-size: 0.95rem;
+    min-height: 1.2em;
+  }
+
+  .success {
+    color: #00ff99;
+    font-size: 1.1rem;
+    margin-top: 2rem;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #00f0ff;
+    text-decoration: underline;
+    font-size: 0.95rem;
+  }
+</style>
+
+<div class="register-container">
+  <div class="logo-text fade-in fade-delay-1">QuantumX</div>
+  <div class="headline fade-in fade-delay-2">Buat akun baru</div>
+  <form id="registerForm" class="fade-in fade-delay-3">
+    <input id="name" type="text" placeholder="Nama lengkap" required />
+    <input id="email" type="email" placeholder="Email" required />
+    <input id="password" type="password" placeholder="Password" required />
+    <button type="submit">Daftar</button>
+    <div id="error" class="error"></div>
+  </form>
+  <div class="fade-in fade-delay-5">
+    <a href="/login" onclick="loadPage('login'); return false;">Sudah punya akun? Login</a>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+    authDomain: "quantechapp.firebaseapp.com",
+    databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
+    projectId: "quantechapp",
+    storageBucket: "quantechapp.firebasestorage.app",
+    messagingSenderId: "825384610343",
+    appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+    measurementId: "G-E9L012VH32"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  document.getElementById("registerForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const errorDiv = document.getElementById("error");
+
+    if (!name || !email || !password) {
+      errorDiv.textContent = "Semua field wajib diisi.";
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Tambahkan nama ke profil Auth
+      await updateProfile(user, { displayName: name });
+
+      // Simpan data ke Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        displayName: name,
+        email: user.email,
+        createdAt: serverTimestamp(),
+        online: true
+      });
+
+      document.getElementById("app").innerHTML = `
+        <div class="success">✅ Akun berhasil dibuat!<br>Selamat datang, ${name}.</div>
+      `;
+    } catch (error) {
+      errorDiv.textContent = error.message.replace("Firebase:", "").trim();
+    }
+  });
+</script>
