@@ -3,37 +3,39 @@
 { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
 
 
-body { background: #0b0f1a; color: #e0f0ff; font-family: 'Segoe UI', sans-serif; line-height: 1.6; overflow-x: hidden; padding-bottom: 4rem; }
+body { background-color: #0a0f1c; color: #e0f0ff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; overflow-x: hidden; padding-bottom: 5rem; }
 
-section { padding: 4rem 2rem; max-width: 800px; margin: auto; opacity: 0; transform: translateY(50px); transition: all 0.8s ease; }
+h1, h2 { color: #4cf8ff; text-align: center; margin-bottom: 1rem; }
+
+p { max-width: 700px; margin: 0 auto 2rem; text-align: center; }
+
+section { padding: 4rem 2rem; opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out; }
 
 section.visible { opacity: 1; transform: translateY(0); }
 
-h1, h2 { margin-bottom: 1rem; color: #4cf8ff; }
+/* === Hero Section === */ .hero { padding: 8rem 2rem 4rem; text-align: center; }
 
-.neon { color: #4cf8ff; text-shadow: 0 0 8px #4cf8ff, 0 0 16px #4cf8ff; }
+.neon { color: #4cf8ff; text-shadow: 0 0 5px #4cf8ff, 0 0 10px #4cf8ff, 0 0 20px #4cf8ff; }
 
-/* === Hero === */ .hero { text-align: center; padding: 8rem 2rem 4rem; }
+.typing { display: inline-block; overflow: hidden; white-space: nowrap; border-right: 2px solid #4cf8ff; animation: typing 3s steps(30, end) infinite alternate, blink 0.7s step-end infinite; color: #88e3ff; font-size: 1.2rem; margin-top: 1rem; }
 
-.typing { font-size: 1.2rem; color: #88e3ff; border-right: 2px solid #4cf8ff; white-space: nowrap; overflow: hidden; animation: typing 4s steps(30, end) infinite, blink 0.7s step-end infinite; }
-
-@keyframes typing { 0% { width: 0; } 50% { width: 18ch; } 100% { width: 0; } }
+@keyframes typing { from { width: 0; } to { width: 18ch; } }
 
 @keyframes blink { 50% { border-color: transparent; } }
 
-/* === Skills & Projects === */ .skill-list, .project-list { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1rem; }
+/* === Skill & Project Boxes === */ .skill-list, .project-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; }
 
-.skill, .project { padding: 1rem 2rem; background: #111827; border: 1px solid #4cf8ff33; border-radius: 8px; box-shadow: 0 0 12px #4cf8ff11; color: #e0f0ff; transition: 0.3s ease; }
+.skill, .project { background: #111827; border: 1px solid #4cf8ff33; padding: 1rem 2rem; border-radius: 8px; color: #e0f0ff; box-shadow: 0 0 12px rgba(76, 248, 255, 0.1); transition: all 0.3s ease; }
 
-.skill:hover, .project:hover { transform: scale(1.05); box-shadow: 0 0 20px #4cf8ff88; }
+.skill:hover, .project:hover { transform: scale(1.05); box-shadow: 0 0 20px #4cf8ff; }
 
-/* === Contact === */ .contact-links { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
+/* === Contact Links === */ .contact-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; }
 
-.neon-link { color: #4cf8ff; text-decoration: none; border-bottom: 1px solid transparent; transition: all 0.3s ease; }
+.neon-link { color: #4cf8ff; text-decoration: none; border-bottom: 1px solid transparent; transition: 0.3s ease; }
 
-.neon-link:hover { border-color: #4cf8ff; text-shadow: 0 0 8px #4cf8ff; }
+.neon-link:hover { border-color: #4cf8ff; text-shadow: 0 0 6px #4cf8ff; }
 
-/* === Footer === */ footer { text-align: center; font-size: 0.8rem; padding: 2rem 1rem; color: #88aabb; }
+/* === Footer === */ footer { text-align: center; color: #8aaecf; font-size: 0.8rem; padding: 2rem 1rem; }
 
-/* === Background Grid === */ .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(#1a1f2b 1px, transparent 1px), linear-gradient(90deg, #1a1f2b 1px, transparent 1px); background-size: 40px 40px; z-index: -1; opacity: 0.05; }
+/* === Grid Background === */ .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(#1a1f2b 1px, transparent 1px), linear-gradient(90deg, #1a1f2b 1px, transparent 1px); background-size: 40px 40px; opacity: 0.05; z-index: -1; }
 
