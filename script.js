@@ -1,57 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('parallax-container');
-    const layers = Array.from(container.getElementsByClassName('parallax-layer'));
+    const scene = document.getElementById('scene');
 
-    // Tentukan kekuatan efek
-    const movementStrength = 25; 
+    // Kekuatan rotasi (sesuaikan nilainya)
+    const rotationStrength = 15; // dalam derajat
 
-    // Fungsi untuk mengupdate posisi layer
-    const updateLayers = (x, y) => {
-        layers.forEach(layer => {
-            const depth = parseFloat(layer.getAttribute('data-depth'));
-            if (isNaN(depth)) return;
+    const updateSceneRotation = (x, y) => {
+        // Hitung rotasi berdasarkan posisi input (-1 sampai 1)
+        // Kita balik sumbu Y agar gerakan terasa natural (mouse ke atas, scene miring ke bawah)
+        const rotateYValue = x * rotationStrength;
+        const rotateXValue = -y * rotationStrength;
 
-            // Hitung pergerakan berdasarkan kedalaman
-            const moveX = x * movementStrength * depth;
-            const moveY = y * movementStrength * depth;
-
-            // Terapkan transformasi. Kita tidak mengubah translateZ yang sudah di set di CSS
-            // Jadi kita hanya perlu menambahkan translateX dan translateY
-            layer.style.transform = `translateX(${moveX}px) translateY(${moveY}px)`;
-        });
+        // Terapkan transformasi rotasi ke seluruh scene
+        scene.style.transform = `rotateX(${rotateXValue}deg) rotateY(${rotateYValue}deg)`;
     };
 
     // --- Untuk Desktop: Mouse Move ---
     document.body.addEventListener('mousemove', (e) => {
         // Normalisasi posisi mouse dari -1 sampai 1
-        const x = (e.clientX / window.innerWidth) - 0.5;
-        const y = (e.clientY / window.innerHeight) - 0.5;
+        const x = (e.clientX / window.innerWidth) * 2 - 1;
+        const y = (e.clientY / window.innerHeight) * 2 - 1;
         
-        updateLayers(x, y);
+        updateSceneRotation(x, y);
     });
 
-
     // --- Untuk Mobile: Device Orientation ---
-    // Cek apakah API didukung
     if (window.DeviceOrientationEvent) {
-        window.addEventListener('deviceorientation', (event) => {
-            // Gamma: pergerakan kiri-kanan (-90 to 90)
-            // Beta: pergerakan depan-belakang (-180 to 180)
-            const gamma = event.gamma; // -90 to 90
-            const beta = event.beta;   // -180 to 180
+        // Minta izin untuk iOS 13+
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            document.body.addEventListener('click', () => {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        }
+                    })
+                    .catch(console.error);
+            }, { once: true });
+        } else {
+            window.addEventListener('deviceorientation', handleOrientation);
+        }
 
-            // Normalisasi nilai agar lebih terkontrol
-            // Batasi nilai agar tidak terlalu liar
+        function handleOrientation(event) {
+            const gamma = event.gamma; // kiri-kanan
+            const beta = event.beta;   // depan-belakang
+
             const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
             
-            let x = clamp(gamma, -45, 45) / 45; // Normalisasi ke -1 sampai 1
-            let y = clamp(beta, -45, 45) / 45;  // Normalisasi ke -1 sampai 1
+            // Normalisasi nilai gamma dan beta ke rentang -1 sampai 1
+            let x = clamp(gamma, -60, 60) / 60;
+            let y = clamp(beta, -60, 60) / 60;
             
-            // Di beberapa orientasi, sumbu mungkin perlu dibalik
-            // Sesuaikan jika perlu
-            updateLayers(x, y);
-        });
+            updateSceneRotation(x, y);
+        }
     } else {
-        console.log("DeviceOrientationEvent tidak didukung pada perangkat ini.");
+        console.log("DeviceOrientationEvent tidak didukung.");
     }
 });
