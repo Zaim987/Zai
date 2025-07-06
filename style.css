@@ -1,0 +1,39 @@
+/* === Global Reset === */
+
+{ margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+
+body { background: #0b0f1a; color: #e0f0ff; font-family: 'Segoe UI', sans-serif; line-height: 1.6; overflow-x: hidden; padding-bottom: 4rem; }
+
+section { padding: 4rem 2rem; max-width: 800px; margin: auto; opacity: 0; transform: translateY(50px); transition: all 0.8s ease; }
+
+section.visible { opacity: 1; transform: translateY(0); }
+
+h1, h2 { margin-bottom: 1rem; color: #4cf8ff; }
+
+.neon { color: #4cf8ff; text-shadow: 0 0 8px #4cf8ff, 0 0 16px #4cf8ff; }
+
+/* === Hero === */ .hero { text-align: center; padding: 8rem 2rem 4rem; }
+
+.typing { font-size: 1.2rem; color: #88e3ff; border-right: 2px solid #4cf8ff; white-space: nowrap; overflow: hidden; animation: typing 4s steps(30, end) infinite, blink 0.7s step-end infinite; }
+
+@keyframes typing { 0% { width: 0; } 50% { width: 18ch; } 100% { width: 0; } }
+
+@keyframes blink { 50% { border-color: transparent; } }
+
+/* === Skills & Projects === */ .skill-list, .project-list { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1rem; }
+
+.skill, .project { padding: 1rem 2rem; background: #111827; border: 1px solid #4cf8ff33; border-radius: 8px; box-shadow: 0 0 12px #4cf8ff11; color: #e0f0ff; transition: 0.3s ease; }
+
+.skill:hover, .project:hover { transform: scale(1.05); box-shadow: 0 0 20px #4cf8ff88; }
+
+/* === Contact === */ .contact-links { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
+
+.neon-link { color: #4cf8ff; text-decoration: none; border-bottom: 1px solid transparent; transition: all 0.3s ease; }
+
+.neon-link:hover { border-color: #4cf8ff; text-shadow: 0 0 8px #4cf8ff; }
+
+/* === Footer === */ footer { text-align: center; font-size: 0.8rem; padding: 2rem 1rem; color: #88aabb; }
+
+/* === Background Grid === */ .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(#1a1f2b 1px, transparent 1px), linear-gradient(90deg, #1a1f2b 1px, transparent 1px); background-size: 40px 40px; z-index: -1; opacity: 0.05; }
+
