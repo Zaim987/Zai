@@ -1,45 +1,124 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Smart Room 3D Carousel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Abik - Creative Developer</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="script.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at center, #0a0f2c, #000);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+    }
+
+    .carousel {
+      width: 100%;
+      max-width: 300px;
+      height: 300px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1s ease;
+    }
+
+    .panel {
+      position: absolute;
+      width: 260px;
+      height: 180px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px #00f2ff55;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      text-align: center;
+      transform-origin: center center;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 40px;
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 1rem 1.5rem;
+      font-size: 1.2rem;
+      background: #111;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #222;
+    }
+
+    @media (max-width: 500px) {
+      .panel {
+        width: 200px;
+        height: 140px;
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="grid-bg"></div>
-  <header class="hero">
-    <h1>Hi, I’m <span class="neon">Abik</span></h1>
-    <h2 class="typing">Creative Developer</h2>
-  </header>  <section class="about">
-    <h2>About Me</h2>
-    <p>I love creating futuristic user interfaces with smooth animations and immersive design. Passionate about turning code into visual experiences.</p>
-  </section>  <section class="skills">
-    <h2>Skills</h2>
-    <div class="skill-list">
-      <div class="skill">HTML5</div>
-      <div class="skill">CSS3</div>
-      <div class="skill">JavaScript</div>
-      <div class="skill">Firebase</div>
-      <div class="skill">UI/UX</div>
-    </div>
-  </section>  <section class="projects">
-    <h2>Projects</h2>
-    <div class="project-list">
-      <div class="project">Project 1</div>
-      <div class="project">Project 2</div>
-      <div class="project">Project 3</div>
-    </div>
-  </section>  <section class="contact">
-    <h2>Contact</h2>
-    <p>Let's connect on social media or send me an email.</p>
-    <div class="contact-links">
-      <a href="#" class="neon-link">GitHub</a>
-      <a href="#" class="neon-link">LinkedIn</a>
-      <a href="#" class="neon-link">Email</a>
-    </div>
-  </section>  <footer>
-    <p>&copy; 2025 Abik. All rights reserved.</p>
-  </footer>
+
+  <div class="carousel" id="carousel">
+    <div class="panel" style="transform: rotateY(0deg) translateZ(400px);">📅 Schedule</div>
+    <div class="panel" style="transform: rotateY(72deg) translateZ(400px);">❄️ AC Control</div>
+    <div class="panel" style="transform: rotateY(144deg) translateZ(400px);">⏰ Alarm</div>
+    <div class="panel" style="transform: rotateY(216deg) translateZ(400px);">🎵 Music</div>
+    <div class="panel" style="transform: rotateY(288deg) translateZ(400px);">⚙️ Settings</div>
+  </div>
+
+  <div class="controls">
+    <button onclick="rotate(-1)">◀</button>
+    <button onclick="rotate(1)">▶</button>
+  </div>
+
+  <script>
+    let angle = 0;
+    const carousel = document.getElementById('carousel');
+    const panelCount = 5;
+    const rotateAmount = 360 / panelCount;
+
+    function rotate(direction) {
+      angle += direction * rotateAmount;
+      carousel.style.transform = `rotateY(${angle}deg)`;
+    }
+
+    // Optional: swipe gesture
+    let startX = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].clientX;
+      const deltaX = endX - startX;
+      if (Math.abs(deltaX) > 50) {
+        rotate(deltaX < 0 ? 1 : -1);
+      }
+    });
+  </script>
 </body>
 </html>
