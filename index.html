@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Inside Ring Mode</title>
+  <meta charset="UTF-8" />
+  <title>3D Carousel with Interactive Panels</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     html, body {
       margin: 0;
       padding: 0;
@@ -15,13 +18,11 @@
       font-family: 'Segoe UI', sans-serif;
       overflow: hidden;
     }
-
     body {
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
     .scene {
       width: 100vw;
       height: 100vh;
@@ -31,104 +32,213 @@
       align-items: center;
       justify-content: center;
     }
-
     .carousel {
       width: 100%;
       height: 300px;
       position: relative;
       transform-style: preserve-3d;
       transform: translateZ(-320px) rotateY(0deg);
-      transition: transform 0.2s ease-out;
+      transition: transform 0.6s ease;
     }
-
     .panel {
       position: absolute;
       width: 280px;
-      height: 160px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      height: 180px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 1rem;
       backdrop-filter: blur(12px);
       box-shadow: 0 0 20px #00f2ff55;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1rem;
       text-align: center;
       left: 50%;
       top: 50%;
+      padding: 1rem;
       transform-style: preserve-3d;
       transform: translate(-50%, -50%) rotateY(0deg) translateZ(320px);
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      opacity: 0.3;
+      scale: 0.9;
+      cursor: pointer;
+    }
+    .panel.active {
+      opacity: 1;
+      scale: 1.05;
+      box-shadow: 0 0 30px #00ffffaa;
+    }
+    .panel h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+      color: #fff;
+    }
+    .panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0.5rem;
+      color: #ccc;
+      font-size: 0.9rem;
+      max-height: 60px;
+      overflow-y: auto;
+    }
+    .panel button {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #00f2ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     @media (max-width: 400px) {
       .panel {
         width: 240px;
-        height: 140px;
-        font-size: 1rem;
+        height: 160px;
+        font-size: 0.9rem;
       }
     }
   </style>
 </head>
 <body>
+  <div class="scene">
+    <div class="carousel" id="carousel"></div>
+  </div>
 
-<div class="scene">
-  <div class="carousel" id="carousel"></div>
-</div>
+  <script>
+    const carousel = document.getElementById('carousel');
+    const radius = 320;
+    const panelsData = [
+      {
+        title: "📅 Schedule",
+        content: `
+          <ul>
+            <li>08:00 AM – Shopping</li>
+            <li>09:30 AM – Meeting</li>
+          </ul>
+          <button onclick="alert('Tambah jadwal')">+ Add Task</button>
+        `
+      },
+      {
+        title: "❄️ AC",
+        content: `
+          <h2>❄️ AC Control</h2>
+          <label>Temp: <input type="range" min="16" max="30" value="22"></label>
+        `
+      },
+      {
+        title: "⏰ Alarm",
+        content: `
+          <h2>⏰ Alarm</h2>
+          <label><input type="checkbox" checked> 06:00 AM</label><br/>
+          <label><input type="checkbox"> 08:00 AM</label>
+        `
+      },
+      {
+        title: "🎵 Music",
+        content: `
+          <h2>🎵 Meditation</h2>
+          <audio controls style="width: 100%;">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+          </audio>
+        `
+      },
+      {
+        title: "⚙️ Settings",
+        content: `
+          <h2>⚙️ Settings</h2>
+          <label><input type="checkbox" checked> Dark Mode</label><br/>
+          <label><input type="checkbox"> Notifications</label>
+        `
+      },
+    ];
 
-<script>
-  const carousel = document.getElementById('carousel');
-  const panels = ['📅 Schedule', '❄️ AC', '⏰ Alarm', '🎵 Music', '⚙️ Settings'];
-  const radius = 320;
-  let angle = 0;
-  let isDragging = false;
-  let startX = 0;
-  let currentX = 0;
-  const sensitivity = 0.35;
+    let angle = 0;
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    const sensitivity = 0.35;
+    let activeIndex = 0;
 
-  panels.forEach((text, i) => {
-    const deg = i * (360 / panels.length);
-    const panel = document.createElement('div');
-    panel.className = 'panel';
-    panel.style.transform = `translate(-50%, -50%) rotateY(${deg}deg) translateZ(${radius}px)`;
-    panel.textContent = text;
-    carousel.appendChild(panel);
-  });
+    function renderPanels() {
+      carousel.innerHTML = '';
+      const count = panelsData.length;
 
-  function updateRotation() {
-    const delta = currentX - startX;
-    const rotateBy = delta * sensitivity;
-    carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle + rotateBy}deg)`;
-  }
+      panelsData.forEach((data, i) => {
+        const deg = i * (360 / count);
+        const panel = document.createElement('div');
+        panel.className = 'panel';
+        panel.style.transform = `translate(-50%, -50%) rotateY(${deg}deg) translateZ(${radius}px)`;
+        panel.dataset.index = i;
 
-  function onStart(e) {
-    isDragging = true;
-    startX = e.touches ? e.touches[0].clientX : e.clientX;
-    currentX = startX;
-  }
+        panel.innerHTML = `<h2>${data.title}</h2>${data.content}`;
+        panel.addEventListener('click', () => rotateToPanel(i));
+        carousel.appendChild(panel);
+      });
 
-  function onMove(e) {
-    if (!isDragging) return;
-    currentX = e.touches ? e.touches[0].clientX : e.clientX;
-    updateRotation();
-  }
+      updateActivePanel();
+    }
 
-  function onEnd() {
-    if (!isDragging) return;
-    const delta = currentX - startX;
-    angle += delta * sensitivity;
-    carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle}deg)`;
-    isDragging = false;
-  }
+    function updateRotation() {
+      const delta = currentX - startX;
+      const rotateBy = delta * sensitivity;
+      carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle + rotateBy}deg)`;
+    }
 
-  // Event listeners
-  carousel.addEventListener('touchstart', onStart);
-  carousel.addEventListener('touchmove', onMove);
-  carousel.addEventListener('touchend', onEnd);
-  carousel.addEventListener('mousedown', onStart);
-  carousel.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onEnd);
-</script>
+    function onStart(e) {
+      isDragging = true;
+      startX = e.touches ? e.touches[0].clientX : e.clientX;
+      currentX = startX;
+    }
 
+    function onMove(e) {
+      if (!isDragging) return;
+      currentX = e.touches ? e.touches[0].clientX : e.clientX;
+      updateRotation();
+    }
+
+    function onEnd() {
+      if (!isDragging) return;
+      const delta = currentX - startX;
+      angle += delta * sensitivity;
+      angle = normalizeAngle(angle);
+      isDragging = false;
+      carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle}deg)`;
+      updateActivePanel();
+    }
+
+    function rotateToPanel(index) {
+      const step = 360 / panelsData.length;
+      angle = -index * step;
+      carousel.style.transform = `translateZ(-${radius}px) rotateY(${angle}deg)`;
+      activeIndex = index;
+      updateActivePanel();
+    }
+
+    function updateActivePanel() {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      const panels = document.querySelectorAll('.panel');
+      if (panels[activeIndex]) panels[activeIndex].classList.add('active');
+    }
+
+    function normalizeAngle(a) {
+      return a % 360;
+    }
+
+    // Event listeners
+    carousel.addEventListener('touchstart', onStart);
+    carousel.addEventListener('touchmove', onMove);
+    carousel.addEventListener('touchend', onEnd);
+    carousel.addEventListener('mousedown', onStart);
+    carousel.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+
+    // Initialize
+    renderPanels();
+    rotateToPanel(0);
+  </script>
 </body>
 </html>
