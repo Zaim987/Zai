@@ -20,15 +20,17 @@
   <script>
     let scene, camera, renderer, panelGroup;
     let isDragging = false, lastX = 0, velocity = 0;
-    const panelCount = 6;
     const radius = 5;
+    const panelWidth = 1.5;
+    const panelHeight = 2.2;
+    const panelCount = Math.floor((2 * Math.PI * radius) / panelWidth);
     const panels = [];init();
 animate();
 
 function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 0); // kamera di pusat lingkaran
+  camera.position.set(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -41,7 +43,7 @@ function init() {
   const panelTexture = new THREE.TextureLoader();
 
   for (let i = 0; i < panelCount; i++) {
-    const geometry = new THREE.PlaneGeometry(2.2, 3.2);
+    const geometry = new THREE.PlaneGeometry(panelWidth, panelHeight);
     const material = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       map: panelTexture.load(`https://picsum.photos/300/450?random=${i+1}`),
@@ -52,7 +54,7 @@ function init() {
 
     const angle = (i / panelCount) * Math.PI * 2;
     panel.position.set(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
-    panel.lookAt(0, 0, 0); // hadap ke pusat
+    panel.lookAt(0, 0, 0);
 
     panelGroup.add(panel);
     panels.push(panel);
