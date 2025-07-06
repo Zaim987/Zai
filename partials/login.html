@@ -1,18 +1,76 @@
 <div id="login-page" style="animation: fadeIn 0.8s ease;">
   <div style="max-width: 320px; margin: 0 auto; text-align: center;">
-    <div style="font-family: 'Orbitron', sans-serif; font-size: 2rem; color: #00f0ff; text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff; margin-bottom: 1.5rem;">
+
+    <!-- Logo QuantumX -->
+    <div style="
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      color: #00f0ff;
+      text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+      margin-bottom: 1.5rem;">
       QuantumX
     </div>
-    <div style="font-size: 1.2rem; color: white; margin-bottom: 2rem;">
+
+    <!-- Headline -->
+    <div style="
+      font-size: 1.2rem;
+      color: white;
+      margin-bottom: 2rem;">
       Selamat datang kembali
     </div>
-    <input type="email" placeholder="Email" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: none; border-radius: 8px; background: #161b22; color: white; font-size: 1rem;" />
-    <input type="password" placeholder="Password" style="width: 100%; padding: 0.75rem; margin-bottom: 1.5rem; border: none; border-radius: 8px; background: #161b22; color: white; font-size: 1rem;" />
-    <button style="width: 100%; padding: 0.75rem; border: none; border-radius: 999px; background: #00f0ff; color: black; font-weight: bold; font-size: 1rem; box-shadow: 0 0 10px #00f0ff;">
+
+    <!-- Input Email -->
+    <input type="email" placeholder="Email" style="
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #161b22;
+      color: white;
+      font-size: 1rem;
+      font-family: 'Rajdhani', sans-serif;
+      outline: none;
+    " />
+
+    <!-- Input Password -->
+    <input type="password" placeholder="Password" style="
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #161b22;
+      color: white;
+      font-size: 1rem;
+      font-family: 'Rajdhani', sans-serif;
+      outline: none;
+    " />
+
+    <!-- Tombol Login -->
+    <button style="
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 999px;
+      background: #00f0ff;
+      color: black;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+      font-family: 'Rajdhani', sans-serif;
+      cursor: pointer;
+    ">
       Login
     </button>
-    <div style="margin-top: 1rem; font-size: 0.9rem;">
-      Belum punya akun? <a onclick="loadPage('register')" style="color: #00f0ff; cursor: pointer;">Daftar di sini</a>
+
+    <!-- Link ke Register -->
+    <div style="margin-top: 1.25rem; font-size: 0.95rem; color: #ccc;">
+      Belum punya akun?
+      <a onclick="loadPage('register')" style="color: #00f0ff; cursor: pointer; text-decoration: none;">
+        Daftar di sini
+      </a>
     </div>
+
   </div>
 </div>
