@@ -17,20 +17,17 @@
       height: 100dvh;
       padding: 1rem;
     }
-
     .container {
       text-align: center;
       max-width: 320px;
       width: 100%;
     }
-
     h1 {
       font-family: 'Orbitron', sans-serif;
       color: #00f0ff;
       text-shadow: 0 0 12px #00f0ff;
       margin-bottom: 1rem;
     }
-
     input {
       width: 100%;
       padding: 0.7rem;
@@ -39,7 +36,6 @@
       border-radius: 6px;
       font-size: 1rem;
     }
-
     button {
       width: 100%;
       padding: 0.8rem;
@@ -52,29 +48,24 @@
       box-shadow: 0 0 12px #00f0ff;
       cursor: pointer;
     }
-
     .link {
       margin-top: 1rem;
       font-size: 0.9rem;
     }
-
     .link a {
       color: #00f0ff;
       text-decoration: none;
     }
-
     .loading {
       margin-top: 1rem;
       font-size: 0.9rem;
       color: #00f0ff;
     }
-
     .success {
       margin-top: 2rem;
       font-size: 1.2rem;
       color: #00ff99;
     }
-
     .error {
       margin-top: 1rem;
       color: #ff5555;
@@ -114,7 +105,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    async function register() {
+    window.register = async function () {
       const name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
@@ -129,12 +120,8 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Tambahkan nama ke profile user Firebase Auth
-        await updateProfile(user, {
-          displayName: name
-        });
+        await updateProfile(user, { displayName: name });
 
-        // Simpan ke Firestore
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           displayName: name,
@@ -143,17 +130,12 @@
           lastActive: serverTimestamp()
         });
 
-        // Feedback + redirect
         form.innerHTML = `<div class="success">✅ Akun berhasil dibuat!<br>Selamat datang, ${name}.</div>`;
 
         setTimeout(() => {
-          try {
-            if (typeof loadPage === "function") {
-              loadPage("dashboard");
-            } else {
-              window.location.href = "/partials/dashboard.html";
-            }
-          } catch (e) {
+          if (typeof loadPage === "function") {
+            loadPage("dashboard");
+          } else {
             window.location.href = "/partials/dashboard.html";
           }
         }, 2000);
@@ -162,7 +144,7 @@
         loading.style.display = "none";
         errorMsg.textContent = "❌ " + error.message;
       }
-    }
+    };
   </script>
 </body>
 </html>
