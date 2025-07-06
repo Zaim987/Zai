@@ -130,12 +130,17 @@
 
   <script>
     async function loadPage(page) {
-      const res = await fetch(`partials/${page}.html`);
-      const html = await res.text();
-      const app = document.getElementById("app");
-      app.innerHTML = html;
-      app.style.opacity = 1;
-      window.history.pushState({ page }, "", `/${page}`);
+      try {
+        const res = await fetch(`/partials/${page}.html`);
+        if (!res.ok) throw new Error('Page not found');
+        const html = await res.text();
+        const app = document.getElementById("app");
+        app.innerHTML = html;
+        app.style.opacity = 1;
+        window.history.pushState({ page }, "", `/${page}`);
+      } catch (err) {
+        document.getElementById("app").innerHTML = "<p style='color:#ccc'>Halaman tidak ditemukan.</p>";
+      }
     }
 
     function startApp() {
@@ -230,6 +235,5 @@
       }
     });
   </script>
-
 </body>
 </html>
