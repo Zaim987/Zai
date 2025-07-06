@@ -4,16 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QuantumX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
       background: #0d1117;
       color: white;
+      font-family: 'Rajdhani', sans-serif;
       overflow-x: hidden;
     }
 
@@ -24,7 +26,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: linear-gradient(160deg, #000000, #0a0f1e);
+      background: linear-gradient(160deg, #000000, #050b1e);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -32,43 +34,58 @@
       text-align: center;
       z-index: 10;
       transition: opacity 1s ease;
-    }
-    #splash .logo {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #00ffff;
-      text-shadow: 0 0 10px #00ffff;
-      margin-bottom: 1.5rem;
-    }
-    #splash .headline {
-      font-size: 1.6rem;
-      color: #ffffff;
-      margin-bottom: 0.5rem;
-    }
-    #splash .subtext {
-      font-size: 1rem;
-      color: #aaa;
-      margin-bottom: 2rem;
-    }
-    #splash button {
-      padding: 0.75rem 2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 999px;
-      background: #00ffff;
-      color: black;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00ffff;
+      animation: fadeIn 1.5s ease;
     }
 
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem;
+      color: #00f0ff;
+      text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+      margin-bottom: 1.5rem;
+      animation: zoomIn 1s ease forwards;
+    }
+
+    .headline {
+      font-size: 1.8rem;
+      color: #ffffff;
+      text-shadow: 0 0 5px #00ffff;
+      margin-bottom: 0.75rem;
+      animation: slideUp 1s ease 0.5s forwards;
+      opacity: 0;
+    }
+
+    .subtext {
+      font-size: 1rem;
+      color: #cccccc;
+      margin-bottom: 2rem;
+      animation: slideUp 1s ease 0.8s forwards;
+      opacity: 0;
+    }
+
+    button {
+      padding: 0.75rem 2rem;
+      font-size: 1.05rem;
+      border: none;
+      border-radius: 999px;
+      background: #00f0ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00f0ff, 0 0 24px #00f0ff;
+      animation: fadeIn 1s ease 1.2s forwards;
+      opacity: 0;
+    }
+
+    /* Nav & App */
     nav {
       display: none;
+      justify-content: center;
       background: #161b22;
       padding: 1rem;
       gap: 1rem;
-      display: flex;
-      justify-content: center;
     }
+
     nav a {
       color: #58a6ff;
       text-decoration: none;
@@ -81,14 +98,30 @@
       opacity: 0;
       transition: opacity 0.4s ease;
     }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Splash screen -->
+  <!-- Splash -->
   <div id="splash">
     <div class="logo">QuantumX</div>
-    <div class="headline">Masuki Dunia Digitalmu Sekarang</div>
+    <div class="headline">Masuki Dunia Digitalmu</div>
     <div class="subtext">Ini bukan masa depan — ini sekarang.</div>
     <button onclick="startApp()">Mulai Sekarang</button>
   </div>
@@ -100,9 +133,10 @@
     <a onclick="loadPage('chat')">Chat</a>
   </nav>
 
-  <!-- Konten halaman -->
+  <!-- Konten -->
   <div id="app"></div>
 
+  <!-- Script -->
   <script>
     async function loadPage(page) {
       const res = await fetch(`partials/${page}.html`);
