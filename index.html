@@ -2,16 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart Room 3D Carousel</title>
+  <title>Smart Room 3D Swipe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      background: radial-gradient(ellipse at center, #0a0f2c, #000);
+      background: radial-gradient(circle at center, #0a0f2c, #000);
       overflow: hidden;
       height: 100vh;
       display: flex;
@@ -20,6 +18,7 @@
       perspective: 1200px;
       font-family: 'Segoe UI', sans-serif;
       color: white;
+      touch-action: pan-y; /* allow horizontal swipe */
     }
 
     .carousel {
@@ -28,7 +27,7 @@
       height: 300px;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform 1s ease;
+      transition: transform 0.2s ease-out;
     }
 
     .panel {
@@ -45,29 +44,6 @@
       justify-content: center;
       font-size: 1.3rem;
       text-align: center;
-      transform-origin: center center;
-    }
-
-    .controls {
-      position: absolute;
-      bottom: 40px;
-      display: flex;
-      gap: 1rem;
-    }
-
-    button {
-      padding: 1rem 1.5rem;
-      font-size: 1.2rem;
-      background: #111;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #222;
     }
 
     @media (max-width: 500px) {
@@ -89,36 +65,53 @@
     <div class="panel" style="transform: rotateY(288deg) translateZ(400px);">⚙️ Settings</div>
   </div>
 
-  <div class="controls">
-    <button onclick="rotate(-1)">◀</button>
-    <button onclick="rotate(1)">▶</button>
-  </div>
-
   <script>
-    let angle = 0;
     const carousel = document.getElementById('carousel');
-    const panelCount = 5;
-    const rotateAmount = 360 / panelCount;
+    let angle = 0;
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    let velocity = 0;
+    let frame;
 
-    function rotate(direction) {
-      angle += direction * rotateAmount;
-      carousel.style.transform = `rotateY(${angle}deg)`;
+    const panelCount = 5;
+    const sensitivity = 0.3; // adjust for faster or slower rotation
+
+    function updateRotation() {
+      const delta = currentX - startX;
+      const rotateBy = delta * sensitivity;
+      carousel.style.transform = `rotateY(${angle + rotateBy}deg)`;
     }
 
-    // Optional: swipe gesture
-    let startX = 0;
+    function onTouchStart(e) {
+      isDragging = true;
+      startX = e.touches ? e.touches[0].clientX : e.clientX;
+      currentX = startX;
+      cancelAnimationFrame(frame);
+    }
 
-    document.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-    });
+    function onTouchMove(e) {
+      if (!isDragging) return;
+      currentX = e.touches ? e.touches[0].clientX : e.clientX;
+      updateRotation();
+    }
 
-    document.addEventListener('touchend', (e) => {
-      const endX = e.changedTouches[0].clientX;
-      const deltaX = endX - startX;
-      if (Math.abs(deltaX) > 50) {
-        rotate(deltaX < 0 ? 1 : -1);
-      }
-    });
+    function onTouchEnd(e) {
+      if (!isDragging) return;
+      const delta = currentX - startX;
+      angle += delta * sensitivity;
+      carousel.style.transform = `rotateY(${angle}deg)`;
+      isDragging = false;
+    }
+
+    // Support both touch and mouse
+    carousel.addEventListener('mousedown', onTouchStart);
+    carousel.addEventListener('mousemove', onTouchMove);
+    document.addEventListener('mouseup', onTouchEnd);
+
+    carousel.addEventListener('touchstart', onTouchStart);
+    carousel.addEventListener('touchmove', onTouchMove);
+    carousel.addEventListener('touchend', onTouchEnd);
   </script>
 </body>
 </html>
