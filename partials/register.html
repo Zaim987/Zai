@@ -1,62 +1,12 @@
-<!-- partials/register.html -->
+
 <div class="container">
   <div class="logo">QuantumX</div>
   <h2>Daftar Akun Baru</h2>
-  <form id="registerForm">
+  <form onsubmit="event.preventDefault(); registerUser();">
     <input type="text" id="name" placeholder="Nama Lengkap" required />
     <input type="email" id="email" placeholder="Email" required />
     <input type="password" id="password" placeholder="Password" required />
     <button type="submit">Daftar</button>
   </form>
   <p>Sudah punya akun? <a href="#" onclick="loadPage('login')">Login di sini</a></p>
-  <div id="loading" style="display:none;margin-top:1rem;">⏳ Mendaftarkan...</div>
 </div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-    authDomain: "quantechapp.firebaseapp.com",
-    projectId: "quantechapp",
-    storageBucket: "quantechapp.firebasestorage.app",
-    messagingSenderId: "825384610343",
-    appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const loading = document.getElementById("loading");
-    loading.style.display = "block";
-
-    try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-
-      await updateProfile(result.user, { displayName: name });
-
-      await setDoc(doc(db, "users", result.user.uid), {
-        uid: result.user.uid,
-        displayName: name,
-        email: email,
-        online: true,
-        createdAt: serverTimestamp()
-      });
-
-      // animasi keluar (fade)
-      document.getElementById("app").style.opacity = 0;
-      setTimeout(() => loadPage("dashboard"), 500);
-    } catch (error) {
-      alert("Gagal mendaftar: " + error.message);
-      loading.style.display = "none";
-    }
-  });
-</script>
