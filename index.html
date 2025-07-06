@@ -2,22 +2,18 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuantumX - Dunia Digitalmu</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantumX - Portal Futuristik</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
   <style>
-    * {
+    html, body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
       height: 100%;
-      background: #0a0a0a;
-      font-family: 'Orbitron', sans-serif;
+      background-color: #000;
       overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      perspective: 1000px;
     }
 
     body::before {
@@ -25,9 +21,9 @@
       position: fixed;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle at center, #0ff2, #00f1, #000 90%);
+      background: radial-gradient(circle at center, #0ff1, #00f1, #000 90%);
       z-index: -3;
-      animation: rotateBG 60s linear infinite;
+      animation: rotateBG 80s linear infinite;
     }
 
     @keyframes rotateBG {
@@ -40,72 +36,63 @@
       width: 100%;
       height: 100%;
       background: url('https://www.transparenttextures.com/patterns/stardust.png');
-      opacity: 0.06;
+      opacity: 0.05;
       z-index: -2;
-      animation: starsMove 60s linear infinite;
+      animation: starsMove 100s linear infinite;
     }
 
     @keyframes starsMove {
       from { background-position: 0 0; }
-      to { background-position: 1000px 1000px; }
+      to { background-position: 2000px 2000px; }
     }
 
-    header {
-      width: 100%;
-      padding: 1.2rem 2rem;
+    .container {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      color: #00f2ff;
-      font-size: 1.2rem;
-      letter-spacing: 1px;
+      height: 100%;
+      color: white;
+      text-align: center;
     }
 
-    .logo {
-      font-weight: 700;
-      font-size: 1.5rem;
+    .hidden {
+      opacity: 0;
+      transform: scale(0.8) translateZ(-200px);
+      filter: blur(12px);
+    }
+
+    .fade-in {
+      animation: appear 1.6s ease-out forwards;
+    }
+
+    @keyframes appear {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateZ(-200px);
+        filter: blur(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateZ(0);
+        filter: blur(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.5rem;
       text-shadow: 0 0 8px #00f2ff;
     }
 
-    main {
-      height: calc(100% - 80px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-    }
-
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      border-radius: 16px;
-      padding: 2.5rem 2rem;
+    p {
+      margin-top: 1rem;
       max-width: 400px;
-      text-align: center;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
-      transition: transform 0.6s ease;
-    }
-
-    .card:hover {
-      transform: perspective(600px) rotateY(6deg) translateY(-4px);
-      box-shadow: 0 0 32px rgba(0, 255, 255, 0.35);
-    }
-
-    .card h1 {
-      font-size: 2rem;
-      color: #ffffff;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 6px #0ff;
-    }
-
-    .card p {
       color: #aaa;
-      font-size: 0.95rem;
-      margin-bottom: 2rem;
+      font-size: 1rem;
     }
 
-    .cta-btn {
+    button {
+      margin-top: 2rem;
       padding: 0.9rem 2rem;
       font-size: 1rem;
       background: #00f2ff;
@@ -114,47 +101,50 @@
       border-radius: 30px;
       cursor: pointer;
       font-weight: bold;
-      box-shadow: 0 0 15px #00f2ff;
-      transition: all 0.3s ease;
+      box-shadow: 0 0 20px #00f2ff;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .cta-btn:hover {
+    button:hover {
       transform: scale(1.08);
-      box-shadow: 0 0 25px #00f2ff;
-    }
-
-    @media (max-width: 480px) {
-      .card {
-        padding: 2rem 1.5rem;
-      }
-
-      .card h1 {
-        font-size: 1.6rem;
-      }
-
-      .cta-btn {
-        font-size: 0.95rem;
-        padding: 0.8rem 1.5rem;
-      }
+      box-shadow: 0 0 30px #00f2ff;
     }
   </style>
 </head>
 <body>
 
+  <!-- Background animasi -->
   <div class="stars"></div>
 
-  <header>
-    <div class="logo">QuantumX</div>
-    <div></div> <!-- Optional: tambahkan navigasi -->
-  </header>
+  <!-- Konten -->
+  <div class="container">
+    <h1 class="hidden" id="title">QuantumX</h1>
+    <p class="hidden" id="desc">Masuki dunia digitalmu. Ini bukan masa depan — ini sekarang.</p>
+    <button class="hidden" id="startBtn" onclick="location.href='login.html'">Mulai Sekarang</button>
+  </div>
 
-  <main>
-    <div class="card">
-      <h1>Masuki Dunia Digitalmu</h1>
-      <p>Jelajahi teknologi futuristik yang menghubungkan Anda dengan masa depan. Semuanya dimulai di sini.</p>
-      <button class="cta-btn" onclick="location.href='login.html'">Mulai Sekarang</button>
-    </div>
-  </main>
+  <!-- Suara -->
+  <audio id="sfx-title" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav" preload="auto"></audio>
+  <audio id="sfx-desc" src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.wav" preload="auto"></audio>
+  <audio id="sfx-btn" src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.wav" preload="auto"></audio>
 
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('title').classList.add('fade-in');
+        document.getElementById('sfx-title').play();
+      }, 500);
+
+      setTimeout(() => {
+        document.getElementById('desc').classList.add('fade-in');
+        document.getElementById('sfx-desc').play();
+      }, 1300);
+
+      setTimeout(() => {
+        document.getElementById('startBtn').classList.add('fade-in');
+        document.getElementById('sfx-btn').play();
+      }, 2100);
+    });
+  </script>
 </body>
 </html>
