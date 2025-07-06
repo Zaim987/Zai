@@ -3,105 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Interaktif Mobile dengan Panel Melingkar</title>
+  <title>Smart Room 3D Dashboard</title>
   <style>
-    body { margin: 0; overflow: hidden; touch-action: none; }
-    canvas { display: block; }
+    body { margin: 0; background: #050c1a; overflow: hidden; }
+    #overlayUI {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+    }
+    .panel {
+      position: absolute;
+      width: 230px; height: 320px;
+      background: rgba(20,40,80,0.38);
+      border-radius: 24px;
+      box-shadow: 0 4px 32px 0 rgba(0,0,0,0.18);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      padding: 24px 18px 16px 18px;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      transition: box-shadow 0.3s;
+    }
+    .panel:hover {
+      box-shadow: 0 8px 48px 0 rgba(0,0,0,0.28);
+    }
+    .title { font-size: 1.18em; font-weight: 600; margin-bottom: 12px;}
+    .subtitle { font-size: 0.9em; color: #c3e0ff; margin-bottom: 4px;}
+    .slider-label { font-size: 0.85em; margin-bottom: 4px;}
+    .slider { width: 100%; }
+    .row { display: flex; justify-content: space-between; align-items: center; }
+    .button { padding: 7px 18px; border-radius: 13px; background: #2196f3; color: #fff; border: none; cursor: pointer;}
+    .avatar { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; margin-bottom: 12px;}
   </style>
 </head>
 <body>
+  <div id="overlayUI"></div>
   <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
   <script>
-    // --- Setup Scene, Camera, Renderer ---
+    // ---- THREE.js ROOM SETUP ----
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    scene.background = new THREE.Color("#111b35");
 
-    const renderer = new THREE.WebGLRenderer({antialias:true});
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 50);
+    camera.position.set(0, 1.35, 0); // Eye level
+
+    const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-    scene.add(ambientLight);
+    // Soft blue light
+    const ambient = new THREE.AmbientLight(0x4060a0, 1.4);
+    scene.add(ambient);
 
-    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight.position.set(0, 10, 10);
-    scene.add(pointLight);
+    // Room walls (box, open front)
+    const roomGeo = new THREE.BoxGeometry(8, 3.5, 8);
+    const roomMat = new THREE.MeshPhysicalMaterial({
+      color: 0x1b2c4a, transmission: 0.94, transparent: true, opacity: 0.89, roughness: 0.85, metalness: 0.02
+    });
+    const roomMesh = new THREE.Mesh(roomGeo, roomMat);
+    roomMesh.position.y = 1.2;
+    scene.add(roomMesh);
 
-    // --- Panel Setup ---
-    const jumlahPanel = 8;
-    const radius = 3;
-    const panels = [];
-    const panelGroup = new THREE.Group();
-
-    for(let i=0; i<jumlahPanel; i++) {
-      const geometry = new THREE.BoxGeometry(1, 1.5, 0.1);
-      const material = new THREE.MeshPhongMaterial({
-        color: 0xffffff * Math.random(),
-        side: THREE.DoubleSide,
-      });
-      const panel = new THREE.Mesh(geometry, material);
-
-      // Circular arrangement
-      const angle = (i / jumlahPanel) * Math.PI * 2;
-      panel.position.x = radius * Math.cos(angle);
-      panel.position.z = radius * Math.sin(angle);
-      panel.lookAt(0, 0, 0);
-
-      panelGroup.add(panel);
-      panels.push(panel);
-    }
-    scene.add(panelGroup);
-
-    // Camera position
-    camera.position.set(0, 0, 0);
-
-    // --- Gesture / Touch Controls ---
-    let lastX = 0;
-    let isDragging = false;
-    let rotationY = 0;
-
-    // For mobile & desktop
-    function onPointerDown(event) {
-      isDragging = true;
-      lastX = event.touches ? event.touches[0].clientX : event.clientX;
-    }
-
-    function onPointerMove(event) {
-      if (!isDragging) return;
-      let clientX = event.touches ? event.touches[0].clientX : event.clientX;
-      let deltaX = clientX - lastX;
-      lastX = clientX;
-      // Adjust rotation speed as desired
-      rotationY += deltaX * 0.01;
-    }
-
-    function onPointerUp(event) {
-      isDragging = false;
-    }
-
-    // Add listeners
-    renderer.domElement.addEventListener('mousedown', onPointerDown);
-    renderer.domElement.addEventListener('mousemove', onPointerMove);
-    renderer.domElement.addEventListener('mouseup', onPointerUp);
-
-    renderer.domElement.addEventListener('touchstart', onPointerDown, {passive: false});
-    renderer.domElement.addEventListener('touchmove', onPointerMove, {passive: false});
-    renderer.domElement.addEventListener('touchend', onPointerUp);
-
-    // --- Responsive Resize ---
-    window.addEventListener('resize', function() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+    // Remove front wall
+    roomMesh.geometry.groups.forEach((g,i)=>{
+      if(i===4) roomMesh.geometry.addGroup(g.start,g.count,0); // front wall not rendered
     });
 
-    // --- Animate Loop ---
+    // Simple bed (cube)
+    const bed = new THREE.Mesh(
+      new THREE.BoxGeometry(2.2,0.46,1.5),
+      new THREE.MeshStandardMaterial({color:0x13213c, roughness:0.5, metalness:0.15})
+    );
+    bed.position.set(0,0.31,-1.8);
+    scene.add(bed);
+
+    // Simple pillow
+    const pillow = new THREE.Mesh(
+      new THREE.BoxGeometry(0.8,0.12,0.35),
+      new THREE.MeshStandardMaterial({color:0x6db1ff, roughness:0.45, metalness:0.10})
+    );
+    pillow.position.set(-0.45,0.56,-1.19);
+    scene.add(pillow);
+    const pillow2 = pillow.clone(); pillow2.position.x = 0.45; scene.add(pillow2);
+
+    // Side plants (cone + box)
+    const plantStem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.06,0.09,0.46,12),
+      new THREE.MeshStandardMaterial({color:0x328066})
+    );
+    plantStem.position.set(-2.7,0.3,-2.2);
+    scene.add(plantStem);
+    const plantLeaf = new THREE.Mesh(
+      new THREE.SphereGeometry(0.28,14,10,0,Math.PI*2,0,Math.PI/2),
+      new THREE.MeshStandardMaterial({color:0x4fe1bc})
+    );
+    plantLeaf.position.set(-2.7,0.66,-2.2);
+    scene.add(plantLeaf);
+
+    // Glass ball
+    const ball = new THREE.Mesh(
+      new THREE.SphereGeometry(0.29,22,18),
+      new THREE.MeshPhysicalMaterial({color:0x39b3e6, transmission:0.98, opacity:0.42, transparent:true, metalness:0.12})
+    );
+    ball.position.set(2.1, 0.31, -2.3);
+    scene.add(ball);
+
+    // ---- PANEL UI (HTML/CSS) ----
+    // Panel configs for demo
+    const panels = [
+      {
+        title: "Schedule",
+        content: `<div class="subtitle">06:00 AM &bull; Meet with Jhone</div>
+        <div class="subtitle">08:00 AM &bull; Shopping</div>
+        <div class="subtitle">09:30 AM &bull; Attend in AR/VR Conferences</div>
+        <button class="button">ADD</button>`
+      },
+      {
+        title: "AC & Light",
+        content: `<div class="slider-label">AC On <span style="float:right">20°C</span></div>
+        <input type="range" min="16" max="26" value="20" class="slider">
+        <div class="slider-label">Light On <span style="float:right">80%</span></div>
+        <input type="range" min="0" max="100" value="80" class="slider">`
+      },
+      {
+        title: "Alarm",
+        content: `<div class="subtitle">06:00 AM &bull; Everyday</div>
+        <div class="subtitle">07:00 AM &bull; Not Scheduled</div>
+        <div class="subtitle">08:00 AM &bull; Sun, Sat, Mon</div>
+        <button class="button">ADD</button>`
+      },
+      {
+        title: "Meditation Soft Music",
+        content: `<img class="avatar" src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=facearea&w=256&h=256" alt="music">
+        <div class="subtitle">Jhon Smith</div>
+        <input type="range" min="0" max="100" value="50" class="slider">
+        <div class="slider-label">Volume</div>`
+      }
+    ];
+
+    const overlayUI = document.getElementById('overlayUI');
+    let panelAngles = [];
+    let basePanelAngle = 0; // For rotation
+
+    function renderPanels() {
+      const n = panels.length;
+      overlayUI.innerHTML = '';
+      const centerX = window.innerWidth/2, centerY = window.innerHeight/2+30;
+      const circleR = Math.min(centerX,centerY)-120;
+
+      for(let i=0;i<n;i++) {
+        const angle = basePanelAngle + Math.PI/2 + (i-(n-1)/2)*(Math.PI/9); // spread horizontally
+        panelAngles[i] = angle;
+        const x = centerX + Math.cos(angle)*circleR - 115;
+        const y = centerY + Math.sin(angle)*circleR*0.22 - 160;
+        const panel = document.createElement('div');
+        panel.className = 'panel';
+        panel.style.left = `${x}px`;
+        panel.style.top = `${y}px`;
+        panel.innerHTML = `<div class="title">${panels[i].title}</div>${panels[i].content}`;
+        overlayUI.appendChild(panel);
+      }
+    }
+    renderPanels();
+
+    // ---- Touch/Drag Interaction ----
+    let dragging = false, lastX = 0;
+    window.addEventListener('pointerdown',e=>{
+      dragging = true; lastX = e.clientX;
+    });
+    window.addEventListener('pointermove',e=>{
+      if(!dragging) return;
+      let dx = e.clientX - lastX; lastX = e.clientX;
+      basePanelAngle += dx * 0.0063;
+      renderPanels();
+    });
+    window.addEventListener('pointerup',()=>{ dragging = false; });
+    window.addEventListener('resize',renderPanels);
+
+    // ---- Animate (room subtle movement) ----
     function animate() {
-      requestAnimationFrame(animate);
-      // Rotasi panel secara horizontal
-      panelGroup.rotation.y = rotationY;
+      roomMesh.rotation.y = Math.sin(Date.now()*0.0002)*0.06;
       renderer.render(scene, camera);
+      requestAnimationFrame(animate);
     }
     animate();
   </script>
