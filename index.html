@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart Room 3D - Mobile</title>
+  <title>Smart Room 3D - Centered</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
     * {
@@ -13,13 +13,12 @@
     html, body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at center, #0a0f2c, #000);
-      height: 100%;
       width: 100%;
+      height: 100%;
       overflow: hidden;
       font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at center, #0a0f2c, #000);
       color: white;
-      touch-action: pan-y;
     }
 
     body {
@@ -27,12 +26,13 @@
       align-items: center;
       justify-content: center;
       perspective: 1000px;
+      touch-action: pan-y;
     }
 
     .carousel {
       width: 100vw;
-      height: 60vh;
       max-width: 320px;
+      height: 300px;
       position: relative;
       transform-style: preserve-3d;
       transition: transform 0.2s ease-out;
@@ -50,16 +50,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       text-align: center;
       left: 5%;
-      top: 20px;
+      top: 70px;
+    }
+
+    @media (max-height: 500px) {
+      .carousel {
+        height: 250px;
+      }
+      .panel {
+        height: 140px;
+        top: 50px;
+        font-size: 1rem;
+      }
     }
 
     @media (max-width: 400px) {
       .panel {
-        height: 140px;
+        height: 130px;
         font-size: 1rem;
+        top: 50px;
       }
     }
   </style>
@@ -112,10 +124,10 @@
     carousel.addEventListener('touchmove', onMove);
     carousel.addEventListener('touchend', onEnd);
 
-    // Optional mouse support (desktop testing)
     carousel.addEventListener('mousedown', onStart);
     carousel.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onEnd);
   </script>
+
 </body>
 </html>
