@@ -19,6 +19,18 @@
       overflow-x: hidden;
     }
 
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      opacity: 1;
+      z-index: 100;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
     #splash {
       position: fixed;
       top: 0;
@@ -124,6 +136,9 @@
 </head>
 <body>
 
+  <!-- Overlay animasi transisi -->
+  <div id="overlay"></div>
+
   <!-- Splash screen -->
   <div id="splash">
     <div class="logo">QuantumX</div>
@@ -139,9 +154,10 @@
     <a onclick="loadPage('chat')">Chat</a>
   </nav>
 
-  <!-- Konten halaman -->
+  <!-- Konten -->
   <div id="app"></div>
 
+  <!-- Script -->
   <script>
     async function loadPage(page) {
       const res = await fetch(`partials/${page}.html`);
@@ -178,6 +194,7 @@
 
     function resetSplash() {
       const splash = document.getElementById("splash");
+      const overlay = document.getElementById("overlay");
       splash.style.display = "flex";
       splash.style.opacity = 1;
 
@@ -186,19 +203,24 @@
       const subtext = splash.querySelector(".subtext");
       const button = splash.querySelector("button");
 
-      // Reset fade-out dan animasi masuk
       [logo, headline, subtext, button].forEach(el => {
         el.classList.remove("fade-out");
         el.style.opacity = 1;
         el.style.animation = "none";
-        el.offsetHeight; // trigger reflow
+        el.offsetHeight;
       });
 
-      // Set animasi masuk ulang
+      // Tampilkan ulang animasi
       logo.style.animation = "zoomIn 1s ease forwards";
       headline.style.animation = "slideUp 1s ease 0.5s forwards";
       subtext.style.animation = "slideUp 1s ease 0.8s forwards";
       button.style.animation = "fadeIn 1s ease 1.2s forwards";
+
+      // Tampilkan overlay hitam lalu fade out
+      overlay.style.opacity = 1;
+      setTimeout(() => {
+        overlay.style.opacity = 0;
+      }, 100); // Delay agar efek mulus
     }
 
     function showSplash() {
@@ -230,6 +252,11 @@
             loadPage(current);
           }, 1000);
         }, 500);
+      } else {
+        // Saat pertama masuk ke splash, fade out overlay
+        setTimeout(() => {
+          document.getElementById("overlay").style.opacity = 0;
+        }, 300);
       }
     });
   </script>
