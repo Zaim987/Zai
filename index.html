@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Smart Room 3D - Centered</title>
+  <title>Smart Room 3D - Inside Mode</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <style>
     * {
@@ -54,6 +54,7 @@
       text-align: center;
       left: 5%;
       top: 70px;
+      transform-origin: center center;
     }
 
     @media (max-height: 500px) {
@@ -78,13 +79,7 @@
 </head>
 <body>
 
-  <div class="carousel" id="carousel">
-    <div class="panel" style="transform: rotateY(0deg) translateZ(320px);">📅 Schedule</div>
-    <div class="panel" style="transform: rotateY(72deg) translateZ(320px);">❄️ AC Control</div>
-    <div class="panel" style="transform: rotateY(144deg) translateZ(320px);">⏰ Alarm</div>
-    <div class="panel" style="transform: rotateY(216deg) translateZ(320px);">🎵 Music</div>
-    <div class="panel" style="transform: rotateY(288deg) translateZ(320px);">⚙️ Settings</div>
-  </div>
+  <div class="carousel" id="carousel"></div>
 
   <script>
     const carousel = document.getElementById('carousel');
@@ -93,7 +88,27 @@
     let startX = 0;
     let currentX = 0;
     const sensitivity = 0.35;
+    const radius = 320;
+    const panels = [
+      '📅 Schedule',
+      '❄️ AC Control',
+      '⏰ Alarm',
+      '🎵 Music',
+      '⚙️ Settings'
+    ];
 
+    // Generate panels
+    panels.forEach((text, i) => {
+      const deg = i * (360 / panels.length);
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      // rotateY to place, then rotateY(180deg) to face inward
+      panel.style.transform = `rotateY(${deg}deg) translateZ(${radius}px) rotateY(180deg)`;
+      panel.textContent = text;
+      carousel.appendChild(panel);
+    });
+
+    // Drag to rotate
     function updateRotation() {
       const delta = currentX - startX;
       const rotateBy = delta * sensitivity;
@@ -120,6 +135,7 @@
       isDragging = false;
     }
 
+    // Touch and mouse listeners
     carousel.addEventListener('touchstart', onStart);
     carousel.addEventListener('touchmove', onMove);
     carousel.addEventListener('touchend', onEnd);
