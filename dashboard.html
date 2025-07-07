@@ -58,17 +58,16 @@ h1 {
   transform: scale(1.02);
 }
 
-.card.expanded {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 80vw !important;
-  max-width: 360px !important;
-  z-index: 1001 !important;
-  box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff !important;
-  padding: 1.5rem !important;
-  box-sizing: border-box !important;
+.clone-card {
+  position: fixed;
+  background: #111827;
+  box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  z-index: 1001;
+  transition: all 0.4s ease;
+  overflow: hidden;
 }
 
 #logoutButton {
@@ -172,21 +171,44 @@ h1 {
       }
     });
 
-    let expandedCard = null;
+    let clone = null;
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => {
-        if (expandedCard) return;
-        card.classList.add('expanded');
+        if (clone) return;
+
+        const rect = card.getBoundingClientRect();
+        const scrollY = window.scrollY;
+        const cloneEl = card.cloneNode(true);
+
+        cloneEl.classList.add('clone-card');
+        cloneEl.style.top = (rect.top + scrollY) + 'px';
+        cloneEl.style.left = rect.left + 'px';
+        cloneEl.style.width = rect.width + 'px';
+        cloneEl.style.height = rect.height + 'px';
+
+        document.body.appendChild(cloneEl);
         overlay.style.display = 'block';
-        expandedCard = card;
+        clone = cloneEl;
+
+        requestAnimationFrame(() => {
+          cloneEl.style.top = '50%';
+          cloneEl.style.left = '50%';
+          cloneEl.style.transform = 'translate(-50%, -50%)';
+          cloneEl.style.width = '80vw';
+          cloneEl.style.maxWidth = '360px';
+        });
       });
     });
 
     overlay.addEventListener('click', () => {
-      if (!expandedCard) return;
-      expandedCard.classList.remove('expanded');
-      overlay.style.display = 'none';
-      expandedCard = null;
+      if (!clone) return;
+      clone.style.opacity = '0';
+      clone.style.transform += ' scale(0.9)';
+      setTimeout(() => {
+        clone.remove();
+        clone = null;
+        overlay.style.display = 'none';
+      }, 300);
     });
   </script></body>
 </html>
