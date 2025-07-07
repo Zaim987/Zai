@@ -1,10 +1,18 @@
 <!DOCTYPE html><html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUpOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-30px); }
+    }
     body {
       font-family: 'Rajdhani', sans-serif;
       background-color: #0d1117;
@@ -12,6 +20,8 @@
       padding: 2rem;
       overflow-x: hidden;
     }
+    .fade-in { opacity: 0; animation: fadeSlideUp 0.8s ease forwards; }
+    .fade-out { animation: fadeUpOut 0.5s ease forwards; }
     h1 {
       color: #00f0ff;
       text-shadow: 0 0 10px #00f0ff;
@@ -31,10 +41,12 @@
       transition: transform 0.3s ease;
       cursor: pointer;
       position: relative;
+      z-index: 1;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
     }
-    .card:hover {
-      transform: scale(1.02);
-    }
+    .card:hover { transform: scale(1.02); }
+    .card:focus { outline: none; }
     .clone-card {
       position: fixed;
       background: #111827;
@@ -44,6 +56,7 @@
       box-sizing: border-box;
       z-index: 1001;
       transition: all 0.7s ease;
+      overflow: hidden;
     }
     #logoutButton {
       margin: 2rem auto 0;
@@ -57,43 +70,99 @@
       border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444;
+      transition: transform 0.2s ease;
     }
+    #logoutButton:hover { transform: scale(1.05); }
     #overlay {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(4px);
       z-index: 1000;
     }
+    .youtube-search {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .youtube-search input {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    .youtube-search button {
+      background: #00f0ff;
+      color: black;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .youtube-results {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .video-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      background: #1a1f2c;
+      padding: 0.5rem;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+    .video-item:hover { background: #222b3a; }
+    .video-item img { width: 120px; border-radius: 6px; }
+    iframe {
+      width: 100%; height: 240px;
+      border: none;
+      border-radius: 12px;
+      margin-top: 1rem;
+    }
   </style>
 </head>
-<body>
-  <h1>🚀 Selamat Datang di Dashboard</h1>
+<body class="fade-in">
+  <h1> Selamat Datang di Dashboard</h1>
   <div class="grid-container">
     <div class="card">
-      <h2>📊 Statistik</h2>
+      <h2> Statistik</h2>
       <p>Total Pengguna: <span id="totalUsers">-</span></p>
     </div>
     <div class="card">
-      <h2>👤 Profil</h2>
+      <h2> Profil</h2>
       <p>Email: <span id="userEmail">-</span></p>
     </div>
     <div class="card">
-      <h2>🕒 Aktivitas Terakhir</h2>
+      <h2> Aktivitas Terakhir</h2>
       <p>Belum tersedia</p>
+    </div>
+    <div class="card">
+      <h2> YouTube Mini</h2>
+      <div class="youtube-search">
+        <input type="text" id="searchInput" placeholder="Cari video YouTube...">
+        <button id="searchBtn">Cari</button>
+      </div>
+      <div class="youtube-results" id="results"></div>
+      <div id="player"></div>
     </div>
   </div>
   <button id="logoutButton">Logout</button>
   <div id="overlay"></div>
+  <!-- SCRIPT AKTIF DI SINI -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904",
+  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
   authDomain: "quantechapp.firebaseapp.com",
   projectId: "quantechapp",
   storageBucket: "quantechapp.appspot.com",
@@ -105,26 +174,28 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-setPersistence(auth, browserLocalPersistence);
-
 const logoutBtn = document.getElementById("logoutButton");
 const userEmailSpan = document.getElementById("userEmail");
 const totalUsersSpan = document.getElementById("totalUsers");
 const overlay = document.getElementById("overlay");
 
 logoutBtn?.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (user) {
-    await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
-  }
-  await signOut(auth);
-  sessionStorage.clear();
-  localStorage.clear();
-  window.location.href = "login.html";
+  document.body.classList.remove("fade-in");
+  document.body.classList.add("fade-out");
+
+  setTimeout(async () => {
+    const user = auth.currentUser;
+    if (user) {
+      await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
+    }
+    await signOut(auth);
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = "login.html";
+  }, 500);
 });
 
 onAuthStateChanged(auth, async user => {
-  console.log("Auth state changed:", user);
   if (user) {
     userEmailSpan.textContent = user.email;
     try {
@@ -138,51 +209,95 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-let clone = null;
-let originalCard = null;
-let originalRect = null;
+const apiKey = "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904";
+function setYouTubeListeners(root) {
+  const searchBtn = root.querySelector("#searchBtn");
+  const input = root.querySelector("#searchInput");
+  const results = root.querySelector("#results");
+  const player = root.querySelector("#player");
+  if (!searchBtn || !input || !results || !player) return;
+  searchBtn.addEventListener("click", async () => {
+    const query = input.value.trim();
+    if (!query) return;
+    results.innerHTML = "<p>Loading...</p>";
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${apiKey}`);
+      const data = await res.json();
+      results.innerHTML = "";
+      data.items.forEach(item => {
+        const videoId = item.id.videoId;
+        const snippet = item.snippet;
+        const div = document.createElement("div");
+        div.className = "video-item";
+        div.innerHTML = `
+          <img src="${snippet.thumbnails.medium.url}" alt="${snippet.title}" />
+          <div>
+            <strong>${snippet.title}</strong><br>
+            <small>${snippet.channelTitle}</small>
+          </div>
+        `;
+        div.addEventListener("click", () => {
+          player.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
+        });
+        results.appendChild(div);
+      });
+    } catch (err) {
+      results.innerHTML = `<p style='color:red'>Gagal ambil video</p>`;
+      console.error(err);
+    }
+  });
+}
 
-document.querySelectorAll(".card").forEach(card => {
-  card.addEventListener("click", () => {
-    if (clone) return;
-    originalRect = card.getBoundingClientRect();
-    const scrollY = window.scrollY;
-    const cloneEl = card.cloneNode(true);
-    cloneEl.classList.add("clone-card");
-    cloneEl.style.top = (originalRect.top + scrollY) + "px";
-    cloneEl.style.left = originalRect.left + "px";
-    cloneEl.style.width = originalRect.width + "px";
-    cloneEl.style.height = originalRect.height + "px";
-    document.body.appendChild(cloneEl);
-    card.style.visibility = "hidden";
-    overlay.style.display = "block";
-    clone = cloneEl;
-    originalCard = card;
-    requestAnimationFrame(() => {
-      cloneEl.style.top = "50%";
-      cloneEl.style.left = "50%";
-      cloneEl.style.transform = "translate(-50%, -50%)";
-      cloneEl.style.width = "80vw";
-      cloneEl.style.maxWidth = "360px";
+window.addEventListener("DOMContentLoaded", () => {
+  setYouTubeListeners(document);
+
+  let clone = null;
+  let originalCard = null;
+  let originalRect = null;
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (clone) return;
+      originalRect = card.getBoundingClientRect();
+      const scrollY = window.scrollY;
+      const cloneEl = card.cloneNode(true);
+      cloneEl.classList.add('clone-card');
+      cloneEl.style.top = (originalRect.top + scrollY) + 'px';
+      cloneEl.style.left = originalRect.left + 'px';
+      cloneEl.style.width = originalRect.width + 'px';
+      cloneEl.style.height = originalRect.height + 'px';
+      document.body.appendChild(cloneEl);
+      card.style.visibility = 'hidden';
+      overlay.style.display = 'block';
+      clone = cloneEl;
+      originalCard = card;
+      requestAnimationFrame(() => {
+        cloneEl.style.top = '50%';
+        cloneEl.style.left = '50%';
+        cloneEl.style.transform = 'translate(-50%, -50%)';
+        cloneEl.style.width = '80vw';
+        cloneEl.style.maxWidth = '360px';
+      });
+      setTimeout(() => setYouTubeListeners(cloneEl), 400);
     });
   });
-});
 
-overlay.addEventListener("click", () => {
-  if (!clone || !originalRect) return;
-  clone.style.top = (originalRect.top + window.scrollY) + "px";
-  clone.style.left = originalRect.left + "px";
-  clone.style.width = originalRect.width + "px";
-  clone.style.height = originalRect.height + "px";
-  clone.style.transform = "translate(0, 0)";
-  setTimeout(() => {
-    clone.remove();
-    overlay.style.display = "none";
-    originalCard.style.visibility = "visible";
-    clone = null;
-    originalCard = null;
-    originalRect = null;
-  }, 700);
+  overlay.addEventListener('click', () => {
+    if (!clone || !originalRect) return;
+    clone.style.top = (originalRect.top + window.scrollY) + 'px';
+    clone.style.left = originalRect.left + 'px';
+    clone.style.width = originalRect.width + 'px';
+    clone.style.height = originalRect.height + 'px';
+    clone.style.transform = 'translate(0, 0)';
+    setTimeout(() => {
+      clone.remove();
+      overlay.style.display = 'none';
+      if (originalCard) originalCard.style.visibility = 'visible';
+      clone = null;
+      originalCard = null;
+      originalRect = null;
+    }, 900);
+  });
 });
 
   </script>
