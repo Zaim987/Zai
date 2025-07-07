@@ -1,13 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Dashboard
+  </title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&amp;family=Rajdhani:wght@400;600&amp;display=swap" rel="stylesheet"/>
   <style>
-    body {
+   body {
       font-family: 'Rajdhani', sans-serif;
       background-color: #0d1117;
       color: white;
@@ -144,37 +145,67 @@
       z-index: 10;
     }
   </style>
-</head>
-<body>
-  <h1>ðŸš€ Selamat Datang di Dashboard</h1>
+ </head>
+ <body>
+  <h1>
+   ðŸš€ Selamat Datang di Dashboard
+  </h1>
   <div class="grid-container">
-    <div class="card">
-      <h2>ðŸ“Š Statistik</h2>
-      <p>Total Pengguna: <span id="totalUsers">-</span></p>
+   <div class="card">
+    <h2>
+     ðŸ“Š Statistik
+    </h2>
+    <p>
+     Total Pengguna:
+     <span id="totalUsers">
+      -
+     </span>
+    </p>
+   </div>
+   <div class="card">
+    <h2>
+     ðŸ‘¤ Profil
+    </h2>
+    <p>
+     Email:
+     <span id="userEmail">
+      -
+     </span>
+    </p>
+   </div>
+   <div class="card">
+    <h2>
+     ðŸ•’ Aktivitas Terakhir
+    </h2>
+    <p>
+     Belum tersedia
+    </p>
+   </div>
+   <div class="card" id="youtubeCard">
+    <h2>
+     ðŸ“º YouTube Mini
+    </h2>
+    <div class="youtube-search">
+     <input id="searchInput" placeholder="Cari video YouTube..." type="text"/>
+     <button id="searchBtn">
+      Cari
+     </button>
     </div>
-    <div class="card">
-      <h2>ðŸ‘¤ Profil</h2>
-      <p>Email: <span id="userEmail">-</span></p>
+    <div class="youtube-results" id="results">
     </div>
-    <div class="card">
-      <h2>ðŸ•’ Aktivitas Terakhir</h2>
-      <p>Belum tersedia</p>
-    </div>
-    <div class="card" id="youtubeCard">
-      <h2>ðŸ“º YouTube Mini</h2>
-      <div class="youtube-search">
-        <input type="text" id="searchInput" placeholder="Cari video YouTube...">
-        <button id="searchBtn">Cari</button>
-      </div>
-      <div class="youtube-results" id="results"></div>
-    </div>
+   </div>
   </div>
-  <button id="logoutButton">Logout</button>
-  <div id="overlay"></div>
-  <div id="floating-player"></div>
-
+  <button id="logoutButton">
+   Logout
+  </button>
+  <div id="overlay">
+  </div>
+  <div id="floating-player">
+  </div>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+// =================== Firebase Init ===================
+
+   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
@@ -191,13 +222,16 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const logoutBtn = document.getElementById("logoutButton");
+    // =================== DOM Reference ===================
+const logoutBtn = document.getElementById("logoutButton");
     const userEmailSpan = document.getElementById("userEmail");
     const totalUsersSpan = document.getElementById("totalUsers");
     const overlay = document.getElementById("overlay");
     const floating = document.getElementById("floating-player");
 
-    logoutBtn?.addEventListener("click", async () => {
+    
+// =================== Logout Handler ===================
+logoutBtn?.addEventListener("click", async () => {
       const user = auth.currentUser;
       if (user) {
         await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
@@ -208,7 +242,9 @@
       window.location.href = "login.html";
     });
 
-    onAuthStateChanged(auth, async user => {
+    
+// =================== Auth Redirect Handler ===================
+onAuthStateChanged(auth, async user => {
       if (user) {
         userEmailSpan.textContent = user.email;
         try {
@@ -226,7 +262,9 @@
     const input = document.getElementById("searchInput");
     const results = document.getElementById("results");
 
-    searchBtn?.addEventListener("click", async () => {
+    
+// =================== YouTube Search Logic ===================
+searchBtn?.addEventListener("click", async () => {
       const query = input.value.trim();
       if (!query) return;
       results.innerHTML = "<p>Loading...</p>";
@@ -250,7 +288,9 @@
       });
     });
 
-    function openFloatingPlayer(videoId) {
+    
+// =================== Floating YouTube Player ===================
+function openFloatingPlayer(videoId) {
       floating.style.display = "block";
       floating.innerHTML = `
         <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>
@@ -266,7 +306,9 @@
     let originalCard = null;
     let originalRect = null;
 
-    document.querySelectorAll(".card").forEach(card => {
+    
+// =================== Zoom Panel Except YouTube ===================
+document.querySelectorAll(".card").forEach(card => {
       card.addEventListener("click", () => {
         if (card.id === "youtubeCard" || clone) return;
         originalRect = card.getBoundingClientRect();
@@ -292,7 +334,9 @@
       });
     });
 
-    overlay.addEventListener("click", () => {
+    
+// =================== Close Zoomed Card ===================
+overlay.addEventListener("click", () => {
       if (!clone || !originalRect) return;
       clone.style.top = (originalRect.top + window.scrollY) + "px";
       clone.style.left = originalRect.left + "px";
@@ -309,5 +353,5 @@
       }, 700);
     });
   </script>
-</body>
+ </body>
 </html>
