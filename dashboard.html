@@ -1,50 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Rajdhani', sans-serif;
-      background-color: #0d1117;
-      color: white;
-      text-align: center;
-      padding: 2rem;
-    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }@keyframes fadeUpOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-30px); }
+}
 
-    h1 {
-      color: #00f0ff;
-      text-shadow: 0 0 10px #00f0ff;
-    }
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background-color: #0d1117;
+  color: white;
+  padding: 2rem;
+  overflow-x: hidden;
+}
 
-    #logoutButton {
-      margin-top: 2rem;
-      padding: 0.75rem 2rem;
-      font-size: 1rem;
-      font-weight: bold;
-      background: #ff4444;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444;
-      transition: transform 0.2s ease;
-    }
+.fade-in {
+  opacity: 0;
+  animation: fadeSlideUp 0.8s ease forwards;
+}
 
-    #logoutButton:hover {
-      transform: scale(1.05);
-    }
+.fade-out {
+  animation: fadeUpOut 0.5s ease forwards;
+}
+
+h1 {
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff;
+  text-align: center;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background: #111827;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+#logoutButton {
+  margin: 2rem auto 0;
+  display: block;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444;
+  transition: transform 0.2s ease;
+}
+
+#logoutButton:hover {
+  transform: scale(1.05);
+}
+
   </style>
 </head>
-<body>
-  <h1>Selamat datang di Dashboard</h1>
-  <button id="logoutButton">Logout</button>
+<body class="fade-in">
+  <h1>🚀 Selamat Datang di Dashboard</h1>
+  <div class="grid-container">
+    <div class="card">
+      <h2>📊 Statistik</h2>
+      <p>Total Pengguna: <span id="totalUsers">-</span></p>
+    </div>
+    <div class="card">
+      <h2>👤 Profil</h2>
+      <p>Email: <span id="userEmail">-</span></p>
+    </div>
+    <div class="card">
+      <h2>🕒 Aktivitas Terakhir</h2>
+      <p>Belum tersedia</p>
+    </div>
+  </div><button id="logoutButton">Logout</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
@@ -60,31 +112,37 @@
     const db = getFirestore(app);
 
     const logoutBtn = document.getElementById("logoutButton");
+    const userEmailSpan = document.getElementById("userEmail");
+    const totalUsersSpan = document.getElementById("totalUsers");
 
     logoutBtn.addEventListener("click", async () => {
-      try {
+      document.body.classList.remove("fade-in");
+      document.body.classList.add("fade-out");
+
+      setTimeout(async () => {
         const user = auth.currentUser;
         if (user) {
-          // ✅ Set status offline di Firestore
-          await setDoc(doc(db, "users", user.uid), {
-            online: false
-          }, { merge: true });
+          await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
         }
-
-        // ✅ Sign out user
         await signOut(auth);
-
-        // ✅ Hapus semua session dan riwayat lokal
         sessionStorage.clear();
         localStorage.clear();
-
-        // ✅ Redirect ke login
         window.location.href = "login.html";
-      } catch (error) {
-        console.error("Logout gagal:", error);
-        alert("Terjadi kesalahan saat logout.");
+      }, 500);
+    });
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        userEmailSpan.textContent = user.email;
+        try {
+          const snapshot = await getDocs(collection(db, "users"));
+          totalUsersSpan.textContent = snapshot.size;
+        } catch (err) {
+          totalUsersSpan.textContent = "Gagal memuat";
+        }
+      } else {
+        window.location.href = "login.html";
       }
     });
-  </script>
-</body>
+  </script></body>
 </html>
