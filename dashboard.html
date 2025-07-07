@@ -8,12 +8,11 @@
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
-    }@keyframes fadeUpOut {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-30px); }
-}
-
-body {
+    }
+    @keyframes fadeUpOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-30px); }
+    }body {
   font-family: 'Rajdhani', sans-serif;
   background-color: #0d1117;
   color: white;
@@ -21,14 +20,8 @@ body {
   overflow-x: hidden;
 }
 
-.fade-in {
-  opacity: 0;
-  animation: fadeSlideUp 0.8s ease forwards;
-}
-
-.fade-out {
-  animation: fadeUpOut 0.5s ease forwards;
-}
+.fade-in { opacity: 0; animation: fadeSlideUp 0.8s ease forwards; }
+.fade-out { animation: fadeUpOut 0.5s ease forwards; }
 
 h1 {
   color: #00f0ff;
@@ -56,13 +49,8 @@ h1 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.card:hover {
-  transform: scale(1.02);
-}
-
-.card:focus {
-  outline: none;
-}
+.card:hover { transform: scale(1.02); }
+.card:focus { outline: none; }
 
 .clone-card {
   position: fixed;
@@ -91,9 +79,7 @@ h1 {
   transition: transform 0.2s ease;
 }
 
-#logoutButton:hover {
-  transform: scale(1.05);
-}
+#logoutButton:hover { transform: scale(1.05); }
 
 #overlay {
   display: none;
@@ -103,6 +89,53 @@ h1 {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   z-index: 1000;
+}
+
+.youtube-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.youtube-search input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+.youtube-search button {
+  background: #00f0ff;
+  color: black;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.youtube-results {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.video-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  background: #1a1f2c;
+  padding: 0.5rem;
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+.video-item:hover { background: #222b3a; }
+.video-item img { width: 120px; border-radius: 6px; }
+iframe {
+  width: 100%; height: 240px;
+  border: none;
+  border-radius: 12px;
+  margin-top: 1rem;
 }
 
   </style>
@@ -121,6 +154,15 @@ h1 {
     <div class="card">
       <h2>🕒 Aktivitas Terakhir</h2>
       <p>Belum tersedia</p>
+    </div>
+    <div class="card">
+      <h2>📺 YouTube Mini</h2>
+      <div class="youtube-search">
+        <input type="text" id="searchInput" placeholder="Cari video YouTube...">
+        <button id="searchBtn">Cari</button>
+      </div>
+      <div class="youtube-results" id="results"></div>
+      <div id="player"></div>
     </div>
   </div><button id="logoutButton">Logout</button>
 
@@ -177,6 +219,7 @@ h1 {
       }
     });
 
+    // Kartu Zoom Animation Tetap Aktif
     let clone = null;
     let originalCard = null;
     let originalRect = null;
@@ -184,24 +227,19 @@ h1 {
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => {
         if (clone) return;
-
         originalRect = card.getBoundingClientRect();
         const scrollY = window.scrollY;
         const cloneEl = card.cloneNode(true);
-
         cloneEl.classList.add('clone-card');
         cloneEl.style.top = (originalRect.top + scrollY) + 'px';
         cloneEl.style.left = originalRect.left + 'px';
         cloneEl.style.width = originalRect.width + 'px';
         cloneEl.style.height = originalRect.height + 'px';
-
         document.body.appendChild(cloneEl);
         card.style.visibility = 'hidden';
         overlay.style.display = 'block';
-
         clone = cloneEl;
         originalCard = card;
-
         requestAnimationFrame(() => {
           cloneEl.style.top = '50%';
           cloneEl.style.left = '50%';
@@ -214,13 +252,11 @@ h1 {
 
     overlay.addEventListener('click', () => {
       if (!clone || !originalRect) return;
-
       clone.style.top = (originalRect.top + window.scrollY) + 'px';
       clone.style.left = originalRect.left + 'px';
       clone.style.width = originalRect.width + 'px';
       clone.style.height = originalRect.height + 'px';
       clone.style.transform = 'translate(0, 0)';
-
       setTimeout(() => {
         clone.remove();
         overlay.style.display = 'none';
@@ -229,6 +265,39 @@ h1 {
         originalCard = null;
         originalRect = null;
       }, 900);
+    });
+
+    // YouTube Mini App
+    const apiKey = "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904";
+    const searchBtn = document.getElementById("searchBtn");
+    const input = document.getElementById("searchInput");
+    const results = document.getElementById("results");
+    const player = document.getElementById("player");
+
+    searchBtn.addEventListener("click", async () => {
+      const query = input.value.trim();
+      if (!query) return;
+      results.innerHTML = "<p>Loading...</p>";
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${apiKey}`);
+      const data = await res.json();
+      results.innerHTML = "";
+      data.items.forEach(item => {
+        const videoId = item.id.videoId;
+        const snippet = item.snippet;
+        const div = document.createElement("div");
+        div.className = "video-item";
+        div.innerHTML = `
+          <img src="${snippet.thumbnails.medium.url}" alt="${snippet.title}" />
+          <div>
+            <strong>${snippet.title}</strong><br>
+            <small>${snippet.channelTitle}</small>
+          </div>
+        `;
+        div.addEventListener("click", () => {
+          player.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
+        });
+        results.appendChild(div);
+      });
     });
   </script></body>
 </html>
