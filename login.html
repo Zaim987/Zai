@@ -18,12 +18,16 @@
       from { opacity: 1; transform: translateY(0); }
       to { opacity: 0; transform: translateY(-30px); }
     }
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
 
     .fade-in { opacity: 0; animation: fadeSlideUp 0.8s ease forwards; }
     .fade-delay-1 { animation-delay: 0.3s; }
     .fade-delay-2 { animation-delay: 0.6s; }
     .fade-delay-3 { animation-delay: 0.9s; }
     .fade-delay-4 { animation-delay: 1.2s; }
+
     .fade-out { animation: fadeOut 0.6s ease forwards; }
 
     .fade-up-out {
@@ -80,8 +84,48 @@
       cursor: pointer;
       box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
       transition: transform 0.2s ease;
+      position: relative;
     }
     button:hover { transform: scale(1.05); }
+
+    /* Spinner & Success */
+    button.loading {
+      color: transparent !important;
+      pointer-events: none;
+    }
+
+    button.loading::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border: 3px solid white;
+      border-top: 3px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    button.success {
+      background-color: #00d26a;
+      color: white !important;
+      font-size: 1.2rem;
+    }
+
+    button.success::after {
+      content: "✓";
+      animation: none;
+      font-size: 1.5rem;
+      color: white;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: none;
+    }
+
     .login-container {
       max-width: 320px;
       margin: 0 auto;
@@ -165,7 +209,8 @@
       const errorDiv = document.getElementById("error");
 
       button.disabled = true;
-      button.textContent = "⏳ Memproses...";
+      button.classList.add("loading");
+      button.textContent = "Logging in...";
 
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -173,19 +218,37 @@
 
         await setDoc(doc(db, "users", user.uid), { online: true }, { merge: true });
 
-        document.querySelector('.login-container').classList.add('fade-out');
-        document.getElementById("overlay").style.opacity = 1;
+        // Spinner selama 5 detik
         setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 800);
+          button.classList.remove("loading");
+          button.classList.add("success");
+          button.textContent = "";
+
+          const elements = [
+            { el: document.getElementById("logo"), delayClass: "fade-up-delay-1" },
+            { el: document.getElementById("headline"), delayClass: "fade-up-delay-2" },
+            { el: document.getElementById("loginForm"), delayClass: "fade-up-delay-3" },
+            { el: document.getElementById("registerLink"), delayClass: "fade-up-delay-4" },
+          ];
+
+          elements.forEach(item => {
+            item.el.classList.remove("fade-in");
+            item.el.classList.add("fade-up-out", item.delayClass);
+          });
+
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 800);
+        }, 5000);
       } catch (error) {
         errorDiv.textContent = error.message.replace("Firebase:", "").trim();
         button.disabled = false;
+        button.classList.remove("loading");
         button.textContent = "Login";
       }
     });
 
-    // ✨ Transisi keluar sebelum redirect ke register
+    // Transisi keluar sebelum redirect ke register
     document.getElementById("toRegister").addEventListener("click", function (e) {
       e.preventDefault();
 
