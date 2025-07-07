@@ -1,71 +1,107 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avengers Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background-color: #0d1117;
+      background: linear-gradient(145deg, #0d1117, #1c1f26);
       color: white;
       font-family: 'Rajdhani', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-    }h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 2rem;
-  color: #00f0ff;
-  text-shadow: 0 0 10px #00f0ff;
-  margin-bottom: 2rem;
-}
-
-.fade-in {
-  opacity: 0;
-  animation: fadeSlideUp 0.8s ease forwards;
-}
-
-.fade-out {
-  animation: fadeUpOut 0.5s ease forwards;
-}
-
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeUpOut {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-30px); }
-}
-
-button {
-  padding: 0.75rem 2rem;
-  font-size: 1rem;
-  font-weight: bold;
-  background: #00f0ff;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-  transition: all 0.3s ease;
-}
-
-button:hover {
-  transform: scale(1.05);
-}
-
+      overflow-x: hidden;
+    }
+    header {
+      text-align: center;
+      padding: 2rem;
+      color: #00f0ff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      text-shadow: 0 0 20px #00f0ff;
+      letter-spacing: 2px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      perspective: 1000px;
+    }
+    .card {
+      background: #111827;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,240,255,0.2);
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+      transform-style: preserve-3d;
+      transform: rotateX(0deg) rotateY(0deg);
+      animation: cardFadeIn 1s ease forwards;
+    }
+    .card:hover {
+      transform: rotateX(5deg) rotateY(10deg) scale(1.03);
+      box-shadow: 0 0 25px #00f0ff, 0 0 60px rgba(0,240,255,0.5);
+    }
+    @keyframes cardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .card h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #00f0ff;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px #00f0ff;
+    }
+    .card p {
+      color: #ccc;
+    }
+    #logoutButton {
+      display: block;
+      margin: 2rem auto;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444;
+      transition: transform 0.3s ease;
+    }
+    #logoutButton:hover {
+      transform: scale(1.1);
+    }
   </style>
 </head>
-<body class="fade-in">
-  <h1>🚀 Dashboard Kosong Siap Dibangun</h1>
-  <button id="logoutButton">Logout</button>  <script type="module">
+<body>
+  <header>âš¡ AVENGERS DASHBOARD</header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>ðŸ“Š Statistik</h2>
+      <p>Total Pengguna: <span id="totalUsers">123</span></p>
+    </div>
+    <div class="card">
+      <h2>ðŸ‘¤ Profil</h2>
+      <p>Email: <span id="userEmail">user@avengers.com</span></p>
+    </div>
+    <div class="card">
+      <h2>ðŸŽ¥ YouTube</h2>
+      <p>Mini player atau pencarian bisa ditambahkan di sini</p>
+    </div>
+  </div>
+
+  <button id="logoutButton">Logout</button>
+
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
@@ -85,7 +121,7 @@ button:hover {
     setPersistence(auth, browserLocalPersistence);
 
     const logoutBtn = document.getElementById("logoutButton");
-    logoutBtn.addEventListener("click", async () => {
+    logoutBtn?.addEventListener("click", async () => {
       const user = auth.currentUser;
       if (user) {
         await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
@@ -95,5 +131,22 @@ button:hover {
       localStorage.clear();
       window.location.href = "login.html";
     });
-  </script></body>
+  </script>
+
+<svg id="hud-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:0.08;" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="hudLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#007a99"/>
+    </linearGradient>
+  </defs>
+  <g stroke="url(#hudLine)" stroke-width="2" fill="none">
+    <path d="M10 100 H300 M50 150 H350 M80 200 H380 M120 250 H420" />
+    <path d="M1900 100 H1620 M1850 150 H1550 M1820 200 H1520 M1780 250 H1480" />
+    <rect x="400" y="800" width="200" height="100" rx="10" ry="10"/>
+    <rect x="1320" y="800" width="200" height="100" rx="10" ry="10"/>
+  </g>
+</svg>
+
+</body>
 </html>
