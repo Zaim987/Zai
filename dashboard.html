@@ -13,6 +13,24 @@
   to { opacity: 0; transform: translateY(-30px); }
 }
 
+@keyframes zoomIn {
+  to { transform: scale(1); }
+}
+
+@keyframes zoomOut {
+  from { transform: scale(1); }
+  to { transform: scale(0.7); }
+}
+
+@keyframes borderGlow {
+  from {
+    box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+  }
+  to {
+    box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff;
+  }
+}
+
 body {
   font-family: 'Rajdhani', sans-serif;
   background-color: #0d1117;
@@ -49,6 +67,7 @@ h1 {
   padding: 1.5rem;
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
   transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
 .card:hover {
@@ -74,6 +93,34 @@ h1 {
   transform: scale(1.05);
 }
 
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+
+.zoom-card {
+  background: #111827;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 80%;
+  max-width: 400px;
+  transform: scale(0.7);
+  animation: zoomIn 0.3s ease forwards;
+  box-shadow: 0 0 0 transparent;
+  position: relative;
+}
+
+.zoom-card.glow-border {
+  animation: borderGlow 1.5s infinite alternate;
+}
+
   </style>
 </head>
 <body class="fade-in">
@@ -93,7 +140,9 @@ h1 {
     </div>
   </div><button id="logoutButton">Logout</button>
 
-  <script type="module">
+  <div id="overlay" class="overlay">
+    <div id="zoomCard" class="zoom-card"></div>
+  </div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
@@ -114,6 +163,8 @@ h1 {
     const logoutBtn = document.getElementById("logoutButton");
     const userEmailSpan = document.getElementById("userEmail");
     const totalUsersSpan = document.getElementById("totalUsers");
+    const overlay = document.getElementById("overlay");
+    const zoomCard = document.getElementById("zoomCard");
 
     logoutBtn.addEventListener("click", async () => {
       document.body.classList.remove("fade-in");
@@ -142,6 +193,26 @@ h1 {
         }
       } else {
         window.location.href = "login.html";
+      }
+    });
+
+    // Zoom & glow animation for cards
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => {
+        zoomCard.innerHTML = card.innerHTML;
+        zoomCard.classList.add('glow-border');
+        overlay.style.display = 'flex';
+      });
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        zoomCard.style.animation = 'zoomOut 0.3s ease forwards';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          zoomCard.classList.remove('glow-border');
+          zoomCard.style.animation = 'zoomIn 0.3s ease forwards';
+        }, 300);
       }
     });
   </script></body>
