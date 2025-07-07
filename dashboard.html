@@ -172,6 +172,8 @@ h1 {
     });
 
     let clone = null;
+    let originalCard = null;
+
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => {
         if (clone) return;
@@ -187,8 +189,11 @@ h1 {
         cloneEl.style.height = rect.height + 'px';
 
         document.body.appendChild(cloneEl);
+        card.style.visibility = 'hidden'; // 🔒 SEMBUNYIKAN kartu asli
         overlay.style.display = 'block';
+
         clone = cloneEl;
+        originalCard = card;
 
         requestAnimationFrame(() => {
           cloneEl.style.top = '50%';
@@ -204,10 +209,13 @@ h1 {
       if (!clone) return;
       clone.style.opacity = '0';
       clone.style.transform += ' scale(0.9)';
+
       setTimeout(() => {
         clone.remove();
-        clone = null;
         overlay.style.display = 'none';
+        if (originalCard) originalCard.style.visibility = 'visible'; // 🔓 TAMPILKAN ulang
+        clone = null;
+        originalCard = null;
       }, 300);
     });
   </script></body>
