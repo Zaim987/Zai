@@ -1,11 +1,22 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>QuantumX</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&amp;family=Rajdhani:wght@400;600&amp;display=swap" rel="stylesheet"/>
-<style>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>QuantumX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes zoomIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { opacity: 0; animation: fadeSlideUp 0.8s ease forwards; }
+    .fade-delay-1 { animation-delay: 0.3s; }
+    .fade-delay-2 { animation-delay: 0.6s; }
+    .fade-delay-3 { animation-delay: 0.9s; }
+    .fade-delay-4 { animation-delay: 1.2s; }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #0d1117;
@@ -18,235 +29,145 @@
       top: 0; left: 0;
       width: 100vw; height: 100vh;
       background: #000;
-      opacity: 1;
-      z-index: 100;
+      opacity: 0;
+      z-index: 99;
       pointer-events: none;
       transition: opacity 0.8s ease;
     }
-    #splash {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: linear-gradient(160deg, #000000, #050b1e);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      z-index: 10;
-      transition: opacity 1s ease;
-      animation: fadeIn 1.5s ease;
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: 2px solid #333;
+      border-radius: 8px;
+      background: #0d1117;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.3s, box-shadow 0.3s;
     }
-    .logo {
+    input:focus {
+      border-color: #00f0ff;
+      box-shadow: 0 0 8px #00f0ff;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background: #00f0ff;
+      color: black;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+      transition: transform 0.2s ease;
+    }
+    button:hover { transform: scale(1.05); }
+    .login-container {
+      max-width: 320px;
+      margin: 0 auto;
+      text-align: center;
+      padding-top: 5vh;
+    }
+    .logo-text {
       font-family: 'Orbitron', sans-serif;
-      font-size: 2.8rem;
+      font-size: 2rem;
       color: #00f0ff;
       text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
       margin-bottom: 1.5rem;
-      animation: zoomIn 1s ease forwards;
     }
     .headline {
-      font-size: 1.8rem;
-      color: #ffffff;
-      text-shadow: 0 0 5px #00ffff;
-      margin-bottom: 0.75rem;
-      animation: slideUp 1s ease 0.5s forwards;
-      opacity: 0;
-    }
-    .subtext {
-      font-size: 1rem;
-      color: #cccccc;
+      font-size: 1.2rem;
+      color: white;
       margin-bottom: 2rem;
-      animation: slideUp 1s ease 0.8s forwards;
-      opacity: 0;
     }
-    button {
-      padding: 0.75rem 2rem;
-      font-size: 1.05rem;
-      border: none;
-      border-radius: 999px;
-      background: #00f0ff;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 12px #00f0ff, 0 0 24px #00f0ff;
-      animation: fadeIn 1s ease 1.2s forwards;
-      opacity: 0;
+    .error {
+      margin-top: 0.75rem;
+      color: #ff4444;
+      font-size: 0.95rem;
+      min-height: 1.2em;
     }
-    #app {
-      padding: 2rem;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+    a {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #00f0ff;
+      text-decoration: underline;
+      font-size: 0.95rem;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes zoomIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-    .fade-out { animation: fadeOut 0.6s ease forwards; }
+  
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.fade-out {
+  animation: fadeOut 0.6s ease forwards;
+}
+
 </style>
 </head>
 <body>
-<style>
-  @keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .fade-in {
-    opacity: 0;
-    animation: fadeSlideUp 0.8s ease forwards;
-  }
-
-  .fade-delay-1 { animation-delay: 0.3s; }
-  .fade-delay-2 { animation-delay: 0.6s; }
-  .fade-delay-3 { animation-delay: 0.9s; }
-  .fade-delay-4 { animation-delay: 1.2s; }
-
-  input {
-    width: 100%;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border: 2px solid #333;
-    border-radius: 8px;
-    background: #0d1117;
-    color: white;
-    font-size: 1rem;
-    outline: none;
-    transition: border 0.3s, box-shadow 0.3s;
-  }
-
-  input:focus {
-    border-color: #00f0ff;
-    box-shadow: 0 0 8px #00f0ff;
-  }
-
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    margin-top: 1rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    background: #00f0ff;
-    color: black;
-    cursor: pointer;
-    box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-    transition: transform 0.2s ease;
-  }
-
-  button:hover {
-    transform: scale(1.05);
-  }
-
-  .login-container {
-    max-width: 320px;
-    margin: 0 auto;
-    text-align: center;
-    padding-top: 5vh;
-  }
-
-  .logo-text {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2rem;
-    color: #00f0ff;
-    text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-    margin-bottom: 1.5rem;
-  }
-
-  .headline {
-    font-size: 1.2rem;
-    color: white;
-    margin-bottom: 2rem;
-  }
-
-  .error {
-    margin-top: 0.75rem;
-    color: #ff4444;
-    font-size: 0.95rem;
-    min-height: 1.2em;
-  }
-
-  a {
-    display: inline-block;
-    margin-top: 1rem;
-    color: #00f0ff;
-    text-decoration: underline;
-    font-size: 0.95rem;
-  }
-</style>
-
-<div class="login-container" id="loginWrap">
-  <div class="logo-text fade-in fade-delay-1">QuantumX</div>
-  <div class="headline fade-in fade-delay-2">Selamat datang kembali</div>
-  <form id="loginForm" class="fade-in fade-delay-3">
-    <input id="email" type="email" placeholder="Email" required />
-    <input id="password" type="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-    <div id="error" class="error"></div>
-  </form>
-  <div class="fade-in fade-delay-4">
-    <!-- ✅ Ubah redirect langsung ke register.html -->
-    <a href="register.html">Belum punya akun? Daftar</a>
+  <div id="overlay"></div>
+  <div class="login-container">
+    <div class="logo-text fade-in fade-delay-1">QuantumX</div>
+    <div class="headline fade-in fade-delay-2">Selamat datang kembali</div>
+    <form id="loginForm" class="fade-in fade-delay-3">
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <div id="error" class="error"></div>
+    </form>
+    <div class="fade-in fade-delay-4"><a href="register.html">Belum punya akun? Daftar</a></div>
   </div>
-</div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-  import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-    authDomain: "quantechapp.firebaseapp.com",
-    databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
-    projectId: "quantechapp",
-    storageBucket: "quantechapp.firebasestorage.app",
-    messagingSenderId: "825384610343",
-    appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
-    measurementId: "G-E9L012VH32"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  const form = document.getElementById("loginForm");
-  const appDiv = document.getElementById("app");
-  const button = form.querySelector("button");
+    const form = document.getElementById("loginForm");
+    const button = form.querySelector("button");
 
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const errorDiv = document.getElementById("error");
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorDiv = document.getElementById("error");
 
-    button.disabled = true;
-    button.textContent = "⏳ Memproses...";
+      button.disabled = true;
+      button.textContent = "⏳ Memproses...";
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-      // Tulis online: true ke Firestore
-      await updateDoc(doc(db, "users", user.uid), {
-        online: true
-      });
+        await updateDoc(doc(db, "users", user.uid), { online: true });
 
-      // Fade-out dan redirect ke dashboard
-      appDiv.style.transition = "opacity 0.5s ease";
-      appDiv.style.opacity = 0;
-
-      setTimeout(() => {
-        window.location.href = "dashboard.html";
-      }, 600);
-
-    } catch (error) {
-      errorDiv.textContent = error.message.replace("Firebase:", "").trim();
-      button.disabled = false;
-      button.textContent = "Login";
-    }
-  });
-</script>
+        document.querySelector('.login-container').classList.add('fade-out');
+        document.getElementById("overlay").style.opacity = 1;
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 800);
+      } catch (error) {
+        errorDiv.textContent = error.message.replace("Firebase:", "").trim();
+        button.disabled = false;
+        button.textContent = "Login";
+      }
+    });
+  </script>
 </body>
 </html>
