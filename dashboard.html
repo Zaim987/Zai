@@ -1,78 +1,71 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
   <style>
-    #logoutBtn {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      padding: 0.5rem 1rem;
-      background: #ff4d4d;
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #0d1117;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #00f0ff;
+      text-shadow: 0 0 10px #00f0ff;
+    }
+
+    #logoutButton {
+      margin-top: 2rem;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #ff4444;
       color: white;
       border: none;
       border-radius: 8px;
-      font-weight: bold;
       cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 0 10px #ff4d4d;
+      box-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444;
+      transition: transform 0.2s ease;
+    }
+
+    #logoutButton:hover {
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <button id="logoutBtn">Logout</button>
-
-  <div class="dashboard-content" style="display: none;">
-    <h2>Selamat datang di Dashboard 🚀</h2>
-    <p>Halo, <span id="userName"></span> 👋</p>
-    <p>Ini adalah halaman private. User harus login untuk mengakses ini.</p>
-  </div>
+  <h1>Selamat datang di Dashboard</h1>
+  <button id="logoutButton">Logout</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
       authDomain: "quantechapp.firebaseapp.com",
-      databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
       projectId: "quantechapp",
-      storageBucket: "quantechapp.firebasestorage.app",
+      storageBucket: "quantechapp.appspot.com",
       messagingSenderId: "825384610343",
-      appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
-      measurementId: "G-E9L012VH32"
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
 
-    // Cek apakah user sudah login
-    onAuthStateChanged(auth, user => {
-      if (!user) {
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        sessionStorage.removeItem("justLoggedIn"); // ✅ Clear manual login flag
         window.location.href = "login.html";
-      } else {
-        const userName = user.displayName || user.email;
-        document.getElementById("userName").textContent = userName;
-        document.querySelector(".dashboard-content").style.display = "block";
+      } catch (error) {
+        console.error("Logout gagal:", error);
+        alert("Terjadi kesalahan saat logout.");
       }
-    });
-
-    // Logout dan redirect
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          await updateDoc(doc(db, "users", user.uid), { online: false });
-          await signOut(auth);
-        } catch (error) {
-          console.error("Gagal logout:", error);
-        }
-      }
-      window.location.href = "login.html";
     });
   </script>
 </body>
