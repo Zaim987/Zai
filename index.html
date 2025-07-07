@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuantumX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d1117;
+      color: white;
+      font-family: 'Rajdhani', sans-serif;
+      overflow: hidden;
+    }
+
+    .splash {
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(160deg, #000000, #050b1e);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .logo, .headline, .subtext, button {
+      opacity: 0;
+    }
+
+    .fade-in {
+      animation: fadeInUp 1.5s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.3s; }
+    .delay-2 { animation-delay: 2.2s; }
+    .delay-3 { animation-delay: 3.8s; }
+    .delay-4 { animation-delay: 5.4s; }
+
+    .fade-out {
+      animation: fadeOutUp 0.5s ease forwards;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem;
+      color: #00f0ff;
+      text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+      margin-bottom: 1.5rem;
+    }
+
+    .headline {
+      font-size: 1.8rem;
+      color: #ffffff;
+      text-shadow: 0 0 5px #00ffff;
+      margin-bottom: 0.75rem;
+    }
+
+    .subtext {
+      font-size: 1rem;
+      color: #cccccc;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      padding: 0.75rem 2rem;
+      font-size: 1.05rem;
+      border: none;
+      border-radius: 999px;
+      background: #00f0ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00f0ff, 0 0 24px #00f0ff;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    /* Animasi masuk (dari bawah ke atas) */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 🔄 Animasi keluar (naik dan hilang) */
+    @keyframes fadeOutUp {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-30px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="splash" id="splash">
+    <div class="logo fade-in delay-1" id="logo">QuantumX</div>
+    <div class="headline fade-in delay-2" id="headline">Masuki Dunia Digitalmu</div>
+    <div class="subtext fade-in delay-3" id="subtext">Ini bukan masa depan — ini sekarang.</div>
+    <button class="fade-in delay-4" id="startBtn" onclick="startExit()">Mulai Sekarang</button>
+  </div>
+
+  <script>
+    function startExit() {
+      const logo = document.getElementById('logo');
+      const headline = document.getElementById('headline');
+      const subtext = document.getElementById('subtext');
+      const button = document.getElementById('startBtn');
+
+      // Jangan hapus fade-in, langsung timpa dengan animasi keluar
+      setTimeout(() => logo.classList.add('fade-out'), 0);
+      setTimeout(() => headline.classList.add('fade-out'), 200);
+      setTimeout(() => subtext.classList.add('fade-out'), 400);
+      setTimeout(() => button.classList.add('fade-out'), 600);
+
+      // Redirect ke login.html setelah selesai animasi
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1200);
+    }
+  </script>
+
+</body>
+</html>
