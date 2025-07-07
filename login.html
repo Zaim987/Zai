@@ -88,12 +88,10 @@
     }
     button:hover { transform: scale(1.05); }
 
-    /* Spinner & Success */
     button.loading {
       color: transparent !important;
       pointer-events: none;
     }
-
     button.loading::after {
       content: "";
       width: 20px;
@@ -111,19 +109,27 @@
     button.success {
       background-color: #00d26a;
       color: white !important;
-      font-size: 1.2rem;
     }
-
     button.success::after {
       content: "✓";
-      animation: none;
       font-size: 1.5rem;
-      color: white;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      border: none;
+    }
+
+    button.failed {
+      background-color: #ff4444;
+      color: white !important;
+    }
+    button.failed::after {
+      content: "✖";
+      font-size: 1.5rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     .login-container {
@@ -195,7 +201,19 @@
 
     onAuthStateChanged(auth, user => {
       if (user) {
-        window.location.href = "dashboard.html";
+        const elements = [
+          { el: document.getElementById("logo"), delayClass: "fade-up-delay-1" },
+          { el: document.getElementById("headline"), delayClass: "fade-up-delay-2" },
+          { el: document.getElementById("loginForm"), delayClass: "fade-up-delay-3" },
+          { el: document.getElementById("registerLink"), delayClass: "fade-up-delay-4" },
+        ];
+        elements.forEach(item => {
+          item.el.classList.remove("fade-in");
+          item.el.classList.add("fade-up-out", item.delayClass);
+        });
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 8000); // ⏱️ 8 detik delay
       }
     });
 
@@ -209,6 +227,7 @@
       const errorDiv = document.getElementById("error");
 
       button.disabled = true;
+      button.classList.remove("failed", "success");
       button.classList.add("loading");
       button.textContent = "Logging in...";
 
@@ -218,7 +237,6 @@
 
         await setDoc(doc(db, "users", user.uid), { online: true }, { merge: true });
 
-        // Spinner selama 5 detik
         setTimeout(() => {
           button.classList.remove("loading");
           button.classList.add("success");
@@ -230,7 +248,6 @@
             { el: document.getElementById("loginForm"), delayClass: "fade-up-delay-3" },
             { el: document.getElementById("registerLink"), delayClass: "fade-up-delay-4" },
           ];
-
           elements.forEach(item => {
             item.el.classList.remove("fade-in");
             item.el.classList.add("fade-up-out", item.delayClass);
@@ -242,13 +259,21 @@
         }, 5000);
       } catch (error) {
         errorDiv.textContent = error.message.replace("Firebase:", "").trim();
-        button.disabled = false;
-        button.classList.remove("loading");
-        button.textContent = "Login";
+
+        setTimeout(() => {
+          button.classList.remove("loading");
+          button.classList.add("failed");
+          button.textContent = "";
+
+          setTimeout(() => {
+            button.classList.remove("failed");
+            button.disabled = false;
+            button.textContent = "Login";
+          }, 1500);
+        }, 3000);
       }
     });
 
-    // Transisi keluar sebelum redirect ke register
     document.getElementById("toRegister").addEventListener("click", function (e) {
       e.preventDefault();
 
