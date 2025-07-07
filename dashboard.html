@@ -122,70 +122,47 @@
     }
     .video-item:hover { background: #222b3a; }
     .video-item img { width: 120px; border-radius: 6px; }
-    #floating-player {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80vw;
-      max-width: 600px;
-      height: 360px;
-      background: rgba(0, 0, 0, 0.75);
-      border-radius: 12px;
-      overflow: hidden;
-      z-index: 9999;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
-      backdrop-filter: blur(10px);
-    }
-    #floating-player iframe {
-      width: 100%; height: 100%; border: none;
-    }
-    #floating-close {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      background: red;
-      color: white;
+    iframe {
+      width: 100%; height: 240px;
       border: none;
-      padding: 6px 10px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 10;
+      border-radius: 12px;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body class="fade-in">
-  <h1>🚀 Selamat Datang di Dashboard</h1>
+  <h1> Selamat Datang di Dashboard</h1>
   <div class="grid-container">
     <div class="card">
-      <h2>📊 Statistik</h2>
+      <h2> Statistik</h2>
       <p>Total Pengguna: <span id="totalUsers">-</span></p>
     </div>
     <div class="card">
-      <h2>👤 Profil</h2>
+      <h2> Profil</h2>
       <p>Email: <span id="userEmail">-</span></p>
     </div>
     <div class="card">
-      <h2>🕒 Aktivitas Terakhir</h2>
+      <h2> Aktivitas Terakhir</h2>
       <p>Belum tersedia</p>
     </div>
-    <div class="card" id="youtubeCard">
-      <h2>📺 YouTube Mini</h2>
+    <div class="card">
+      <h2> YouTube Mini</h2>
       <div class="youtube-search">
         <input type="text" id="searchInput" placeholder="Cari video YouTube...">
         <button id="searchBtn">Cari</button>
       </div>
       <div class="youtube-results" id="results"></div>
+      <div id="player"></div>
     </div>
   </div>
   <button id="logoutButton">Logout</button>
   <div id="overlay"></div>
+  <!-- SCRIPT AKTIF DI SINI -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904",
+  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
   authDomain: "quantechapp.firebaseapp.com",
   projectId: "quantechapp",
   storageBucket: "quantechapp.appspot.com",
@@ -205,6 +182,7 @@ const overlay = document.getElementById("overlay");
 logoutBtn?.addEventListener("click", async () => {
   document.body.classList.remove("fade-in");
   document.body.classList.add("fade-out");
+
   setTimeout(async () => {
     const user = auth.currentUser;
     if (user) {
@@ -232,96 +210,94 @@ onAuthStateChanged(auth, async user => {
 });
 
 const apiKey = "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904";
-const searchBtn = document.getElementById("searchBtn");
-const input = document.getElementById("searchInput");
-const results = document.getElementById("results");
-const youtubeCard = document.getElementById("youtubeCard");
-let clone = null;
-let originalCard = null;
-let originalRect = null;
-
-searchBtn?.addEventListener("click", async () => {
-  const query = input.value.trim();
-  if (!query) return;
-  results.innerHTML = "<p>Loading...</p>";
-  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${apiKey}`);
-  const data = await res.json();
-  results.innerHTML = "";
-  data.items.forEach(item => {
-    const videoId = item.id.videoId;
-    const snippet = item.snippet;
-    const div = document.createElement("div");
-    div.className = "video-item";
-    div.innerHTML = `
-      <img src="${snippet.thumbnails.medium.url}" alt="${snippet.title}" />
-      <div>
-        <strong>${snippet.title}</strong><br>
-        <small>${snippet.channelTitle}</small>
-      </div>
-    `;
-    div.addEventListener("click", () => {
-      openFloatingPlayer(videoId);
-    });
-    results.appendChild(div);
+function setYouTubeListeners(root) {
+  const searchBtn = root.querySelector("#searchBtn");
+  const input = root.querySelector("#searchInput");
+  const results = root.querySelector("#results");
+  const player = root.querySelector("#player");
+  if (!searchBtn || !input || !results || !player) return;
+  searchBtn.addEventListener("click", async () => {
+    const query = input.value.trim();
+    if (!query) return;
+    results.innerHTML = "<p>Loading...</p>";
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${apiKey}`);
+      const data = await res.json();
+      results.innerHTML = "";
+      data.items.forEach(item => {
+        const videoId = item.id.videoId;
+        const snippet = item.snippet;
+        const div = document.createElement("div");
+        div.className = "video-item";
+        div.innerHTML = `
+          <img src="${snippet.thumbnails.medium.url}" alt="${snippet.title}" />
+          <div>
+            <strong>${snippet.title}</strong><br>
+            <small>${snippet.channelTitle}</small>
+          </div>
+        `;
+        div.addEventListener("click", () => {
+          player.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
+        });
+        results.appendChild(div);
+      });
+    } catch (err) {
+      results.innerHTML = `<p style='color:red'>Gagal ambil video</p>`;
+      console.error(err);
+    }
   });
-});
-
-function openFloatingPlayer(videoId) {
-  const existing = document.getElementById("floating-player");
-  if (existing) existing.remove();
-  const floating = document.createElement("div");
-  floating.id = "floating-player";
-  floating.innerHTML = `
-    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>
-    <button id="floating-close">✕</button>
-  `;
-  document.body.appendChild(floating);
-  document.getElementById("floating-close").addEventListener("click", () => floating.remove());
 }
 
-document.querySelectorAll(".card").forEach(card => {
-  if (card === youtubeCard) return;
-  card.addEventListener("click", () => {
-    if (clone) return;
-    originalRect = card.getBoundingClientRect();
-    const scrollY = window.scrollY;
-    const cloneEl = card.cloneNode(true);
-    cloneEl.classList.add("clone-card");
-    cloneEl.style.top = (originalRect.top + scrollY) + "px";
-    cloneEl.style.left = originalRect.left + "px";
-    cloneEl.style.width = originalRect.width + "px";
-    cloneEl.style.height = originalRect.height + "px";
-    document.body.appendChild(cloneEl);
-    card.style.visibility = "hidden";
-    overlay.style.display = "block";
-    clone = cloneEl;
-    originalCard = card;
-    requestAnimationFrame(() => {
-      cloneEl.style.top = "50%";
-      cloneEl.style.left = "50%";
-      cloneEl.style.transform = "translate(-50%, -50%)";
-      cloneEl.style.width = "80vw";
-      cloneEl.style.maxWidth = "360px";
+window.addEventListener("DOMContentLoaded", () => {
+  setYouTubeListeners(document);
+
+  let clone = null;
+  let originalCard = null;
+  let originalRect = null;
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (clone) return;
+      originalRect = card.getBoundingClientRect();
+      const scrollY = window.scrollY;
+      const cloneEl = card.cloneNode(true);
+      cloneEl.classList.add('clone-card');
+      cloneEl.style.top = (originalRect.top + scrollY) + 'px';
+      cloneEl.style.left = originalRect.left + 'px';
+      cloneEl.style.width = originalRect.width + 'px';
+      cloneEl.style.height = originalRect.height + 'px';
+      document.body.appendChild(cloneEl);
+      card.style.visibility = 'hidden';
+      overlay.style.display = 'block';
+      clone = cloneEl;
+      originalCard = card;
+      requestAnimationFrame(() => {
+        cloneEl.style.top = '50%';
+        cloneEl.style.left = '50%';
+        cloneEl.style.transform = 'translate(-50%, -50%)';
+        cloneEl.style.width = '80vw';
+        cloneEl.style.maxWidth = '360px';
+      });
+      setTimeout(() => setYouTubeListeners(cloneEl), 400);
     });
   });
-});
 
-overlay.addEventListener("click", () => {
-  if (!clone || !originalCard) return;
-  const rect = originalCard.getBoundingClientRect();
-  clone.style.top = (rect.top + window.scrollY) + "px";
-  clone.style.left = rect.left + "px";
-  clone.style.width = rect.width + "px";
-  clone.style.height = rect.height + "px";
-  clone.style.transform = "translate(0, 0)";
-  setTimeout(() => {
-    clone.remove();
-    overlay.style.display = "none";
-    originalCard.style.visibility = "visible";
-    clone = null;
-    originalCard = null;
-    originalRect = null;
-  }, 900);
+  overlay.addEventListener('click', () => {
+    if (!clone || !originalRect) return;
+    clone.style.top = (originalRect.top + window.scrollY) + 'px';
+    clone.style.left = originalRect.left + 'px';
+    clone.style.width = originalRect.width + 'px';
+    clone.style.height = originalRect.height + 'px';
+    clone.style.transform = 'translate(0, 0)';
+    setTimeout(() => {
+      clone.remove();
+      overlay.style.display = 'none';
+      if (originalCard) originalCard.style.visibility = 'visible';
+      clone = null;
+      originalCard = null;
+      originalRect = null;
+    }, 900);
+  });
 });
 
   </script>
