@@ -173,23 +173,24 @@ h1 {
 
     let clone = null;
     let originalCard = null;
+    let originalRect = null;
 
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => {
         if (clone) return;
 
-        const rect = card.getBoundingClientRect();
+        originalRect = card.getBoundingClientRect();
         const scrollY = window.scrollY;
         const cloneEl = card.cloneNode(true);
 
         cloneEl.classList.add('clone-card');
-        cloneEl.style.top = (rect.top + scrollY) + 'px';
-        cloneEl.style.left = rect.left + 'px';
-        cloneEl.style.width = rect.width + 'px';
-        cloneEl.style.height = rect.height + 'px';
+        cloneEl.style.top = (originalRect.top + scrollY) + 'px';
+        cloneEl.style.left = originalRect.left + 'px';
+        cloneEl.style.width = originalRect.width + 'px';
+        cloneEl.style.height = originalRect.height + 'px';
 
         document.body.appendChild(cloneEl);
-        card.style.visibility = 'hidden'; // 🔒 SEMBUNYIKAN kartu asli
+        card.style.visibility = 'hidden';
         overlay.style.display = 'block';
 
         clone = cloneEl;
@@ -206,17 +207,22 @@ h1 {
     });
 
     overlay.addEventListener('click', () => {
-      if (!clone) return;
-      clone.style.opacity = '0';
-      clone.style.transform += ' scale(0.9)';
+      if (!clone || !originalRect) return;
+
+      clone.style.top = (originalRect.top + window.scrollY) + 'px';
+      clone.style.left = originalRect.left + 'px';
+      clone.style.width = originalRect.width + 'px';
+      clone.style.height = originalRect.height + 'px';
+      clone.style.transform = 'translate(0, 0)';
 
       setTimeout(() => {
         clone.remove();
         overlay.style.display = 'none';
-        if (originalCard) originalCard.style.visibility = 'visible'; // 🔓 TAMPILKAN ulang
+        if (originalCard) originalCard.style.visibility = 'visible';
         clone = null;
         originalCard = null;
-      }, 300);
+        originalRect = null;
+      }, 400);
     });
   </script></body>
 </html>
