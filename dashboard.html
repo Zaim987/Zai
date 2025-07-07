@@ -185,7 +185,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+  apiKey: "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904",
   authDomain: "quantechapp.firebaseapp.com",
   projectId: "quantechapp",
   storageBucket: "quantechapp.appspot.com",
@@ -235,6 +235,10 @@ const apiKey = "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904";
 const searchBtn = document.getElementById("searchBtn");
 const input = document.getElementById("searchInput");
 const results = document.getElementById("results");
+const youtubeCard = document.getElementById("youtubeCard");
+let clone = null;
+let originalCard = null;
+let originalRect = null;
 
 searchBtn?.addEventListener("click", async () => {
   const query = input.value.trim();
@@ -274,6 +278,51 @@ function openFloatingPlayer(videoId) {
   document.body.appendChild(floating);
   document.getElementById("floating-close").addEventListener("click", () => floating.remove());
 }
+
+document.querySelectorAll(".card").forEach(card => {
+  if (card === youtubeCard) return;
+  card.addEventListener("click", () => {
+    if (clone) return;
+    originalRect = card.getBoundingClientRect();
+    const scrollY = window.scrollY;
+    const cloneEl = card.cloneNode(true);
+    cloneEl.classList.add("clone-card");
+    cloneEl.style.top = (originalRect.top + scrollY) + "px";
+    cloneEl.style.left = originalRect.left + "px";
+    cloneEl.style.width = originalRect.width + "px";
+    cloneEl.style.height = originalRect.height + "px";
+    document.body.appendChild(cloneEl);
+    card.style.visibility = "hidden";
+    overlay.style.display = "block";
+    clone = cloneEl;
+    originalCard = card;
+    requestAnimationFrame(() => {
+      cloneEl.style.top = "50%";
+      cloneEl.style.left = "50%";
+      cloneEl.style.transform = "translate(-50%, -50%)";
+      cloneEl.style.width = "80vw";
+      cloneEl.style.maxWidth = "360px";
+    });
+  });
+});
+
+overlay.addEventListener("click", () => {
+  if (!clone || !originalCard) return;
+  const rect = originalCard.getBoundingClientRect();
+  clone.style.top = (rect.top + window.scrollY) + "px";
+  clone.style.left = rect.left + "px";
+  clone.style.width = rect.width + "px";
+  clone.style.height = rect.height + "px";
+  clone.style.transform = "translate(0, 0)";
+  setTimeout(() => {
+    clone.remove();
+    overlay.style.display = "none";
+    originalCard.style.visibility = "visible";
+    clone = null;
+    originalCard = null;
+    originalRect = null;
+  }, 900);
+});
 
   </script>
 </body>
