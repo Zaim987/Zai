@@ -122,11 +122,33 @@
     }
     .video-item:hover { background: #222b3a; }
     .video-item img { width: 120px; border-radius: 6px; }
-    iframe {
-      width: 100%; height: 240px;
-      border: none;
+    #floating-player {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 320px;
+      height: 180px;
+      background: #000;
       border-radius: 12px;
-      margin-top: 1rem;
+      overflow: hidden;
+      z-index: 9999;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+    }
+    #floating-player iframe {
+      width: 100%; height: 100%; border: none;
+    }
+    #floating-close {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 10;
     }
   </style>
 </head>
@@ -152,142 +174,105 @@
         <button id="searchBtn">Cari</button>
       </div>
       <div class="youtube-results" id="results"></div>
-      <div id="player"></div>
     </div>
   </div>
   <button id="logoutButton">Logout</button>
-  <div id="overlay"></div>  <script type="module">
+  <div id="overlay"></div>
+  <div id="player-container"></div>
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";const firebaseConfig = {
+  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+  authDomain: "quantechapp.firebaseapp.com",
+  projectId: "quantechapp",
+  storageBucket: "quantechapp.appspot.com",
+  messagingSenderId: "825384610343",
+  appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+};
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-      authDomain: "quantechapp.firebaseapp.com",
-      projectId: "quantechapp",
-      storageBucket: "quantechapp.appspot.com",
-      messagingSenderId: "825384610343",
-      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-    };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const logoutBtn = document.getElementById("logoutButton");
+const userEmailSpan = document.getElementById("userEmail");
+const totalUsersSpan = document.getElementById("totalUsers");
+const overlay = document.getElementById("overlay");
 
-    const logoutBtn = document.getElementById("logoutButton");
-    const userEmailSpan = document.getElementById("userEmail");
-    const totalUsersSpan = document.getElementById("totalUsers");
-    const overlay = document.getElementById("overlay");
+logoutBtn?.addEventListener("click", async () => {
+  document.body.classList.remove("fade-in");
+  document.body.classList.add("fade-out");
+  setTimeout(async () => {
+    const user = auth.currentUser;
+    if (user) {
+      await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
+    }
+    await signOut(auth);
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = "login.html";
+  }, 500);
+});
 
-    logoutBtn?.addEventListener("click", async () => {
-      document.body.classList.remove("fade-in");
-      document.body.classList.add("fade-out");
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    userEmailSpan.textContent = user.email;
+    try {
+      const snapshot = await getDocs(collection(db, "users"));
+      totalUsersSpan.textContent = snapshot.size;
+    } catch (err) {
+      totalUsersSpan.textContent = "Gagal memuat";
+    }
+  } else {
+    window.location.href = "login.html";
+  }
+});
 
-      setTimeout(async () => {
-        const user = auth.currentUser;
-        if (user) {
-          await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
-        }
-        await signOut(auth);
-        sessionStorage.clear();
-        localStorage.clear();
-        window.location.href = "login.html";
-      }, 500);
+const apiKey = "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904";
+const searchBtn = document.getElementById("searchBtn");
+const input = document.getElementById("searchInput");
+const results = document.getElementById("results");
+
+searchBtn?.addEventListener("click", async () => {
+  const query = input.value.trim();
+  if (!query) return;
+  results.innerHTML = "<p>Loading...</p>";
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${apiKey}`);
+  const data = await res.json();
+  results.innerHTML = "";
+  data.items.forEach(item => {
+    const videoId = item.id.videoId;
+    const snippet = item.snippet;
+    const div = document.createElement("div");
+    div.className = "video-item";
+    div.innerHTML = `
+      <img src="${snippet.thumbnails.medium.url}" alt="${snippet.title}" />
+      <div>
+        <strong>${snippet.title}</strong><br>
+        <small>${snippet.channelTitle}</small>
+      </div>
+    `;
+    div.addEventListener("click", () => {
+      openFloatingPlayer(videoId);
     });
+    results.appendChild(div);
+  });
+});
 
-    onAuthStateChanged(auth, async user => {
-      if (user) {
-        userEmailSpan.textContent = user.email;
-        try {
-          const snapshot = await getDocs(collection(db, "users"));
-          totalUsersSpan.textContent = snapshot.size;
-        } catch (err) {
-          totalUsersSpan.textContent = "Gagal memuat";
-        }
-      } else {
-        window.location.href = "login.html";
-      }
-    });
+function openFloatingPlayer(videoId) {
+  const old = document.getElementById("floating-player");
+  if (old) old.remove();
+  const floating = document.createElement("div");
+  floating.id = "floating-player";
+  floating.innerHTML = `
+    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>
+    <button id="floating-close">✕</button>
+  `;
+  document.body.appendChild(floating);
+  document.getElementById("floating-close").addEventListener("click", () => floating.remove());
+}
 
-    const apiKey = "AIzaSyDCCyMKNnrWXD_X69LKEfWvQq0-BdnX904";
-    const searchBtn = document.getElementById("searchBtn");
-    const input = document.getElementById("searchInput");
-    const results = document.getElementById("results");
-    const player = document.getElementById("player");
-
-    searchBtn?.addEventListener("click", async () => {
-      const query = input.value.trim();
-      if (!query) return;
-      results.innerHTML = "<p>Loading...</p>";
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${apiKey}`);
-      const data = await res.json();
-      results.innerHTML = "";
-      data.items.forEach(item => {
-        const videoId = item.id.videoId;
-        const snippet = item.snippet;
-        const div = document.createElement("div");
-        div.className = "video-item";
-        div.innerHTML = `
-          <img src="${snippet.thumbnails.medium.url}" alt="${snippet.title}" />
-          <div>
-            <strong>${snippet.title}</strong><br>
-            <small>${snippet.channelTitle}</small>
-          </div>
-        `;
-        div.addEventListener("click", () => {
-          player.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen></iframe>`;
-        });
-        results.appendChild(div);
-      });
-    });
-
-    const youtubeCard = document.getElementById("youtubeCard");
-    let clone = null;
-    let originalCard = null;
-    let originalRect = null;
-
-    document.querySelectorAll(".card").forEach(card => {
-      if (card === youtubeCard) return; // ❌ skip YouTube card dari animasi
-      card.addEventListener("click", () => {
-        if (clone) return;
-        originalRect = card.getBoundingClientRect();
-        const scrollY = window.scrollY;
-        const cloneEl = card.cloneNode(true);
-        cloneEl.classList.add("clone-card");
-        cloneEl.style.top = (originalRect.top + scrollY) + "px";
-        cloneEl.style.left = originalRect.left + "px";
-        cloneEl.style.width = originalRect.width + "px";
-        cloneEl.style.height = originalRect.height + "px";
-        document.body.appendChild(cloneEl);
-        card.style.visibility = "hidden";
-        overlay.style.display = "block";
-        clone = cloneEl;
-        originalCard = card;
-        requestAnimationFrame(() => {
-          cloneEl.style.top = "50%";
-          cloneEl.style.left = "50%";
-          cloneEl.style.transform = "translate(-50%, -50%)";
-          cloneEl.style.width = "80vw";
-          cloneEl.style.maxWidth = "360px";
-        });
-      });
-    });
-
-    overlay.addEventListener("click", () => {
-      if (!clone || !originalRect) return;
-      clone.style.top = (originalRect.top + window.scrollY) + "px";
-      clone.style.left = originalRect.left + "px";
-      clone.style.width = originalRect.width + "px";
-      clone.style.height = originalRect.height + "px";
-      clone.style.transform = "translate(0, 0)";
-      setTimeout(() => {
-        clone.remove();
-        overlay.style.display = "none";
-        if (originalCard) originalCard.style.visibility = "visible";
-        clone = null;
-        originalCard = null;
-        originalRect = null;
-      }, 900);
-    });
-  </script></body>
+  </script>
+</body>
 </html>
