@@ -155,6 +155,23 @@
       text-decoration: underline;
       font-size: 0.95rem;
     }
+
+    #autoLoginNotice {
+      display: none;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    #autoLoginNotice div:first-child {
+      font-size: 1.2rem;
+      color: #00d26a;
+      margin-bottom: 0.5rem;
+    }
+    #countdown {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00f0ff;
+      text-shadow: 0 0 10px #00f0ff;
+    }
   </style>
 </head>
 <body>
@@ -171,6 +188,12 @@
     <div id="registerLink" class="fade-in fade-delay-4">
       <a id="toRegister" href="#">Belum punya akun? Daftar</a>
     </div>
+  </div>
+
+  <!-- ✅ Notifikasi Auto Login -->
+  <div id="autoLoginNotice">
+    <div>✅ Sudah masuk</div>
+    <div id="countdown">8</div>
   </div>
 
   <script type="module">
@@ -203,7 +226,6 @@
         item.el.classList.add("fade-up-out", item.delayClass);
       });
 
-      // Redirect setelah animasi terakhir selesai
       const lastEl = document.getElementById("registerLink");
       lastEl.addEventListener("animationend", () => {
         window.location.href = redirectUrl;
@@ -212,9 +234,22 @@
 
     onAuthStateChanged(auth, user => {
       if (user) {
-        setTimeout(() => {
-          animateOutAndRedirect("dashboard.html");
-        }, 8000);
+        const notice = document.getElementById("autoLoginNotice");
+        const countdown = document.getElementById("countdown");
+
+        notice.style.display = "block";
+
+        let timeLeft = 8;
+        countdown.textContent = timeLeft;
+
+        const interval = setInterval(() => {
+          timeLeft--;
+          countdown.textContent = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            animateOutAndRedirect("dashboard.html");
+          }
+        }, 1000);
       }
     });
 
@@ -242,7 +277,6 @@
           button.classList.remove("loading");
           button.classList.add("success");
           button.textContent = "";
-
           animateOutAndRedirect("dashboard.html");
         }, 5000);
       } catch (error) {
@@ -251,7 +285,6 @@
           button.classList.remove("loading");
           button.classList.add("failed");
           button.textContent = "";
-
           setTimeout(() => {
             button.classList.remove("failed");
             button.disabled = false;
