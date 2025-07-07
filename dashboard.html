@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <style>
+    #logoutBtn {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 0 10px #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <button id="logoutBtn">Logout</button>
+
+  <div class="dashboard-content" style="display: none;">
+    <h2>Selamat datang di Dashboard 🚀</h2>
+    <p>Halo, <span id="userName"></span> 👋</p>
+    <p>Ini adalah halaman private. User harus login untuk mengakses ini.</p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.firebasestorage.app",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+      measurementId: "G-E9L012VH32"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Cek apakah user sudah login
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        const userName = user.displayName || user.email;
+        document.getElementById("userName").textContent = userName;
+        document.querySelector(".dashboard-content").style.display = "block";
+      }
+    });
+
+    // Logout dan redirect
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await updateDoc(doc(db, "users", user.uid), { online: false });
+          await signOut(auth);
+        } catch (error) {
+          console.error("Gagal logout:", error);
+        }
+      }
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>
