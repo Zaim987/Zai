@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QuantumX</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
@@ -24,9 +24,7 @@
     .fade-delay-3 { animation-delay: 0.9s; }
     .fade-delay-4 { animation-delay: 1.2s; }
 
-    .fade-up-out {
-      animation: fadeUpOut 0.5s ease forwards;
-    }
+    .fade-up-out { animation: fadeUpOut 0.5s ease forwards; }
     .fade-up-delay-1 { animation-delay: 0s; }
     .fade-up-delay-2 { animation-delay: 0.15s; }
     .fade-up-delay-3 { animation-delay: 0.3s; }
@@ -37,16 +35,6 @@
       background: #0d1117;
       color: white;
       font-family: 'Rajdhani', sans-serif;
-    }
-    #overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: #000;
-      opacity: 0;
-      z-index: 99;
-      pointer-events: none;
-      transition: opacity 0.8s ease;
     }
     input {
       width: 100%;
@@ -175,7 +163,6 @@
   </style>
 </head>
 <body>
-  <div id="overlay"></div>
   <div class="login-container">
     <div id="logo" class="logo-text fade-in fade-delay-1">QuantumX</div>
     <div id="headline" class="headline fade-in fade-delay-2">Selamat datang kembali</div>
@@ -190,7 +177,7 @@
     </div>
   </div>
 
-  <!-- ✅ Notifikasi Auto Login -->
+  <!-- ✅ Auto login notice -->
   <div id="autoLoginNotice">
     <div>✅ Sudah masuk</div>
     <div id="countdown">8</div>
@@ -214,7 +201,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    function animateOutAndRedirect(redirectUrl) {
+    function animateOutAndRedirect(url) {
       const elements = [
         { el: document.getElementById("logo"), delayClass: "fade-up-delay-1" },
         { el: document.getElementById("headline"), delayClass: "fade-up-delay-2" },
@@ -225,18 +212,24 @@
         item.el.classList.remove("fade-in");
         item.el.classList.add("fade-up-out", item.delayClass);
       });
-
-      const lastEl = document.getElementById("registerLink");
-      lastEl.addEventListener("animationend", () => {
-        window.location.href = redirectUrl;
+      document.getElementById("registerLink").addEventListener("animationend", () => {
+        window.location.href = url;
       }, { once: true });
     }
 
     onAuthStateChanged(auth, user => {
       if (user) {
+        // Cek apakah ini login manual baru saja
+        const justLoggedIn = sessionStorage.getItem("justLoggedIn");
+        if (justLoggedIn === "true") {
+          sessionStorage.removeItem("justLoggedIn");
+          animateOutAndRedirect("dashboard.html");
+          return;
+        }
+
+        // Tampilkan countdown 8 detik
         const notice = document.getElementById("autoLoginNotice");
         const countdown = document.getElementById("countdown");
-
         notice.style.display = "block";
 
         let timeLeft = 8;
@@ -272,6 +265,9 @@
         const user = userCredential.user;
 
         await setDoc(doc(db, "users", user.uid), { online: true }, { merge: true });
+
+        // Tandai login manual agar onAuth tidak ulangi countdown
+        sessionStorage.setItem("justLoggedIn", "true");
 
         setTimeout(() => {
           button.classList.remove("loading");
