@@ -48,7 +48,7 @@ h1 {
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
-  transition: transform 0.3s ease, left 0.3s, top 0.3s;
+  transition: transform 0.3s ease;
   cursor: pointer;
   position: relative;
   z-index: 1;
@@ -59,16 +59,14 @@ h1 {
 }
 
 .card.expanded {
-  position: fixed;
-  z-index: 1000;
-  margin: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90vw;
-  max-width: 360px;
-  height: auto;
-  box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 90vw !important;
+  max-width: 360px !important;
+  z-index: 1001 !important;
+  box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff !important;
 }
 
 #logoutButton {
@@ -97,7 +95,7 @@ h1 {
   width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-  z-index: 999;
+  z-index: 1000;
 }
 
   </style>
@@ -172,37 +170,21 @@ h1 {
       }
     });
 
-    // Detach card ke tengah layar
     let expandedCard = null;
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => {
-        if (expandedCard) return; // Cegah jika sudah ada yang aktif
-
-        const rect = card.getBoundingClientRect();
-        const scrollY = window.scrollY;
-        card.style.position = 'fixed';
-        card.style.top = rect.top + scrollY + 'px';
-        card.style.left = rect.left + 'px';
-        card.style.width = rect.width + 'px';
-        card.style.height = rect.height + 'px';
-        card.style.zIndex = '1000';
-
-        requestAnimationFrame(() => {
-          card.classList.add('expanded');
-          overlay.style.display = 'block';
-          expandedCard = card;
-        });
+        if (expandedCard) return;
+        card.classList.add('expanded');
+        overlay.style.display = 'block';
+        expandedCard = card;
       });
     });
 
     overlay.addEventListener('click', () => {
       if (!expandedCard) return;
       expandedCard.classList.remove('expanded');
-      setTimeout(() => {
-        expandedCard.removeAttribute('style');
-        overlay.style.display = 'none';
-        expandedCard = null;
-      }, 300);
+      overlay.style.display = 'none';
+      expandedCard = null;
     });
   </script></body>
 </html>
