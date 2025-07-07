@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,15 +6,16 @@
   <title>QuantumX</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes zoomIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    /* --- Animasi dan styling --- */
     @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
     .fade-in { opacity: 0; animation: fadeSlideUp 0.8s ease forwards; }
     .fade-delay-1 { animation-delay: 0.3s; }
     .fade-delay-2 { animation-delay: 0.6s; }
     .fade-delay-3 { animation-delay: 0.9s; }
     .fade-delay-4 { animation-delay: 1.2s; }
+    .fade-out { animation: fadeOut 0.6s ease forwards; }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -96,16 +96,7 @@
       text-decoration: underline;
       font-size: 0.95rem;
     }
-  
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-.fade-out {
-  animation: fadeOut 0.6s ease forwards;
-}
-
-</style>
+  </style>
 </head>
 <body>
   <div id="overlay"></div>
@@ -123,9 +114,10 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
+    // Konfigurasi Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
       authDomain: "quantechapp.firebaseapp.com",
@@ -138,6 +130,13 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // ✅ Cek apakah user sudah login sebelumnya
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        window.location.href = "dashboard.html";
+      }
+    });
 
     const form = document.getElementById("loginForm");
     const button = form.querySelector("button");
@@ -155,8 +154,10 @@
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        await updateDoc(doc(db, "users", user.uid), { online: true });
+        // ✅ Update status online di Firestore (jika dokumen belum ada, dibuat)
+        await setDoc(doc(db, "users", user.uid), { online: true }, { merge: true });
 
+        // ✅ Redirect dengan animasi
         document.querySelector('.login-container').classList.add('fade-out');
         document.getElementById("overlay").style.opacity = 1;
         setTimeout(() => {
