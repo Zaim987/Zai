@@ -10,10 +10,6 @@
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
     @keyframes fadeUpOut {
       from { opacity: 1; transform: translateY(0); }
       to { opacity: 0; transform: translateY(-30px); }
@@ -28,8 +24,6 @@
     .fade-delay-3 { animation-delay: 0.9s; }
     .fade-delay-4 { animation-delay: 1.2s; }
 
-    .fade-out { animation: fadeOut 0.6s ease forwards; }
-
     .fade-up-out {
       animation: fadeUpOut 0.5s ease forwards;
     }
@@ -43,7 +37,6 @@
       background: #0d1117;
       color: white;
       font-family: 'Rajdhani', sans-serif;
-      overflow-x: hidden;
     }
     #overlay {
       position: fixed;
@@ -83,7 +76,6 @@
       color: black;
       cursor: pointer;
       box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-      transition: transform 0.2s ease;
       position: relative;
     }
     button:hover { transform: scale(1.05); }
@@ -199,21 +191,30 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    function animateOutAndRedirect(redirectUrl) {
+      const elements = [
+        { el: document.getElementById("logo"), delayClass: "fade-up-delay-1" },
+        { el: document.getElementById("headline"), delayClass: "fade-up-delay-2" },
+        { el: document.getElementById("loginForm"), delayClass: "fade-up-delay-3" },
+        { el: document.getElementById("registerLink"), delayClass: "fade-up-delay-4" },
+      ];
+      elements.forEach(item => {
+        item.el.classList.remove("fade-in");
+        item.el.classList.add("fade-up-out", item.delayClass);
+      });
+
+      // Redirect setelah animasi terakhir selesai
+      const lastEl = document.getElementById("registerLink");
+      lastEl.addEventListener("animationend", () => {
+        window.location.href = redirectUrl;
+      }, { once: true });
+    }
+
     onAuthStateChanged(auth, user => {
       if (user) {
-        const elements = [
-          { el: document.getElementById("logo"), delayClass: "fade-up-delay-1" },
-          { el: document.getElementById("headline"), delayClass: "fade-up-delay-2" },
-          { el: document.getElementById("loginForm"), delayClass: "fade-up-delay-3" },
-          { el: document.getElementById("registerLink"), delayClass: "fade-up-delay-4" },
-        ];
-        elements.forEach(item => {
-          item.el.classList.remove("fade-in");
-          item.el.classList.add("fade-up-out", item.delayClass);
-        });
         setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 8000); // 8 detik delay
+          animateOutAndRedirect("dashboard.html");
+        }, 8000);
       }
     });
 
@@ -242,24 +243,10 @@
           button.classList.add("success");
           button.textContent = "";
 
-          const elements = [
-            { el: document.getElementById("logo"), delayClass: "fade-up-delay-1" },
-            { el: document.getElementById("headline"), delayClass: "fade-up-delay-2" },
-            { el: document.getElementById("loginForm"), delayClass: "fade-up-delay-3" },
-            { el: document.getElementById("registerLink"), delayClass: "fade-up-delay-4" },
-          ];
-          elements.forEach(item => {
-            item.el.classList.remove("fade-in");
-            item.el.classList.add("fade-up-out", item.delayClass);
-          });
-
-          setTimeout(() => {
-            window.location.href = "dashboard.html";
-          }, 1000); // delay setelah animasi keluar
+          animateOutAndRedirect("dashboard.html");
         }, 5000);
       } catch (error) {
         errorDiv.textContent = error.message.replace("Firebase:", "").trim();
-
         setTimeout(() => {
           button.classList.remove("loading");
           button.classList.add("failed");
@@ -276,22 +263,7 @@
 
     document.getElementById("toRegister").addEventListener("click", function (e) {
       e.preventDefault();
-
-      const elements = [
-        { el: document.getElementById("logo"), delayClass: "fade-up-delay-1" },
-        { el: document.getElementById("headline"), delayClass: "fade-up-delay-2" },
-        { el: document.getElementById("loginForm"), delayClass: "fade-up-delay-3" },
-        { el: document.getElementById("registerLink"), delayClass: "fade-up-delay-4" },
-      ];
-
-      elements.forEach(item => {
-        item.el.classList.remove("fade-in");
-        item.el.classList.add("fade-up-out", item.delayClass);
-      });
-
-      setTimeout(() => {
-        window.location.href = "register.html";
-      }, 800);
+      animateOutAndRedirect("register.html");
     });
   </script>
 </body>
