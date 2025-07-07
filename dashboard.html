@@ -43,7 +43,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
@@ -56,11 +57,28 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    document.getElementById("logoutButton").addEventListener("click", async () => {
+    const logoutBtn = document.getElementById("logoutButton");
+
+    logoutBtn.addEventListener("click", async () => {
       try {
+        const user = auth.currentUser;
+        if (user) {
+          // ✅ Set status offline di Firestore
+          await setDoc(doc(db, "users", user.uid), {
+            online: false
+          }, { merge: true });
+        }
+
+        // ✅ Sign out user
         await signOut(auth);
-        sessionStorage.removeItem("justLoggedIn"); // ✅ Clear manual login flag
+
+        // ✅ Hapus semua session dan riwayat lokal
+        sessionStorage.clear();
+        localStorage.clear();
+
+        // ✅ Redirect ke login
         window.location.href = "login.html";
       } catch (error) {
         console.error("Logout gagal:", error);
