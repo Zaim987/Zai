@@ -273,6 +273,56 @@ function openFloatingPlayer(videoId) {
   document.getElementById("floating-close").addEventListener("click", () => floating.remove());
 }
 
+// Panel animasi zoom untuk selain YouTube
+const youtubeCard = document.getElementById("youtubeCard");
+let clone = null;
+let originalCard = null;
+let originalRect = null;
+
+document.querySelectorAll(".card").forEach(card => {
+  if (card === youtubeCard) return;
+  card.addEventListener("click", () => {
+    if (clone) return;
+    originalRect = card.getBoundingClientRect();
+    const scrollY = window.scrollY;
+    const cloneEl = card.cloneNode(true);
+    cloneEl.classList.add("clone-card");
+    cloneEl.style.top = (originalRect.top + scrollY) + "px";
+    cloneEl.style.left = originalRect.left + "px";
+    cloneEl.style.width = originalRect.width + "px";
+    cloneEl.style.height = originalRect.height + "px";
+    document.body.appendChild(cloneEl);
+    card.style.visibility = "hidden";
+    overlay.style.display = "block";
+    clone = cloneEl;
+    originalCard = card;
+    requestAnimationFrame(() => {
+      cloneEl.style.top = "50%";
+      cloneEl.style.left = "50%";
+      cloneEl.style.transform = "translate(-50%, -50%)";
+      cloneEl.style.width = "80vw";
+      cloneEl.style.maxWidth = "360px";
+    });
+  });
+});
+
+overlay.addEventListener("click", () => {
+  if (!clone || !originalRect) return;
+  clone.style.top = (originalRect.top + window.scrollY) + "px";
+  clone.style.left = originalRect.left + "px";
+  clone.style.width = originalRect.width + "px";
+  clone.style.height = originalRect.height + "px";
+  clone.style.transform = "translate(0, 0)";
+  setTimeout(() => {
+    clone.remove();
+    overlay.style.display = "none";
+    if (originalCard) originalCard.style.visibility = "visible";
+    clone = null;
+    originalCard = null;
+    originalRect = null;
+  }, 900);
+});
+
   </script>
 </body>
 </html>
