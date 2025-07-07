@@ -13,24 +13,6 @@
   to { opacity: 0; transform: translateY(-30px); }
 }
 
-@keyframes zoomIn {
-  to { transform: scale(1); }
-}
-
-@keyframes zoomOut {
-  from { transform: scale(1); }
-  to { transform: scale(0.7); }
-}
-
-@keyframes borderGlow {
-  from {
-    box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-  }
-  to {
-    box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff;
-  }
-}
-
 body {
   font-family: 'Rajdhani', sans-serif;
   background-color: #0d1117;
@@ -66,12 +48,24 @@ h1 {
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease, left 0.3s, top 0.3s;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
 .card:hover {
   transform: scale(1.02);
+}
+
+.card.expanded {
+  position: fixed;
+  z-index: 1000;
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff;
 }
 
 #logoutButton {
@@ -93,32 +87,14 @@ h1 {
   transform: scale(1.05);
 }
 
-.overlay {
+#overlay {
   display: none;
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.6);
-  z-index: 999;
-  justify-content: center;
-  align-items: center;
   backdrop-filter: blur(4px);
-}
-
-.zoom-card {
-  background: #111827;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 80%;
-  max-width: 400px;
-  transform: scale(0.7);
-  animation: zoomIn 0.3s ease forwards;
-  box-shadow: 0 0 0 transparent;
-  position: relative;
-}
-
-.zoom-card.glow-border {
-  animation: borderGlow 1.5s infinite alternate;
+  z-index: 999;
 }
 
   </style>
@@ -140,9 +116,7 @@ h1 {
     </div>
   </div><button id="logoutButton">Logout</button>
 
-  <div id="overlay" class="overlay">
-    <div id="zoomCard" class="zoom-card"></div>
-  </div>  <script type="module">
+  <div id="overlay"></div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
@@ -164,7 +138,6 @@ h1 {
     const userEmailSpan = document.getElementById("userEmail");
     const totalUsersSpan = document.getElementById("totalUsers");
     const overlay = document.getElementById("overlay");
-    const zoomCard = document.getElementById("zoomCard");
 
     logoutBtn.addEventListener("click", async () => {
       document.body.classList.remove("fade-in");
@@ -196,24 +169,37 @@ h1 {
       }
     });
 
-    // Zoom & glow animation for cards
+    // Detach card ke tengah layar
+    let expandedCard = null;
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => {
-        zoomCard.innerHTML = card.innerHTML;
-        zoomCard.classList.add('glow-border');
-        overlay.style.display = 'flex';
+        if (expandedCard) return; // Cegah jika sudah ada yang aktif
+
+        const rect = card.getBoundingClientRect();
+        const scrollY = window.scrollY;
+        card.style.position = 'fixed';
+        card.style.top = rect.top + scrollY + 'px';
+        card.style.left = rect.left + 'px';
+        card.style.width = rect.width + 'px';
+        card.style.height = rect.height + 'px';
+        card.style.zIndex = '1000';
+
+        requestAnimationFrame(() => {
+          card.classList.add('expanded');
+          overlay.style.display = 'block';
+          expandedCard = card;
+        });
       });
     });
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        zoomCard.style.animation = 'zoomOut 0.3s ease forwards';
-        setTimeout(() => {
-          overlay.style.display = 'none';
-          zoomCard.classList.remove('glow-border');
-          zoomCard.style.animation = 'zoomIn 0.3s ease forwards';
-        }, 300);
-      }
+    overlay.addEventListener('click', () => {
+      if (!expandedCard) return;
+      expandedCard.classList.remove('expanded');
+      setTimeout(() => {
+        expandedCard.removeAttribute('style');
+        overlay.style.display = 'none';
+        expandedCard = null;
+      }, 300);
     });
   </script></body>
 </html>
