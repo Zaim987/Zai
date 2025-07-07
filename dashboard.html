@@ -6,7 +6,6 @@
   <title>Dashboard - QuantumX</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
-    /* Copas style saka login.html */
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
@@ -79,11 +78,46 @@
       transform: translate(-50%, -50%);
     }
 
+    /* Chat */
+    #chatMessages {
+      height: 300px;
+      overflow-y: auto;
+      padding: 1rem;
+      border: 1px solid #333;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      background: #161b22;
+    }
+    #chatMessages div {
+      margin-bottom: 0.75rem;
+    }
+    #chatInput {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: #0d1117;
+      color: white;
+    }
+    #chatForm {
+      display: flex;
+      gap: 0.5rem;
+    }
   </style>
 </head>
 <body>
   <h1 class="fade-in fade-delay-1">Selamat datang di Dashboard</h1>
   <button id="logoutBtn" class="logout-btn fade-in fade-delay-2">Logout</button>
+
+  <div id="chatArea" class="fade-in fade-delay-2">
+    <div id="chatMessages"></div>
+    <form id="chatForm">
+      <input id="chatInput" type="text" placeholder="Tulis pertanyaan..." required />
+      <button type="submit" class="logout-btn" style="margin: 0;">Kirim</button>
+    </form>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
@@ -104,6 +138,9 @@
     const db = getFirestore(app);
 
     const logoutBtn = document.getElementById("logoutBtn");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatMessages = document.getElementById("chatMessages");
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -113,7 +150,6 @@
 
     logoutBtn.addEventListener("click", async () => {
       logoutBtn.classList.add("loading");
-
       try {
         const user = auth.currentUser;
         if (user) {
@@ -126,6 +162,31 @@
       } catch (error) {
         console.error("Logout error:", error);
         logoutBtn.classList.remove("loading");
+      }
+    });
+
+    // ChatGPT Fetch
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) return;
+
+      chatMessages.innerHTML += `<div><strong>Kamu:</strong> ${message}</div>`;
+      chatInput.value = "";
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      try {
+        const res = await fetch("https://your-vercel-app.vercel.app/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        chatMessages.innerHTML += `<div><strong>AI:</strong> ${data.reply}</div>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      } catch (err) {
+        chatMessages.innerHTML += `<div style="color:red;">Gagal sambung ke AI: ${err.message}</div>`;
       }
     });
   </script>
