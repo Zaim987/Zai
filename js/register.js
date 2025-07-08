@@ -5,12 +5,12 @@ import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.
 
 // Konfigurasi Firebase-mu (GANTI karo punyamu)
 const firebaseConfig = {
-  apiKey: "GANTI_KENE",
-  authDomain: "GANTI_KENE",
-  projectId: "GANTI_KENE",
-  storageBucket: "GANTI_KENE",
-  messagingSenderId: "GANTI_KENE",
-  appId: "GANTI_KENE"
+  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+  authDomain: "quantechapp.firebaseapp.com",
+  projectId: "quantechapp",
+  storageBucket: "quantechapp.appspot.com",
+  messagingSenderId: "825384610343",
+  appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
 };
 
 // Inisialisasi Firebase
