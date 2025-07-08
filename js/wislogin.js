@@ -1,23 +1,14 @@
 import { auth } from './js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
+console.log("🔥 wislogin.js aktif");
+
 onAuthStateChanged(auth, (user) => {
+  console.log("🧠 Firebase user status:", user);
   if (user) {
-    const notice = document.getElementById('autoLoginNotice');
-    const countdown = document.getElementById('countdown');
-    let detik = 3;
-
-    document.querySelector('.login-container')?.style?.display = 'none';
-    notice.style.display = 'block';
-    countdown.innerText = detik;
-
-    const tiker = setInterval(() => {
-      detik--;
-      countdown.innerText = detik;
-      if (detik === 0) {
-        clearInterval(tiker);
-        window.location.href = "dashboard.html";
-      }
-    }, 1000);
+    alert("🔐 AUTO LOGIN SUCCESS! Redirecting...");
+    window.location.href = "dashboard.html";
+  } else {
+    console.warn("❌ User durung login!");
   }
 });
