@@ -1,11 +1,82 @@
-<!DOCTYPE html><html lang="id">
-<head>
+<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QuantumX Chat</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";const firebaseConfig = {
+  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+  authDomain: "quantechapp.firebaseapp.com",
+  projectId: "quantechapp",
+  storageBucket: "quantechapp.appspot.com",
+  messagingSenderId: "825384610343",
+  appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+function sendMessage() {
+  const input = document.getElementById("msgInput");
+  const msg = input.value.trim();
+  if (msg !== "") {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "message";
+    msgDiv.textContent = msg;
+    document.getElementById("messages").appendChild(msgDiv);
+    input.value = "";
+    msgDiv.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
+function goBack() {
+  document.querySelector(".chat-wrapper").classList.add("fade-out-up");
+  setTimeout(() => {
+    window.location.href = "dashboard.html";
+  }, 600);
+}
+
+async function loadUsers() {
+  const list = document.getElementById("users");
+  try {
+    const snapshot = await getDocs(collection(db, "users"));
+    const currentUser = auth.currentUser;
+    snapshot.forEach((docSnap, index) => {
+      const data = docSnap.data();
+      if (currentUser && data.email === currentUser.email) return; // skip user login
+      const div = document.createElement("div");
+      div.className = "user-item";
+      div.textContent = `${data.displayName || 'No Name'} (${data.email || 'No Email'})`;
+      div.style.animationDelay = `${8 + index * 0.3}s`;
+      list.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Gagal load user:", err);
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const displayName = userSnap.data().displayName || "Pengguna";
+      const welcomeEl = document.querySelector(".welcome-text");
+      if (welcomeEl) {
+        welcomeEl.textContent = `Selamat Datang, ${displayName}!`;
+      }
+    }
+    loadUsers();
+  }
+});
+
+window.goBack = goBack;
+window.sendMessage = sendMessage;
+
+  </script>
   <style>
     * {
       margin: 0;
@@ -106,6 +177,12 @@
       width: 100%;
       box-shadow: 0 0 10px cyan;
     }
+    #users {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
     .user-item {
       padding: 0.5rem;
       border-bottom: 1px solid #333;
@@ -134,6 +211,7 @@
       <button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
     </header>
     <main class="chat-box">
+      <h2 class="welcome-text">Selamat Datang, Zaim!</h2>
       <div class="message-list" id="messages">
         <!-- Pesan muncul nang kene -->
       </div>
@@ -146,57 +224,6 @@
       <h3>Daftar Pengguna</h3>
       <div id="users"></div>
     </div>
-  </div>  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-      authDomain: "quantechapp.firebaseapp.com",
-      projectId: "quantechapp",
-      storageBucket: "quantechapp.appspot.com",
-      messagingSenderId: "825384610343",
-      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    function goBack() {
-      document.querySelector(".chat-wrapper").classList.add("fade-out-up");
-      setTimeout(() => {
-        window.location.href = "dashboard.html";
-      }, 600);
-    }
-
-    function sendMessage() {
-      const input = document.getElementById("msgInput");
-      const msg = input.value.trim();
-      if (msg !== "") {
-        const msgDiv = document.createElement("div");
-        msgDiv.className = "message";
-        msgDiv.textContent = msg;
-        document.getElementById("messages").appendChild(msgDiv);
-        input.value = "";
-        msgDiv.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-
-    async function loadUsers() {
-      const userList = document.getElementById("users");
-      try {
-        const snapshot = await db.collection("users").get();
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const div = document.createElement("div");
-          div.className = "user-item";
-          div.textContent = data.displayName || "(Tanpa Nama)";
-          userList.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Gagal load user:", err);
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadUsers();
-    });
-  </script></body>
+  </div>
+</body>
 </html>
