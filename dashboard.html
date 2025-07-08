@@ -2,166 +2,130 @@
 <html lang="jv">
 <head>
   <meta charset="UTF-8">
-  <title>Langit Kalah - Suara Dijamin Muncul</title>
+  <title>Langit Kenangan</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       overflow: hidden;
       background: black;
     }
+
     canvas {
       display: block;
     }
-    #mantan {
+
+    .mantan {
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
+      color: pink;
+      animation: mlebu 10s linear forwards;
+    }
+
+    @keyframes mlebu {
+      0% { left: 100%; opacity: 1; }
+      80% { left: 30%; opacity: 1; }
+      100% { left: 30%; opacity: 0; }
+    }
+
+    .blackhole {
       position: absolute;
       top: 50%;
       left: 50%;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #000000, #222222, #000000);
+      box-shadow: 0 0 100px #000;
       transform: translate(-50%, -50%);
-      font-family: 'Courier New', monospace;
-      font-size: 24px;
-      color: rgba(255, 255, 255, 0);
-      animation: munculHilang 6s infinite ease-in-out;
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 10;
-    }
-    @keyframes munculHilang {
-      0%, 100% { color: rgba(255,255,255,0); }
-      30% { color: rgba(255,255,255,0.7); }
-      60% { color: rgba(255,255,255,0); }
+      animation: spin 4s linear infinite;
     }
 
-    /* Tombol transparan full layar */
-    #klikPlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 999;
-      opacity: 0;
-      border: none;
-      background: none;
-      cursor: pointer;
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
+
   </style>
 </head>
 <body>
 
-  <!-- Tombol klik transparan -->
-  <button id="klikPlay"></button>
+<canvas id="space"></canvas>
+<div class="blackhole"></div>
+<div class="mantan">👩‍🦰 Mantan</div>
 
-  <canvas id="space"></canvas>
-  <div id="mantan">ASU ASU "Aku kalah ning ngarepmu, menang ning kenanganku..."</div>
+<audio id="lagu" autoplay loop hidden>
+  <source src="https://raw.githubusercontent.com/Zaim987/Zai/main/lirik%20kalah%20meydarahma.mp3" type="audio/mpeg">
+</audio>
 
-  <!-- Lagu Kalah -->
-  <audio id="lagu" loop>
-    <source src="https://github.com/Zaim987/Zai/raw/main/videoplayback.m4a" type="audio/mp4">
-  </audio>
+<script>
+  // 🔊 Biar autoplay jalan pas klik user
+  document.addEventListener("click", () => {
+    const audio = document.getElementById("lagu");
+    if (audio.paused) audio.play();
+  });
 
-  <script>
-    const canvas = document.getElementById('space');
-    const ctx = canvas.getContext('2d');
-    let stars = [], meteors = [];
-    const numStars = 800;
-    let w, h;
+  // 🌌 Bintang
+  const canvas = document.getElementById("space");
+  const ctx = canvas.getContext("2d");
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+  let stars = [];
 
-    let blackHole = { x: 0, y: 0, r: 40, angle: 0 };
-
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-      blackHole.x = w / 2;
-      blackHole.y = h / 2;
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    for (let i = 0; i < numStars; i++) {
-      stars.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: Math.random() * 1.5,
-        a: Math.random()
-      });
-    }
-
-    function spawnMeteor() {
-      meteors.push({
-        x: Math.random() * w,
-        y: -20,
-        vx: -2 - Math.random() * 4,
-        vy: 4 + Math.random() * 6,
-        size: 2 + Math.random() * 2
-      });
-      setTimeout(spawnMeteor, 700 + Math.random() * 2000);
-    }
-    spawnMeteor();
-
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-      blackHole.angle += 0.01;
-      ctx.save();
-      ctx.translate(blackHole.x, blackHole.y);
-      ctx.rotate(blackHole.angle);
-      ctx.beginPath();
-      ctx.arc(0, 0, blackHole.r, 0, Math.PI * 2);
-      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, blackHole.r);
-      grad.addColorStop(0, "rgba(0,0,0,1)");
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = grad;
-      ctx.fill();
-      ctx.restore();
-
-      for (let i = 0; i < stars.length; i++) {
-        let s = stars[i];
-        s.a += (Math.random() - 0.5) * 0.05;
-        s.a = Math.max(0.2, Math.min(1, s.a));
-        const dx = blackHole.x - s.x;
-        const dy = blackHole.y - s.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 300) {
-          s.x += dx * 0.0005;
-          s.y += dy * 0.0005;
-        }
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
-        ctx.fill();
-      }
-
-      for (let i = meteors.length - 1; i >= 0; i--) {
-        let m = meteors[i];
-        m.x += m.vx;
-        m.y += m.vy;
-
-        ctx.beginPath();
-        ctx.moveTo(m.x, m.y);
-        ctx.lineTo(m.x - m.vx * 10, m.y - m.vy * 10);
-        ctx.strokeStyle = "rgba(255,255,180,0.6)";
-        ctx.lineWidth = m.size;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.size, 0, 2 * Math.PI);
-        ctx.fillStyle = "white";
-        ctx.fill();
-
-        if (m.y > h + 100 || m.x < -100) {
-          meteors.splice(i, 1);
-        }
-      }
-
-      requestAnimationFrame(draw);
-    }
-
-    draw();
-
-    // Klik layar sekali, langsung muter lagu
-    document.getElementById("klikPlay").addEventListener("click", () => {
-      document.getElementById("lagu").play();
-      document.getElementById("klikPlay").style.display = "none"; // ilangno tombol
+  for (let i = 0; i < 400; i++) {
+    stars.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      size: Math.random() * 2,
+      speed: Math.random() * 0.5 + 0.2
     });
-  </script>
+  }
+
+  // ☄️ Meteor
+  let meteors = [];
+  setInterval(() => {
+    meteors.push({
+      x: Math.random() * w,
+      y: -20,
+      size: Math.random() * 3 + 1,
+      speedX: (Math.random() - 0.5) * 2,
+      speedY: Math.random() * 3 + 2
+    });
+  }, 300);
+
+  function draw() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, w, h);
+
+    // Stars
+    ctx.fillStyle = "white";
+    for (let s of stars) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+      s.y += s.speed;
+      if (s.y > h) s.y = 0;
+    }
+
+    // Meteors
+    ctx.fillStyle = "orange";
+    for (let m of meteors) {
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+      ctx.fill();
+      m.x += m.speedX;
+      m.y += m.speedY;
+    }
+
+    meteors = meteors.filter(m => m.y < h);
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>
+
 </body>
 </html>
