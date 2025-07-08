@@ -47,18 +47,33 @@
     }
   </style>
 </head>
-<body class="text-white font-mono">  <!-- Navbar -->  <nav class="flex justify-between items-center px-8 py-5 bg-gray-950 bg-opacity-60 glass sticky top-0 z-50">
-    <h1 class="text-3xl font-extrabold text-cyan-400 tracking-widest">🎮 GAMERHUB</h1>
-    <div class="space-x-6 text-lg">
-      <a href="#" class="hover:text-cyan-300 transition-all duration-300">Dashboard</a>
-      <a href="#" class="hover:text-cyan-300 transition-all duration-300">Games</a>
-      <a href="#" class="hover:text-cyan-300 transition-all duration-300">Tournaments</a>
-      <a href="#" class="hover:text-cyan-300 transition-all duration-300">Settings</a>
-    </div>
-  </nav>  <!-- Hero Section -->  <section class="py-20 text-center">
-    <h2 class="text-5xl md:text-6xl font-bold text-cyan-300 mb-4 animate-pulse">⚔ Welcome to the Battlezone</h2>
-    <p class="text-lg max-w-xl mx-auto text-gray-300">Dominate the arena, track your triumphs, and power up your game with the most immersive dashboard ever.</p>
-  </section>  <!-- 3D Card Section -->  <section class="grid grid-cols-1 md:grid-cols-3 gap-10 px-8 pb-20">
+<body class="text-white font-mono">  <!-- HERO GAMING HEADER -->  <header class="relative overflow-hidden h-[90vh] flex flex-col justify-center items-center text-center px-4 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]">
+    <!-- Animated Background SVG -->
+    <div class="absolute inset-0 z-0 opacity-20">
+      <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 320">
+        <path fill="#00ffff" fill-opacity="0.3" d="M0,160L60,165.3C120,171,240,181,360,176C480,171,600,149,720,149.3C840,149,960,171,1080,181.3C1200,192,1320,192,1380,192L1440,192V320H0Z"></path>
+      </svg>
+    </div><!-- Content -->
+<div class="relative z-10">
+  <h1 class="text-5xl md:text-7xl font-extrabold text-cyan-300 drop-shadow-[0_0_15px_#00ffff] animate-pulse">
+    WELCOME TO <span class="text-purple-500">GAMERHUB</span>
+  </h1>
+  <p class="mt-4 text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto">
+    Dashboard interaktif paling edan! Pantau stats, pimpin leaderboard, lan conquer game-world.
+  </p>
+
+  <!-- Action Button -->
+  <div class="mt-8 flex justify-center gap-4">
+    <button class="bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
+      🎮 Start Playing
+    </button>
+    <button class="bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
+      📊 View Stats
+    </button>
+  </div>
+</div>
+
+  </header>  <!-- 3D Card Section -->  <section class="grid grid-cols-1 md:grid-cols-3 gap-10 px-8 py-20">
     <div class="card-3d h-72 relative">
       <div class="card-inner h-full">
         <div class="card-front bg-gradient-to-br from-cyan-500 to-blue-800 glass glow">📊 Player Statistics</div>
@@ -77,7 +92,7 @@
         <div class="card-back bg-gray-900 glass glow">Access and manage all your games with stats and updates.</div>
       </div>
     </div>
-  </section>  <!-- Chart & Animation -->  <section class="bg-gray-950 py-16 px-6">
+  </section>  <!-- Chart Section -->  <section class="bg-gray-950 py-16 px-6">
     <h3 class="text-3xl text-center font-bold mb-8 text-cyan-300">🔥 Live Player Stats</h3>
     <div class="max-w-3xl mx-auto bg-gray-900 p-6 rounded-xl glow">
       <canvas id="playerChart"></canvas>
@@ -128,7 +143,7 @@
     animate();
 
     // GSAP Animation on Load
-    gsap.from("nav", { duration: 1, y: -100, opacity: 0, ease: "bounce" });
+    gsap.from("header h1", { duration: 1.2, y: -100, opacity: 0, ease: "bounce" });
     gsap.from(".card-3d", { duration: 1, y: 100, opacity: 0, stagger: 0.2, ease: "power4.out" });
   </script></body>
 </html>
