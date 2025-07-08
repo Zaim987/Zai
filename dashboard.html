@@ -2,8 +2,7 @@
 <html lang="jv">
 <head>
   <meta charset="UTF-8">
-  <title>Langit Pedot Total</title>
-  <!-- #css -->
+  <title>Langit Kenangan - Pedot Edition</title>
   <style>
     body {
       margin: 0;
@@ -13,27 +12,37 @@
     canvas {
       display: block;
     }
+    #mantan {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Courier New', monospace;
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0);
+      animation: munculHilang 6s infinite ease-in-out;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    @keyframes munculHilang {
+      0%, 100% { color: rgba(255,255,255,0); }
+      30% { color: rgba(255,255,255,0.7); }
+      60% { color: rgba(255,255,255,0); }
+    }
   </style>
 </head>
 <body>
   <canvas id="space"></canvas>
+  <div id="mantan">👻 "Aku ora ninggalmu, mung wis lali..."</div>
 
-  <!-- #js -->
   <script>
     const canvas = document.getElementById('space');
     const ctx = canvas.getContext('2d');
-
-    let stars = [];
-    let meteors = [];
-    const numStars = 1000;
+    let stars = [], meteors = [];
+    const numStars = 800;
     let w, h;
 
-    let blackHole = {
-      x: 0,
-      y: 0,
-      r: 40,
-      angle: 0
-    };
+    let blackHole = { x: 0, y: 0, r: 40, angle: 0 };
 
     function resize() {
       w = canvas.width = window.innerWidth;
@@ -41,11 +50,9 @@
       blackHole.x = w / 2;
       blackHole.y = h / 2;
     }
-
     window.addEventListener('resize', resize);
     resize();
 
-    // BINTANG
     for (let i = 0; i < numStars; i++) {
       stars.push({
         x: Math.random() * w,
@@ -55,7 +62,6 @@
       });
     }
 
-    // METEOR RANDOM
     function spawnMeteor() {
       meteors.push({
         x: Math.random() * w,
@@ -64,15 +70,14 @@
         vy: 4 + Math.random() * 6,
         size: 2 + Math.random() * 2
       });
-      setTimeout(spawnMeteor, 500 + Math.random() * 2000); // acak delay
+      setTimeout(spawnMeteor, 700 + Math.random() * 2000);
     }
     spawnMeteor();
 
-    // DRAW
     function draw() {
       ctx.clearRect(0, 0, w, h);
 
-      // BLACK HOLE
+      // BLACK HOLE MUTER
       blackHole.angle += 0.01;
       ctx.save();
       ctx.translate(blackHole.x, blackHole.y);
@@ -91,8 +96,6 @@
         let s = stars[i];
         s.a += (Math.random() - 0.5) * 0.05;
         s.a = Math.max(0.2, Math.min(1, s.a));
-
-        // Efek disedot black hole
         const dx = blackHole.x - s.x;
         const dy = blackHole.y - s.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -100,7 +103,6 @@
           s.x += dx * 0.0005;
           s.y += dy * 0.0005;
         }
-
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
         ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
@@ -113,22 +115,18 @@
         m.x += m.vx;
         m.y += m.vy;
 
-        // ekor
         ctx.beginPath();
-        const trailLen = 15;
         ctx.moveTo(m.x, m.y);
-        ctx.lineTo(m.x - m.vx * trailLen, m.y - m.vy * trailLen);
-        ctx.strokeStyle = "rgba(255,255,200,0.6)";
+        ctx.lineTo(m.x - m.vx * 10, m.y - m.vy * 10);
+        ctx.strokeStyle = "rgba(255,255,180,0.6)";
         ctx.lineWidth = m.size;
         ctx.stroke();
 
-        // titik meteor
         ctx.beginPath();
         ctx.arc(m.x, m.y, m.size, 0, 2 * Math.PI);
         ctx.fillStyle = "white";
         ctx.fill();
 
-        // hancur pas keluar layar
         if (m.y > h + 100 || m.x < -100) {
           meteors.splice(i, 1);
         }
