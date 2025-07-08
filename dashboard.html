@@ -1,7 +1,9 @@
-<!DOCTYPE html><html lang="id"><head>  <meta charset="UTF-8" />
+<!DOCTYPE html><html lang="id"><head>
+  <!-- # START: Bagian <head> - metadata lan CSS -->  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QuantumX Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <!-- # START: CSS Internal -->
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -141,7 +143,9 @@
 .fade-out-up {
   animation: fadeOutUp 0.6s ease-in-out forwards;
 }
-  </style>
+    </style>
+  <!-- # END: CSS Internal -->
+    <!-- # START: Script Interaktif -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
   const menuBtns = document.querySelectorAll(".menu-btn");
@@ -170,13 +174,21 @@
   });
 });
 
-  </script>
+    </script>
+  <!-- # END: Script Interaktif -->
+  <!-- # END: Bagian <head> -->
 </head>
 <body>
+  <!-- # START: Bagian <body> -->
+    <!-- # START: Splash Screen -->
   <div id="splash-screen">
     <h1 class="splash-logo">QuantumX</h1>
-  </div>
+    </div>
+  <!-- # END: Splash Screen -->
+
+  <!-- # START: Konten Utama -->
   <div id="main-content" class="hidden">
+        <!-- # START: Header Navigasi -->
     <header class="top-bar">
       <div class="logo">QuantumX</div>
       <div class="scroll-wrapper">
@@ -188,11 +200,14 @@
           <button class="menu-btn logout">Logout</button>
         </nav>
       </div>
-    </header>
+        </header>
+    <!-- # END: Header Navigasi -->
+        <!-- # START: Dashboard Utama -->
     <main class="dashboard">
       <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
       <p class="desc-text">Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
       <div id="user-list"></div>
+            <!-- # START: Artikel Extra -->
       <div class="extra-content-wrapper">
         <div class="extra-content">
           <h2>Artikel Menarik</h2>
@@ -228,11 +243,20 @@
           <h3>Penutup</h3>
           <p>ROG dudu mung laptop, iki mimpi anak cilik sing wis kesel dicibir PC rakitan. Kowe pengin menang ngelawan musuh, opo kalah karo lag? Nek isih nge-lag nganggo ROG, berarti setan ono nang RAM-mu, asu! 🐶</p>
         </div>
-      </div>
+              </div>
+      <!-- # END: Artikel Extra -->
     </main>
-  </div>
-  <script type="module" src="js/auth-guard.js"></script>
-  <script type="module" src="js/load-users.js"></script>
-  <script type="module" src="js/logout.js"></script>
+    <!-- # END: Dashboard Utama -->
+    </div>
+  <!-- # END: Konten Utama -->
+
+  <!-- # START: Script Auth Guard -->
+  <script type="module" src="js/auth-guard.js">  </script>
+  <!-- # END: Script Interaktif -->
+  <script type="module" src="js/load-users.js">  </script>
+  <!-- # END: Script Interaktif -->
+  <script type="module" src="js/logout.js">  </script>
+  <!-- # END: Script Interaktif -->
+  <!-- # END: Bagian <body> -->
 </body>
 </html>
