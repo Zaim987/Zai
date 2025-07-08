@@ -157,7 +157,10 @@
     }
 
     function exitPrivateMessage() {
-  window.location.reload();
+  dmTarget = null;
+  document.getElementById("dm-target-label").textContent = "";
+  document.querySelector(".welcome-text").textContent = `Selamat Datang, ${currentDisplayName}!`;
+  listenMessages();
 }!`;
       listenMessages();
     }
@@ -178,6 +181,7 @@
     }
 
     function listenMessages() {
+  if (!currentUser) return;
       if (unsubscribe) unsubscribe();
 
       const q = query(collection(db, "messages"), orderBy("createdAt"));
