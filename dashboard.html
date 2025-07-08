@@ -48,6 +48,15 @@
   }
 }
 
+@keyframes glowText {
+  from {
+    text-shadow: 0 0 5px #58a6ff, 0 0 10px #58a6ff;
+  }
+  to {
+    text-shadow: 0 0 20px #58a6ff, 0 0 40px #58a6ff;
+  }
+}
+
 .menu-scroll {
   display: flex;
   gap: 16px;
@@ -75,6 +84,13 @@
   font-size: 1.4rem;
   font-weight: 600;
   margin-right: 20px;
+  animation-name: fadeInSoft, glowText;
+  animation-duration: 1s, 2s;
+  animation-delay: 3.5s, 4.5s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1, infinite;
+  animation-direction: normal, alternate;
+  animation-timing-function: ease-out, ease-in-out;
 }
 
 .menu-scroll a {
