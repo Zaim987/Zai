@@ -1,112 +1,135 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantumX Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  
   <style>
-    body {
-      margin: 0;
-      font-family: 'Rajdhani', sans-serif;
-      background-color: #0d1117;
-      color: white;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; background-color: #020202; color: white;
+      font-family: 'Orbitron', sans-serif; overflow: hidden;
     }
-    header {
-      background-color: #161b22;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 0 10px #00f0ff44;
+    .hidden { display: none; }
+    #splash-screen {
+      position: fixed; inset: 0; background-color: black;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 999;
+      animation: splashIntro 3s ease-in-out forwards;
     }
-    header h1 {
-      font-size: 1.5rem;
-      color: #00f0ff;
+    .splash-logo {
+      font-size: 2.5rem; color: white; opacity: 0;
+      text-shadow: 0 0 15px cyan;
+      animation: splashGlow 3s ease-in-out forwards;
     }
-    button.logout {
-      background-color: #ff4444;
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
+    @keyframes splashGlow {
+      0% { opacity: 0; transform: scale(0.8); text-shadow: none; }
+      50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 5px cyan; }
+      100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px cyan; }
     }
-    main {
-      padding: 2rem;
+    @keyframes splashIntro {
+      0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; }
     }
-    .user-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem; background-color: black; gap: 1rem;
+      overflow: hidden; opacity: 0;
+      animation: fadeInText 1s ease-out 3.5s forwards;
     }
-    .user-card {
-      background: #161b22;
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 0 10px #00f0ff33;
-      transition: transform 0.3s;
+    .logo {
+      font-size: 1.5rem; font-weight: bold;
+      text-shadow: 0 0 10px cyan; white-space: nowrap;
+      pointer-events: none;
     }
-    .user-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00f0ff66;
+    .scroll-wrapper { overflow-x: auto; flex-grow: 1; }
+    .scroll-wrapper::-webkit-scrollbar { display: none; }
+    .menu-bar {
+      display: flex; gap: 1rem; width: max-content;
     }
-    .ps5-section {
-      margin-top: 3rem;
-      padding: 0 2rem;
+    .menu-btn {
+      background: none; color: white; border: none; font-size: 1rem;
+      cursor: pointer; opacity: 0; transform: translateY(-10px);
+      animation: fadeInUp 0.6s ease-out forwards;
     }
-    .ps5-title {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
+    .menu-btn:nth-child(1) { animation-delay: 3.8s; }
+    .menu-btn:nth-child(2) { animation-delay: 4s; }
+    .menu-btn:nth-child(3) { animation-delay: 4.2s; }
+    .menu-btn:nth-child(4) { animation-delay: 4.4s; }
+    .menu-btn:nth-child(5) { animation-delay: 4.6s; }
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dashboard {
+      padding: 2rem; text-align: center;
+      opacity: 0; animation: demoFade 0.5s ease-in-out 5s forwards;
+    }
+    .welcome-text {
+      font-size: 2rem; margin-bottom: 1rem;
+      opacity: 0; transform: translateY(20px) scale(0.95);
+      animation: welcomeAnim 1.2s ease-out 5.5s forwards;
+      text-shadow: 0 0 10px cyan;
+    }
+    .desc-text {
+      font-size: 1rem; color: #ccc;
+      opacity: 0; transform: translateY(20px);
+      animation: descAnim 1s ease-out 6.5s forwards;
+    }
+    #user-list {
+      margin-top: 1rem;
       text-align: left;
-      color: #00f0ff;
-      text-shadow: 0 0 5px #00f0ff;
+      max-width: 600px;
+      margin-inline: auto;
     }
-    .ps5-scroll {
-      display: flex;
-      overflow-x: auto;
-      gap: 1rem;
-      scroll-snap-type: x mandatory;
-      padding-bottom: 1rem;
+    .user-item {
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: fadeLine 0.6s ease-out forwards;
+      padding: 4px 0;
     }
-    .ps5-scroll::-webkit-scrollbar {
-      display: none;
+    @keyframes welcomeAnim {
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .ps5-card {
-      flex: 0 0 auto;
-      width: 160px;
-      height: 100px;
-      background: #111;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #00f0ff44;
-      color: white;
-      text-align: center;
-      line-height: 100px;
-      font-weight: bold;
-      scroll-snap-align: center;
-      transition: transform 0.3s;
+    @keyframes descAnim {
+      to { opacity: 1; transform: translateY(0); }
     }
-    .ps5-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00f0ffaa;
-      cursor: pointer;
+    @keyframes fadeLine {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes demoFade {
+      to { opacity: 1; }
+    }
+    @keyframes fadeInText {
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>QuantumX Dashboard</h1>
-    <button class="logout" id="logoutBtn">Logout</button>
-  </header>  <main>
-    <div id="user-list" class="user-list"></div><div class="ps5-section">
-  <h2 class="ps5-title">Akses Cepat</h2>
-  <div class="ps5-scroll">
-    <div class="ps5-card">Profile</div>
-    <div class="ps5-card">Riwayat</div>
-    <div class="ps5-card">Pengaturan</div>
-    <div class="ps5-card">Notifikasi</div>
-    <div class="ps5-card">Support</div>
+  <div id="splash-screen">
+    <h1 class="splash-logo">QuantumX</h1>
   </div>
-</div>
+  <div id="main-content" class="hidden">
+    <header class="top-bar">
+      <div class="logo">QuantumX</div>
+      <div class="scroll-wrapper">
+        <nav class="menu-bar">
+          <button class="menu-btn">Dashboard</button>
+          <button class="menu-btn">Statistik</button>
+          <button class="menu-btn">Pengguna</button>
+          <button class="menu-btn">Pengaturan</button>
+          <button class="menu-btn logout">Logout</button>
+        </nav>
+      </div>
+    </header>
+    <main class="dashboard">
+      <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+      <p class="desc-text">Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
+      <div id="user-list"></div>
+    </main>
+  </div>
 
-  </main>  <script type="module" src="js/firebase-init.js"></script>  <script type="module" src="js/auth-guard.js"></script>  <script type="module" src="js/load-users.js"></script>  <script type="module" src="js/logout.js"></script></body>
+  <script type="module" src="js/auth-guard.js"></script>
+  <script type="module" src="js/load-users.js"></script>
+  <script type="module" src="js/logout.js"></script>
+</body>
 </html>
