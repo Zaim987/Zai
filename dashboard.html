@@ -2,108 +2,181 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QuantumX Demo</title>
+  <title>QuantumX Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%; height: 100%; background-color: #020202; color: white;
-      font-family: 'Orbitron', sans-serif; overflow: hidden;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .hidden { display: none; }#splash-screen {
-  position: fixed; inset: 0; background-color: black;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; z-index: 999;
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: #020202;
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
+    }.hidden {
+  display: none;
+}
+
+/* Splash */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 999;
   animation: splashIntro 3s ease-in-out forwards;
 }
+
 .splash-logo {
-  font-size: 2.5rem; color: white; opacity: 0;
+  font-size: 2.5rem;
+  color: white;
+  opacity: 0;
   text-shadow: 0 0 15px cyan;
   animation: splashGlow 3s ease-in-out forwards;
 }
+
 @keyframes splashGlow {
-  0% { opacity: 0; transform: scale(0.8); text-shadow: none; }
-  50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 5px cyan; }
-  100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px cyan; }
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+    text-shadow: none;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+    text-shadow: 0 0 5px cyan;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    text-shadow: 0 0 25px cyan;
+  }
 }
+
 @keyframes splashIntro {
-  0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; }
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
-#main-content {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 2rem; height: 100vh; gap: 2rem;
+/* Top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: black;
+  gap: 1rem;
+  overflow: hidden;
   opacity: 0;
-  animation: fadeInText 1.5s ease-in-out 3.5s forwards;
-}
-@keyframes fadeInText { to { opacity: 1; } }
-
-.hero-text {
-  font-size: 2rem; text-align: center; max-width: 90%;
-  animation: fadeInText 2s ease-in-out 3.5s forwards;
+  animation: fadeInText 1s ease-out 3.5s forwards;
 }
 
-.tiles {
-  display: flex; gap: 1rem; flex-wrap: wrap;
-  justify-content: center; animation: fadeInText 2s ease-in-out 4s forwards;
-}
-.tile {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1rem 1.5rem; border-radius: 12px; text-align: center;
-  box-shadow: 0 0 10px rgba(0,255,255,0.2);
-  transition: all 0.3s ease; cursor: pointer;
-}
-.tile:hover {
-  transform: translateY(-5px); box-shadow: 0 0 15px cyan;
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px cyan;
+  color: white;
+  flex-shrink: 0;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
-.ai-input {
-  margin-top: 1rem; width: 100%; max-width: 500px;
-  display: flex; gap: 0.5rem; animation: fadeInText 2s ease-in-out 4.5s forwards;
+.scroll-wrapper {
+  overflow-x: auto;
+  flex-grow: 1;
 }
-.ai-input input {
-  flex-grow: 1; padding: 0.75rem 1rem;
-  background: black; border: 1px solid cyan;
-  color: white; font-family: inherit; border-radius: 8px;
+
+.scroll-wrapper::-webkit-scrollbar {
+  display: none;
 }
-.ai-input button {
-  background: cyan; color: black;
-  border: none; padding: 0.75rem 1rem;
-  border-radius: 8px; font-weight: bold;
+
+.menu-bar {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+}
+
+.menu-btn {
+  background: none;
+  color: white;
+  border: none;
+  font-size: 1rem;
   cursor: pointer;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInUp 0.6s ease-out forwards;
 }
 
-.quote {
-  position: absolute; bottom: 1rem; right: 1rem;
-  font-size: 0.9rem; color: #aaa;
-  font-style: italic; text-align: right;
-  opacity: 0; animation: fadeInText 2s ease-in-out 5.5s forwards;
+.menu-btn:nth-child(1) { animation-delay: 3.8s; }
+.menu-btn:nth-child(2) { animation-delay: 4s; }
+.menu-btn:nth-child(3) { animation-delay: 4.2s; }
+.menu-btn:nth-child(4) { animation-delay: 4.4s; }
+.menu-btn:nth-child(5) { animation-delay: 4.6s; }
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard {
+  padding: 2rem;
+  text-align: center;
+  animation: fadeInText 1.2s ease-in-out 5s forwards;
+  opacity: 0;
+}
+
+.welcome-text {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.desc-text {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+@keyframes fadeInText {
+  to {
+    opacity: 1;
+  }
 }
 
   </style>
 </head>
-<body>  <div id="splash-screen">
+<body>  <!-- Splash Screen -->  <div id="splash-screen">
     <h1 class="splash-logo">QuantumX</h1>
-  </div>  <div id="main-content" class="hidden">
-    <div class="hero-text">
-      <p><strong>Halo, Zaim!</strong></p>
-      <p>Selamat datang di <strong>QuantumX</strong></p>
-      <p>Sistem Futuristik. Untuk Generasi Cerdas.</p>
-    </div><div class="tiles">
-  <div class="tile">💠 Analitik Real-Time</div>
-  <div class="tile">⚙️ Pengaturan Cerdas</div>
-  <div class="tile">🔒 Keamanan Data</div>
-</div>
-
-<div class="ai-input">
-  <input type="text" placeholder="Masukkan perintah...">
-  <button>Kirim</button>
-</div>
-
-<div class="quote">
-  "QuantumX – because the future doesn't wait."
-</div>
+  </div>  <!-- Main Content -->  <div id="main-content" class="hidden">
+    <header class="top-bar">
+      <div class="logo">QuantumX</div>
+      <div class="scroll-wrapper">
+        <nav class="menu-bar">
+          <button class="menu-btn">Dashboard</button>
+          <button class="menu-btn">Statistik</button>
+          <button class="menu-btn">Pengguna</button>
+          <button class="menu-btn">Pengaturan</button>
+          <button class="menu-btn">Logout</button>
+        </nav>
+      </div>
+    </header><main class="dashboard">
+  <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+  <p class="desc-text">Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
+</main>
 
   </div>  <script>
     setTimeout(() => {
