@@ -166,29 +166,32 @@
     });
 
     // ChatGPT Fetch
-    chatForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const message = chatInput.value.trim();
-      if (!message) return;
+chatForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const message = chatInput.value.trim();
+  if (!message) return;
 
-      chatMessages.innerHTML += `<div><strong>Kamu:</strong> ${message}</div>`;
-      chatInput.value = "";
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+  chatMessages.innerHTML += `<div><strong>Kamu:</strong> ${message}</div>`;
+  chatInput.value = "";
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      try {
-        const res = await fetch("https://gpt-backend-tan.vercel.app/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
-        });
-
-        const data = await res.json();
-        chatMessages.innerHTML += `<div><strong>AI:</strong> ${data.reply}</div>`;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      } catch (err) {
-        chatMessages.innerHTML += `<div style="color:red;">Gagal sambung ke AI: ${err.message}</div>`;
-      }
+  try {
+    const res = await fetch("https://gpt-backend-tan.vercel.app/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
     });
+
+    const data = await res.json();
+
+    // 🧠 Tampilkan isi raw JSON kalau kosong
+    let reply = data.reply || JSON.stringify(data, null, 2);
+    chatMessages.innerHTML += `<div><strong>AI:</strong> <pre>${reply}</pre></div>`;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  } catch (err) {
+    chatMessages.innerHTML += `<div style="color:red;">Gagal sambung ke AI: ${err.message}</div>`;
+  }
+});
   </script>
 </body>
 </html>
