@@ -38,6 +38,7 @@
 .container {
   display: flex;
   height: 100vh;
+  width: 100vw;
   opacity: 0;
   animation: fadeInContainer 1s ease-out forwards;
   animation-delay: 4s;
@@ -48,7 +49,7 @@
 }
 
 .sidebar {
-  width: 240px;
+  width: 200px;
   padding: 20px;
   background: transparent;
   display: flex;
@@ -132,6 +133,22 @@
 
 @keyframes fadeInMain {
   to { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .main {
+    padding: 20px;
+  }
 }
 
   </style>
