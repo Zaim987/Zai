@@ -14,6 +14,7 @@
       color: white;
       overflow: hidden;
     }
+
     .splash {
       position: absolute;
       top: 0; left: 0;
@@ -27,6 +28,7 @@
       animation-delay: 3.5s;
       z-index: 99;
     }
+
     .logo {
       font-family: 'Orbitron', sans-serif;
       font-size: 3rem;
@@ -36,18 +38,21 @@
       animation-delay: 1s;
       text-shadow: 0 0 20px #58a6ff, 0 0 40px #58a6ff;
     }
+
     @keyframes fadeInGlow {
       to {
         opacity: 1;
         text-shadow: 0 0 20px #58a6ff, 0 0 40px #58a6ff, 0 0 60px #58a6ff;
       }
     }
+
     @keyframes fadeOutSplash {
       to {
         opacity: 0;
         visibility: hidden;
       }
     }
+
     .container {
       display: flex;
       height: 100%;
@@ -55,9 +60,11 @@
       animation: fadeInContainer 1s ease-out forwards;
       animation-delay: 4s;
     }
+
     @keyframes fadeInContainer {
       to { opacity: 1; }
     }
+
     .sidebar {
       width: 250px;
       padding: 20px;
@@ -68,22 +75,26 @@
       opacity: 0;
       animation: slideInLeft 1.4s ease-out 4.4s forwards;
     }
+
     .main {
       flex: 1;
       padding: 40px;
       overflow-y: auto;
     }
+
     @keyframes slideInLeft {
       to {
         transform: translateX(0);
         opacity: 1;
       }
     }
+
     .sidebar h2 {
       font-family: 'Orbitron', sans-serif;
       color: #58a6ff;
       margin-bottom: 10px;
     }
+
     .sidebar a {
       color: white;
       text-decoration: none;
@@ -92,6 +103,7 @@
       transition: background 0.2s, transform 0.2s;
       cursor: pointer;
     }
+
     .sidebar a:hover {
       background: rgba(255, 255, 255, 0.05);
       transform: translateX(5px);
@@ -99,10 +111,12 @@
   </style>
 </head>
 <body>
+  <!-- Splash screen -->
   <div class="splash">
     <div class="logo">QuantumX</div>
   </div>
 
+  <!-- Main Layout -->
   <div class="container">
     <div class="sidebar">
       <h2>QuantumX</h2>
@@ -113,7 +127,7 @@
       <a href="#">Logout</a>
     </div>
     <div class="main" id="main-content">
-      <!-- konten dynamic bakal dimuat di sini -->
+      <!-- Konten bakal di-load di sini -->
     </div>
   </div>
 
@@ -126,7 +140,7 @@
         });
     }
 
-    // Otomatis load dashboard pas splash ilang
+    // Load dashboard otomatis setelah splash ilang
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         loadPage('dashboard.html');
