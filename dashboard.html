@@ -1,7 +1,8 @@
 <!DOCTYPE html><html lang="id"><head>  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QuantumX Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">  <style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       width: 100%; height: 100%; background-color: #020202; color: white;
@@ -98,6 +99,13 @@
     @keyframes fadeInText {
       to { opacity: 1; }
     }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    .fade-out {
+      animation: fadeOut 0.6s ease-in-out forwards;
+    }
     .extra-content-wrapper {
       margin-top: 3rem;
       height: 400px;
@@ -130,14 +138,27 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const menuBtns = document.querySelectorAll(".menu-btn");
-      menuBtns.forEach((btn) => {
-        if (btn.textContent.trim() === "Statistik") {
-          btn.addEventListener("click", () => {
-            window.location.href = "statistik.html";
-          });
-        }
+      const mainContent = document.getElementById("main-content");menuBtns.forEach((btn) => {
+    if (btn.textContent.trim() === "Statistik") {
+      btn.addEventListener("click", () => {
+        const elementsToFade = mainContent.querySelectorAll(".dashboard > *");
+        let delay = 0;
+        elementsToFade.forEach((el) => {
+          setTimeout(() => {
+            el.classList.add("fade-out");
+          }, delay);
+          delay += 200;
+        });
+
+        // Tambah delay dikit sebelum redirect
+        setTimeout(() => {
+          window.location.href = "statistik.html";
+        }, delay + 800);
       });
-    });
+    }
+  });
+});
+
   </script>
 </head>
 <body>
@@ -160,42 +181,47 @@
     <main class="dashboard">
       <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
       <p class="desc-text">Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
-      <div id="user-list"></div><div class="extra-content-wrapper">
-    <div class="extra-content">
-      <h2>Artikel Menarik</h2><h3>ROG: Raja Gaming Hardware</h3>
-  <p>Republic of Gamers (ROG) wis dadi legenda ning dunia gaming hardware. Wiwit GPU, motherboard, nganti laptop, kabeh produké ROG nduweni performa edan lan desain sing futuristik. Nek kowe gamer sejati, ROG mesthi ana nang wishlist-mu!</p>
-
-  <h3>5 Tips Merawat Laptop Gaming</h3>
-  <p>Laptop gaming butuh perhatian ekstra. Jaga suhu tetep adem nganggo cooling pad, bersihin kipas secara berkala, gunakake charger asli, lan aja nganti main sambil nutupi ventilasi. Rawat apik, performane tetep ndrodok!</p>
-
-  <h3>Sejarah ROG lan Inovasi Edan</h3>
-  <p>ROG lahir tahun 2006 minangka sub-brand ASUS kanggo para gamer hardcore. Saka motherboard munggah dadi laptop, nganti peripheral kabeh disemproti teknologi canggih. Contohe? Sistem pendingin liquid chamber, RGB addressable, keyboard opto-mechanical, sampe layar mini-LED 240Hz.</p>
-
-  <p>Inovasi ora mandeg. ROG nyedekake AI cooling, teknologi mux switch dinamis, lan desain portable tanpa ngorbanke performa. ROG ngerteni apa sing gamer butuh: performa, gaya, lan kontrol total. Iki alasan kenapa ROG terus ana ning papan paling dhuwur industri gaming hardware.</p>
-
-  <h3>Apa Bedane ROG karo Sing Liyane?</h3>
-  <p>ROG ora mung kuat, tapi uga tampil beda. Build quality premium, fitur eksklusif kaya Armoury Crate lan Keystone, aesthetic desain cyberpunk, kabeh digabung karo spek ganas. Siji tembung: karismatik. Nek nguripke ROG, rasane kaya nguripke tank modern sing bisa joget. 😎</p>
-
-  <h3>Worth it ora ROG kuwi?</h3>
-  <p>Yen budgetmu cukup lan kowe pengin perangkat sing ora mung sekadar ngangkat game, tapi uga ngangkat gengsimu... ROG iku jawabane. Saka casual gamer nganti pro e-sport, ROG menehi pengalaman maksimal — ora mung fps tinggi, tapi rasa bangga ning saben ketik tombol lan klik mouse.</p>
-
-<h3>Ngapa Aku Pilih ROG, Dudu Laptop Biasa?</h3>
-<p>Nek kowe ngerti bedane mie rebus karo mie instan + toping telur + kornet + cabe 5, yo kuwi bedane laptop biasa karo ROG. Laptop biasa? Yo mung iso buka browser, nulis tugas. Tapi ROG? Nguripke game sak jagad, render Blender, ngedit video sambil ngrokok ngidul. Nganti BIOS wae glowing, ngecas rasane kayak ngisi chakra.</p><h3>Game Sing Cocok Nek Wis Duwe ROG</h3>
-<ul>
-  <li><strong>Cyberpunk 2077</strong> – iso ultra tanpa ritual tolak bala</li>
-  <li><strong>Valorant</strong> – crosshair gerak luwih cepet ketimbang pikiran</li>
-  <li><strong>Elden Ring</strong> – mlayu-mlayu ning alam semesta, fps stabil</li>
-  <li><strong>Minecraft RTX</strong> – omah desa rasa villa Bali</li>
-</ul><h3>Tips Supaya ROGmu Ora Mlethek Awal</h3>
-<p>- Aja digowo turu, ojo ngeteh bareng adaptor<br>
-- Charger asli, nek ilang... mending ilang mantan<br>
-- Kipas dudu sarang laba-laba, kudu disayang<br>
-- RGB apik, tapi ojo nganti ngalahne cahayane masa depanmu</p><h3>Rasa Bangga Sing Muncul Nek Nggowo ROG</h3>
-<p>Kanca: “Wah iki laptop-mu murup dewe?”<br>
-Tukang servis: “Iki gak usah tak oprek, tak pujani wae.”<br>
-Loading screen? Wis ilang sadurunge sampeyan ndelok</p><h3>Penutup</h3>
-<p>ROG dudu mung laptop, iki mimpi anak cilik sing wis kesel dicibir PC rakitan. Kowe pengin menang ngelawan musuh, opo kalah karo lag? Nek isih nge-lag nganggo ROG, berarti setan ono nang RAM-mu, asu! 🐶</p>
-    </div>
+      <div id="user-list"></div>
+      <div class="extra-content-wrapper">
+        <div class="extra-content">
+          <h2>Artikel Menarik</h2>
+          <h3>ROG: Raja Gaming Hardware</h3>
+          <p>Republic of Gamers (ROG) wis dadi legenda ning dunia gaming hardware. Wiwit GPU, motherboard, nganti laptop, kabeh produké ROG nduweni performa edan lan desain sing futuristik. Nek kowe gamer sejati, ROG mesthi ana nang wishlist-mu!</p>
+          <h3>5 Tips Merawat Laptop Gaming</h3>
+          <p>Laptop gaming butuh perhatian ekstra. Jaga suhu tetep adem nganggo cooling pad, bersihin kipas secara berkala, gunakake charger asli, lan aja nganti main sambil nutupi ventilasi. Rawat apik, performane tetep ndrodok!</p>
+          <h3>Sejarah ROG lan Inovasi Edan</h3>
+          <p>ROG lahir tahun 2006 minangka sub-brand ASUS kanggo para gamer hardcore. Saka motherboard munggah dadi laptop, nganti peripheral kabeh disemproti teknologi canggih. Contohe? Sistem pendingin liquid chamber, RGB addressable, keyboard opto-mechanical, sampe layar mini-LED 240Hz.</p>
+          <p>Inovasi ora mandeg. ROG nyedekake AI cooling, teknologi mux switch dinamis, lan desain portable tanpa ngorbanke performa. ROG ngerteni apa sing gamer butuh: performa, gaya, lan kontrol total. Iki alasan kenapa ROG terus ana ning papan paling dhuwur industri gaming hardware.</p>
+          <h3>Apa Bedane ROG karo Sing Liyane?</h3>
+          <p>ROG ora mung kuat, tapi uga tampil beda. Build quality premium, fitur eksklusif kaya Armoury Crate lan Keystone, aesthetic desain cyberpunk, kabeh digabung karo spek ganas. Siji tembung: karismatik. Nek nguripke ROG, rasane kaya nguripke tank modern sing bisa joget. 😎</p>
+          <h3>Worth it ora ROG kuwi?</h3>
+          <p>Yen budgetmu cukup lan kowe pengin perangkat sing ora mung sekadar ngangkat game, tapi uga ngangkat gengsimu... ROG iku jawabane. Saka casual gamer nganti pro e-sport, ROG menehi pengalaman maksimal — ora mung fps tinggi, tapi rasa bangga ning saben ketik tombol lan klik mouse.</p>
+          <h3>Ngapa Aku Pilih ROG, Dudu Laptop Biasa?</h3>
+          <p>Nek kowe ngerti bedane mie rebus karo mie instan + toping telur + kornet + cabe 5, yo kuwi bedane laptop biasa karo ROG. Laptop biasa? Yo mung iso buka browser, nulis tugas. Tapi ROG? Nguripke game sak jagad, render Blender, ngedit video sambil ngrokok ngidul. Nganti BIOS wae glowing, ngecas rasane kayak ngisi chakra.</p>
+          <h3>Game Sing Cocok Nek Wis Duwe ROG</h3>
+          <ul>
+            <li><strong>Cyberpunk 2077</strong> – iso ultra tanpa ritual tolak bala</li>
+            <li><strong>Valorant</strong> – crosshair gerak luwih cepet ketimbang pikiran</li>
+            <li><strong>Elden Ring</strong> – mlayu-mlayu ning alam semesta, fps stabil</li>
+            <li><strong>Minecraft RTX</strong> – omah desa rasa villa Bali</li>
+          </ul>
+          <h3>Tips Supaya ROGmu Ora Mlethek Awal</h3>
+          <p>- Aja digowo turu, ojo ngeteh bareng adaptor<br>
+          - Charger asli, nek ilang... mending ilang mantan<br>
+          - Kipas dudu sarang laba-laba, kudu disayang<br>
+          - RGB apik, tapi ojo nganti ngalahne cahayane masa depanmu</p>
+          <h3>Rasa Bangga Sing Muncul Nek Nggowo ROG</h3>
+          <p>Kanca: “Wah iki laptop-mu murup dewe?”<br>
+          Tukang servis: “Iki gak usah tak oprek, tak pujani wae.”<br>
+          Loading screen? Wis ilang sadurunge sampeyan ndelok</p>
+          <h3>Penutup</h3>
+          <p>ROG dudu mung laptop, iki mimpi anak cilik sing wis kesel dicibir PC rakitan. Kowe pengin menang ngelawan musuh, opo kalah karo lag? Nek isih nge-lag nganggo ROG, berarti setan ono nang RAM-mu, asu! 🐶</p>
+        </div>
+      </div>
+    </main>
   </div>
-</main>  </div>  <script type="module" src="js/auth-guard.js"></script>  <script type="module" src="js/load-users.js"></script>  <script type="module" src="js/logout.js"></script></body>
+  <script type="module" src="js/auth-guard.js"></script>
+  <script type="module" src="js/load-users.js"></script>
+  <script type="module" src="js/logout.js"></script>
+</body>
 </html>
