@@ -66,14 +66,12 @@ function listenMessages() {
     snapshot.forEach((doc) => {
       const data = doc.data();
 
-      // Filter pesan sesuai mode: umum atau DM
       if (data.to && data.to !== currentUser.uid && data.sender !== currentUser.uid) return;
 
       const div = document.createElement("div");
       div.className = "message";
       div.textContent = `${data.senderName || "Anon"}: ${data.text}`;
 
-      // Atur posisi kiri/kanan
       if (data.sender === currentUser.uid) {
         div.classList.add("right");
       } else {
