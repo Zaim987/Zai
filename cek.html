@@ -1,133 +1,188 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QuantumX App</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+  <title>QuantumX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
-    /* GABUNGAN CSS LOGIN + DASHBOARD */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%; height: 100%; background-color: #020202; color: white;
-      font-family: 'Orbitron', 'Rajdhani', sans-serif;
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    body {
-      background: #0d1117;
+    @keyframes fadeUpOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-30px); }
     }
-    input {
-      width: 100%; padding: 0.75rem; margin: 0.5rem 0;
-      border: 2px solid #333; border-radius: 8px;
-      background: #0d1117; color: white;
-      font-size: 1rem; outline: none;
-      transition: border 0.3s, box-shadow 0.3s;
-    }
-    input:focus {
-      border-color: #00f0ff;
-      box-shadow: 0 0 8px #00f0ff;
-    }
-    button {
-      width: 100%; padding: 0.75rem; margin-top: 1rem;
-      font-size: 1rem; font-weight: bold;
-      border: none; border-radius: 8px;
-      background: #00f0ff; color: black;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-      position: relative;
-    }
-    button:hover { transform: scale(1.05); }
-    button.loading {
-      color: transparent !important; pointer-events: none;
-    }
-    button.loading::after {
-      content: "";
-      width: 20px; height: 20px;
-      border: 3px solid white; border-top: 3px solid transparent;
-      border-radius: 50%; animation: spin 1s linear infinite;
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    }
-    button.success {
-      background-color: #00d26a; color: white !important;
-    }
-    button.success::after {
-      content: "\2713";
-      font-size: 1.5rem;
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    }
-    button.failed {
-      background-color: #ff4444; color: white !important;
-    }
-    button.failed::after {
-      content: "\2716";
-      font-size: 1.5rem;
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    }
-    .login-container {
-      max-width: 320px; margin: 0 auto; text-align: center; padding-top: 5vh;
-    }
-    .logo-text {
-      font-family: 'Orbitron', sans-serif; font-size: 2rem;
-      color: #00f0ff; text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-      margin-bottom: 1.5rem;
-    }
-    .headline {
-      font-size: 1.2rem; color: white; margin-bottom: 2rem;
-    }
-    .error {
-      margin-top: 0.75rem; color: #ff4444; font-size: 0.95rem; min-height: 1.2em;
-    }
-    a {
-      display: inline-block; margin-top: 1rem; color: #00f0ff;
-      text-decoration: underline; font-size: 0.95rem;
-    }
-    #autoLoginNotice {
-      display: none; text-align: center; margin-top: 2rem;
-    }
-    #autoLoginNotice div:first-child {
-      font-size: 1.2rem; color: #00d26a; margin-bottom: 0.5rem;
-    }
-    #countdown {
-      font-size: 1.5rem; font-weight: bold; color: #00f0ff;
-      text-shadow: 0 0 10px #00f0ff;
-    }
-    .hidden { display: none; }
-    .splash-logo { font-size: 2.5rem; color: white; text-shadow: 0 0 15px cyan; }
-    .top-bar, .dashboard, .extra-content-wrapper, .extra-content {
-      animation: fadeInText 1s ease-out forwards;
-    }
-    .fade-out-up {
-      animation: fadeOutUp 0.6s ease-in-out forwards;
-    }
-    @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-    @keyframes fadeInText { to { opacity: 1; } }
-    @keyframes fadeOutUp {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
-    }
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }.fade-in { opacity: 0; animation: fadeSlideUp 0.8s ease forwards; }
+.fade-delay-1 { animation-delay: 0.3s; }
+.fade-delay-2 { animation-delay: 0.6s; }
+.fade-delay-3 { animation-delay: 0.9s; }
+.fade-delay-4 { animation-delay: 1.2s; }
+
+.fade-up-out { animation: fadeUpOut 0.5s ease forwards; }
+.fade-up-delay-1 { animation-delay: 0s; }
+.fade-up-delay-2 { animation-delay: 0.15s; }
+.fade-up-delay-3 { animation-delay: 0.3s; }
+.fade-up-delay-4 { animation-delay: 0.45s; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0d1117;
+  color: white;
+  font-family: 'Rajdhani', sans-serif;
+}
+input {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background: #0d1117;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+input:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 8px #00f0ff;
+}
+button {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  background: #00f0ff;
+  color: black;
+  cursor: pointer;
+  box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+  position: relative;
+}
+button:hover { transform: scale(1.05); }
+
+button.loading {
+  color: transparent !important;
+  pointer-events: none;
+}
+button.loading::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border: 3px solid white;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+button.success {
+  background-color: #00d26a;
+  color: white !important;
+}
+button.success::after {
+  content: "\2713";
+  font-size: 1.5rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+button.failed {
+  background-color: #ff4444;
+  color: white !important;
+}
+button.failed::after {
+  content: "\2716";
+  font-size: 1.5rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.login-container {
+  max-width: 320px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 5vh;
+}
+.logo-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem;
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+  margin-bottom: 1.5rem;
+}
+.headline {
+  font-size: 1.2rem;
+  color: white;
+  margin-bottom: 2rem;
+}
+.error {
+  margin-top: 0.75rem;
+  color: #ff4444;
+  font-size: 0.95rem;
+  min-height: 1.2em;
+}
+a {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #00f0ff;
+  text-decoration: underline;
+  font-size: 0.95rem;
+}
+
+#autoLoginNotice {
+  display: none;
+  text-align: center;
+  margin-top: 2rem;
+}
+#autoLoginNotice div:first-child {
+  font-size: 1.2rem;
+  color: #00d26a;
+  margin-bottom: 0.5rem;
+}
+#countdown {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff;
+}
+
   </style>
 </head>
 <body>
-  <div id="login-section">
-    <div class="login-container">
-      <div id="logo" class="logo-text">QuantumX</div>
-      <div id="headline" class="headline">Selamat datang kembali</div>
-      <form id="loginForm">
-        <input id="email" type="email" placeholder="Email" required />
-        <input id="password" type="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-        <div id="error" class="error"></div>
-      </form>
-      <div id="registerLink">
-        <a id="toRegister" href="#">Belum punya akun? Daftar</a>
-      </div>
+  <div class="login-container">
+    <div id="logo" class="logo-text fade-in fade-delay-1">QuantumX</div>
+    <div id="headline" class="headline fade-in fade-delay-2">Selamat datang kembali</div>
+    <form id="loginForm" class="fade-in fade-delay-3">
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <div id="error" class="error"></div>
+    </form>
+    <div id="registerLink" class="fade-in fade-delay-4">
+      <a id="toRegister" href="#">Belum punya akun? Daftar</a>
     </div>
-    <div id="autoLoginNotice">
-      <div>✅ Sudah masuk</div>
-      <div id="countdown">8</div>
-    </div>
-  </div>  <!-- DASHBOARD -->  <div id="main-content" class="hidden">
-    <div id="splash-screen">
-      <h1 class="splash-logo">QuantumX</h1>
-    </div>
+  </div>  <!-- ✅ Auto login notice -->  <div id="autoLoginNotice">
+    <div>✅ Sudah masuk</div>
+    <div id="countdown">8</div>
+  </div>  <!-- ✅ Fix: Tambahkan firebase-init lebih dulu -->  <script type="module" src="js/firebase-init.js"></script>  <script type="module" src="js/wislogin.js"></script>  <script type="module" src="js/login.js"></script>
+<!-- === DASHBOARD START === -->
+<div id="main-content" class="hidden">
+<div id="splash-screen">
+    <h1 class="splash-logo">QuantumX</h1>
+  </div>
+  <div id="main-content" class="hidden">
     <header class="top-bar">
       <div class="logo">QuantumX</div>
       <div class="scroll-wrapper">
@@ -146,7 +201,6 @@
       <div id="user-list"></div>
       <div class="extra-content-wrapper">
         <div class="extra-content">
-          <!-- Artikel disisipkan lengkap di sini -->
           <h2>Artikel Menarik</h2>
           <h3>ROG: Raja Gaming Hardware</h3>
           <p>Republic of Gamers (ROG) wis dadi legenda ning dunia gaming hardware. Wiwit GPU, motherboard, nganti laptop, kabeh produké ROG nduweni performa edan lan desain sing futuristik. Nek kowe gamer sejati, ROG mesthi ana nang wishlist-mu!</p>
@@ -182,5 +236,35 @@
         </div>
       </div>
     </main>
-  </div>  <!-- SCRIPTS -->  <script type="module" src="js/firebase-init.js"></script>  <script type="module" src="js/wislogin.js"></script>  <script type="module" src="js/login.js"></script>  <script type="module" src="js/auth-guard.js"></script>  <script type="module" src="js/load-users.js"></script>  <script type="module" src="js/logout.js"></script></body>
+  </div>
+  <script type="module" src="js/auth-guard.js"></script>
+  <script type="module" src="js/load-users.js"></script>
+  <script type="module" src="js/logout.js"></script>
+</div>
+<!-- === DASHBOARD END === -->
+
+<script type="module">
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const auth = getAuth();
+  const loginSection = document.querySelector(".login-container");
+  const autoLoginNotice = document.getElementById("autoLoginNotice");
+  const dashboard = document.getElementById("main-content");
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User wis login
+      if (loginSection) loginSection.style.display = "none";
+      if (autoLoginNotice) autoLoginNotice.style.display = "none";
+      if (dashboard) dashboard.classList.remove("hidden");
+    } else {
+      // User durung login
+      if (loginSection) loginSection.style.display = "";
+      if (autoLoginNotice) autoLoginNotice.style.display = "";
+      if (dashboard) dashboard.classList.add("hidden");
+    }
+  });
+</script>
+
+</body>
 </html>
