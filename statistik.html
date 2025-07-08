@@ -86,9 +86,11 @@ let unsubscribeMessages = null;
       const data = doc.data();
 
       if (dmTarget) {
-        if (data.to !== currentUser.uid && data.sender !== currentUser.uid) return;
+        const isIncoming = data.to === currentUser.uid && data.sender === dmTarget.uid;
+        const isOutgoing = data.to === dmTarget.uid && data.sender === currentUser.uid;
+        if (!isIncoming && !isOutgoing) return;
       } else {
-        if (data.to) return;
+        if (data.to !== null) return;
       }
 
       const div = document.createElement("div");
