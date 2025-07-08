@@ -11,13 +11,16 @@ export async function loadUsers() {
   let delay = 8;
 
   querySnapshot.forEach((docSnap, index) => {
-    const data = docSnap.data();
-    const div = document.createElement("div");
-    div.className = "user-item";
-    div.textContent = `${data.displayName || 'No Name'} (${data.email || 'No Email'})`;
-    div.style.animationDelay = `${delay + index * 0.3}s`;
-    list.appendChild(div);
-  });
+  const data = docSnap.data();
+  const isCurrentUser = data.email === auth.currentUser?.email;
+  if (isCurrentUser) return; // 👉 Skip user sing lagi login
+
+  const div = document.createElement("div");
+  div.className = "user-item";
+  div.textContent = `${data.displayName || 'No Name'} (${data.email || 'No Email'})`;
+  div.style.animationDelay = `${delay + index * 0.3}s`;
+  list.appendChild(div);
+});
 
   // Tambahan: Ganti teks "Selamat Datang, Zaim!"
   try {
