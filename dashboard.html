@@ -1,112 +1,170 @@
-<!DOCTYPE html><html lang="en">
-<head>
+<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Rajdhani', sans-serif;
-      background-color: #0d1117;
-      color: white;
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantumX Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; background-color: #020202; color: white;
+      font-family: 'Orbitron', sans-serif; overflow: hidden;
     }
-    header {
-      background-color: #161b22;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 0 10px #00f0ff44;
+    .hidden { display: none; }
+    #splash-screen {
+      position: fixed; inset: 0; background-color: black;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 999;
+      animation: splashIntro 3s ease-in-out forwards;
     }
-    header h1 {
-      font-size: 1.5rem;
-      color: #00f0ff;
+    .splash-logo {
+      font-size: 2.5rem; color: white; opacity: 0;
+      text-shadow: 0 0 15px cyan;
+      animation: splashGlow 3s ease-in-out forwards;
     }
-    button.logout {
-      background-color: #ff4444;
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
+    @keyframes splashGlow {
+      0% { opacity: 0; transform: scale(0.8); text-shadow: none; }
+      50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 5px cyan; }
+      100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px cyan; }
     }
-    main {
-      padding: 2rem;
+    @keyframes splashIntro {
+      0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; }
     }
-    .user-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem; background-color: black; gap: 1rem;
+      overflow: hidden; opacity: 0;
+      animation: fadeInText 1s ease-out 3.5s forwards;
     }
-    .user-card {
-      background: #161b22;
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 0 10px #00f0ff33;
-      transition: transform 0.3s;
+    .logo {
+      font-size: 1.5rem; font-weight: bold;
+      text-shadow: 0 0 10px cyan; white-space: nowrap;
+      pointer-events: none;
     }
-    .user-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00f0ff66;
+    .scroll-wrapper { overflow-x: auto; flex-grow: 1; }
+    .scroll-wrapper::-webkit-scrollbar { display: none; }
+    .menu-bar {
+      display: flex; gap: 1rem; width: max-content;
     }
-    .article-section, .product-section {
+    .menu-btn {
+      background: none; color: white; border: none; font-size: 1rem;
+      cursor: pointer; opacity: 0; transform: translateY(-10px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .menu-btn:nth-child(1) { animation-delay: 3.8s; }
+    .menu-btn:nth-child(2) { animation-delay: 4s; }
+    .menu-btn:nth-child(3) { animation-delay: 4.2s; }
+    .menu-btn:nth-child(4) { animation-delay: 4.4s; }
+    .menu-btn:nth-child(5) { animation-delay: 4.6s; }
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dashboard {
+      padding: 2rem; text-align: center;
+      opacity: 0; animation: demoFade 0.5s ease-in-out 5s forwards;
+    }
+    .welcome-text {
+      font-size: 2rem; margin-bottom: 1rem;
+      opacity: 0; transform: translateY(20px) scale(0.95);
+      animation: welcomeAnim 1.2s ease-out 5.5s forwards;
+      text-shadow: 0 0 10px cyan;
+    }
+    .desc-text {
+      font-size: 1rem; color: #ccc;
+      opacity: 0; transform: translateY(20px);
+      animation: descAnim 1s ease-out 6.5s forwards;
+    }
+    #user-list {
+      margin-top: 1rem;
+      text-align: left;
+      max-width: 600px;
+      margin-inline: auto;
+    }
+    .user-item {
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: fadeLine 0.6s ease-out forwards;
+      padding: 4px 0;
+    }
+    @keyframes welcomeAnim {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes descAnim {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeLine {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes demoFade {
+      to { opacity: 1; }
+    }
+    @keyframes fadeInText {
+      to { opacity: 1; }
+    }
+    .extra-content {
       margin-top: 3rem;
       padding: 1rem;
+      max-width: 700px;
+      margin-inline: auto;
       background-color: #111;
       border-radius: 10px;
       box-shadow: 0 0 10px #00f0ff22;
+      text-align: left;
+      animation: fadeInText 1s ease-out 7s forwards;
+      opacity: 0;
     }
-    .section-title {
-      font-size: 1.5rem;
+    .extra-content h2 {
       color: #00f0ff;
       margin-bottom: 1rem;
     }
-    .article, .product {
-      margin-bottom: 1rem;
-    }
-    .article h3, .product h3 {
+    .extra-content h3 {
       color: #00d2ff;
-      margin-bottom: 0.5rem;
+      margin-top: 1.2rem;
     }
-    .article p, .product p {
+    .extra-content p {
       color: #ccc;
       line-height: 1.6;
     }
-  </style>
-</head>
+  </style></head>
 <body>
-  <header>
-    <h1>QuantumX Dashboard</h1>
-    <button class="logout" id="logoutBtn">Logout</button>
-  </header>  <main>
-    <div id="user-list" class="user-list"></div><div class="article-section">
-  <h2 class="section-title">Artikel Menarik</h2>
-  <div class="article">
+  <div id="splash-screen">
+    <h1 class="splash-logo">QuantumX</h1>
+  </div>
+  <div id="main-content" class="hidden">
+    <header class="top-bar">
+      <div class="logo">QuantumX</div>
+      <div class="scroll-wrapper">
+        <nav class="menu-bar">
+          <button class="menu-btn">Dashboard</button>
+          <button class="menu-btn">Statistik</button>
+          <button class="menu-btn">Pengguna</button>
+          <button class="menu-btn">Pengaturan</button>
+          <button class="menu-btn logout">Logout</button>
+        </nav>
+      </div>
+    </header>
+    <main class="dashboard">
+      <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+      <p class="desc-text">Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
+      <div id="user-list"></div><div class="extra-content">
+    <h2>Artikel Menarik</h2>
+
     <h3>ROG: Raja Gaming Hardware</h3>
     <p>Republic of Gamers (ROG) wis dadi legenda ning dunia gaming hardware. Wiwit GPU, motherboard, nganti laptop, kabeh produké ROG nduweni performa edan lan desain sing futuristik. Nek kowe gamer sejati, ROG mesthi ana nang wishlist-mu!</p>
-  </div>
-  <div class="article">
+
     <h3>5 Tips Merawat Laptop Gaming</h3>
     <p>Laptop gaming butuh perhatian ekstra. Jaga suhu tetep adem nganggo cooling pad, bersihin kipas secara berkala, gunakake charger asli, lan aja nganti main sambil nutupi ventilasi. Rawat apik, performane tetep ndrodok!</p>
-  </div>
-</div>
 
-<div class="product-section">
-  <h2 class="section-title">Produk Rekomendasi</h2>
-  <div class="product">
+    <h2>Produk Rekomendasi</h2>
+
     <h3>ROG Zephyrus G14</h3>
     <p>Laptop gaming ultra-portable, performa Ryzen + RTX, desain cakep, RGB matrix nang tutupé. Cocok kanggo gamer lan kreator konten.</p>
-  </div>
-  <div class="product">
+
     <h3>ROG Strix Scar 17</h3>
     <p>Monster performa karo layar 240Hz, GPU RTX 4080, keyboard mechanical. Nek pengin main Valorant 500fps, iki jawabane.</p>
-  </div>
-  <div class="product">
+
     <h3>ROG Chakram X</h3>
     <p>Mouse wireless RGB karo joystick analog. Koyo gabungan mouse lan controller. Fitur-fitur canggih cocok kanggo gamer kompetitif.</p>
   </div>
-</div>
+</main>
 
-  </main>  <script type="module" src="js/firebase-init.js"></script>  <script type="module" src="js/auth-guard.js"></script>  <script type="module" src="js/load-users.js"></script>  <script type="module" src="js/logout.js"></script></body>
+  </div>  <script type="module" src="js/auth-guard.js"></script>  <script type="module" src="js/load-users.js"></script>  <script type="module" src="js/logout.js"></script></body>
 </html>
