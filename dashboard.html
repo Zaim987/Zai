@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GamerHub - Cosmic Gaming Dashboard</title>
+  <title>GamerHub - Galaxy Mode</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -14,22 +14,16 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: white;
       overflow-x: hidden;
-      background: black;
+      background-color: #000000;
     }
-    .stars {
-      background: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/star.png');
-      animation: moveStars 100s linear infinite;
-      position: absolute;
+    canvas#stars-bg {
+      position: fixed;
       top: 0;
       left: 0;
+      z-index: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 0;
-      opacity: 0.2;
-    }
-    @keyframes moveStars {
-      from { transform: translateY(0); }
-      to { transform: translateY(-2000px); }
+      pointer-events: none;
     }
     .card-3d {
       perspective: 2000px;
@@ -66,8 +60,8 @@
     }
   </style>
 </head>
-<body class="text-white font-mono relative bg-black">
-  <div class="stars"></div>
+<body class="text-white font-mono relative z-10 bg-black">
+  <canvas id="stars-bg"></canvas>
 
   <header class="relative z-10 overflow-hidden h-[90vh] flex flex-col justify-center items-center text-center px-4">
     <h1 class="text-5xl md:text-7xl font-extrabold text-cyan-300 drop-shadow-[0_0_15px_#00ffff] animate-pulse">
@@ -121,8 +115,43 @@
   </section>
 
   <script>
-    const ctx = document.getElementById('playerChart').getContext('2d');
-    new Chart(ctx, {
+    // Star canvas animation
+    const canvas = document.getElementById("stars-bg");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const stars = Array.from({ length: 150 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5,
+      d: Math.random() * 0.5 + 0.2
+    }));
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(0, 255, 255, 0.8)";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "#0ff";
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.d;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // Chart
+    const ctxChart = document.getElementById('playerChart').getContext('2d');
+    new Chart(ctxChart, {
       type: 'bar',
       data: {
         labels: ['Player1', 'Player2', 'Player3', 'Player4'],
@@ -140,6 +169,7 @@
       }
     });
 
+    // 3D box
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas') });
@@ -149,7 +179,6 @@
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
     camera.position.z = 4;
-
     function animate() {
       requestAnimationFrame(animate);
       cube.rotation.x += 0.01;
@@ -158,6 +187,7 @@
     }
     animate();
 
+    // GSAP effects
     gsap.from("header h1", { duration: 1.2, y: -100, opacity: 0, ease: "bounce" });
     gsap.from(".card-3d", { duration: 1.2, scale: 0.8, opacity: 0, stagger: 0.3, ease: "back.out(1.7)" });
   </script>
