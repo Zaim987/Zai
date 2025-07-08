@@ -19,6 +19,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+let currentUser = null;
+
 function sendMessage() {
   const input = document.getElementById("msgInput");
   const msg = input.value.trim();
@@ -39,8 +41,15 @@ function goBack() {
   }, 600);
 }
 
+function insertPrivateMessage(name) {
+  const input = document.getElementById("msgInput");
+  input.value = `@${name} `;
+  input.focus();
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+    currentUser = user;
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
@@ -51,7 +60,6 @@ onAuthStateChanged(auth, async (user) => {
       }
     }
 
-    // Load users setelah login siap
     const snapshot = await getDocs(collection(db, "users"));
     const list = document.getElementById("users");
     snapshot.forEach((docSnap) => {
@@ -60,6 +68,8 @@ onAuthStateChanged(auth, async (user) => {
       const div = document.createElement("div");
       div.className = "user-item";
       div.textContent = `${data.displayName || 'Tanpa Nama'}`;
+      div.style.cursor = "pointer";
+      div.addEventListener("click", () => insertPrivateMessage(data.displayName));
       list.appendChild(div);
     });
   }
@@ -178,6 +188,9 @@ window.sendMessage = sendMessage;
     .user-item {
       padding: 0.5rem;
       border-bottom: 1px solid #333;
+    }
+    .user-item:hover {
+      background-color: rgba(255,255,255,0.1);
     }
     @keyframes chatFadeIn {
       0% { opacity: 0; transform: translateX(10px); }
