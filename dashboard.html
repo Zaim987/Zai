@@ -2,7 +2,7 @@
 <html lang="jv">
 <head>
   <meta charset="UTF-8">
-  <title>Langit + Black Hole Nyedot</title>
+  <title>Langit Pedot Total</title>
   <!-- #css -->
   <style>
     body {
@@ -24,6 +24,7 @@
     const ctx = canvas.getContext('2d');
 
     let stars = [];
+    let meteors = [];
     const numStars = 1000;
     let w, h;
 
@@ -44,6 +45,7 @@
     window.addEventListener('resize', resize);
     resize();
 
+    // BINTANG
     for (let i = 0; i < numStars; i++) {
       stars.push({
         x: Math.random() * w,
@@ -53,10 +55,24 @@
       });
     }
 
+    // METEOR RANDOM
+    function spawnMeteor() {
+      meteors.push({
+        x: Math.random() * w,
+        y: -20,
+        vx: -2 - Math.random() * 4,
+        vy: 4 + Math.random() * 6,
+        size: 2 + Math.random() * 2
+      });
+      setTimeout(spawnMeteor, 500 + Math.random() * 2000); // acak delay
+    }
+    spawnMeteor();
+
+    // DRAW
     function draw() {
       ctx.clearRect(0, 0, w, h);
 
-      // Draw black hole muter
+      // BLACK HOLE
       blackHole.angle += 0.01;
       ctx.save();
       ctx.translate(blackHole.x, blackHole.y);
@@ -70,19 +86,16 @@
       ctx.fill();
       ctx.restore();
 
-      // Bintang
+      // BINTANG
       for (let i = 0; i < stars.length; i++) {
         let s = stars[i];
-
-        // Flicker
         s.a += (Math.random() - 0.5) * 0.05;
         s.a = Math.max(0.2, Math.min(1, s.a));
 
-        // Efek disedot
+        // Efek disedot black hole
         const dx = blackHole.x - s.x;
         const dy = blackHole.y - s.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-
         if (dist < 300) {
           s.x += dx * 0.0005;
           s.y += dy * 0.0005;
@@ -92,6 +105,33 @@
         ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
         ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
         ctx.fill();
+      }
+
+      // METEOR
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        let m = meteors[i];
+        m.x += m.vx;
+        m.y += m.vy;
+
+        // ekor
+        ctx.beginPath();
+        const trailLen = 15;
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(m.x - m.vx * trailLen, m.y - m.vy * trailLen);
+        ctx.strokeStyle = "rgba(255,255,200,0.6)";
+        ctx.lineWidth = m.size;
+        ctx.stroke();
+
+        // titik meteor
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.size, 0, 2 * Math.PI);
+        ctx.fillStyle = "white";
+        ctx.fill();
+
+        // hancur pas keluar layar
+        if (m.y > h + 100 || m.x < -100) {
+          meteors.splice(i, 1);
+        }
       }
 
       requestAnimationFrame(draw);
