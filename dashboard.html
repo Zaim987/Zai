@@ -59,6 +59,7 @@
       box-shadow: 0 0 25px #00f0ff88, 0 0 60px #00f0ff55;
     }
   </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 </head>
 <body class="text-white font-mono relative z-10 bg-black">
   <canvas id="stars-bg"></canvas>
@@ -72,10 +73,10 @@
     </p>
 
     <div class="mt-8 flex justify-center gap-4">
-      <button class="bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
+      <button class="warp-btn bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
         🎮 Start Playing
       </button>
-      <button class="bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
+      <button class="warp-btn bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
         📊 View Stats
       </button>
     </div>
@@ -289,7 +290,7 @@
     animate();
 
     // GSAP planetary transition effect
-    document.querySelectorAll("button").forEach(btn => {
+    document.querySelectorAll(".warp-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         gsap.to(window, {
           duration: 1,
