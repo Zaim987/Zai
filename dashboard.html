@@ -8,10 +8,19 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Rajdhani', sans-serif;
-      display: flex;
       height: 100vh;
       background: linear-gradient(160deg, #000000, #050b1e);
       color: white;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      height: 100%;
+      opacity: 0;
+      animation: fadeInContainer 0.5s ease-out forwards;
+    }
+    @keyframes fadeInContainer {
+      to { opacity: 1; }
     }
     .sidebar {
       width: 250px;
@@ -22,8 +31,9 @@
       flex-direction: column;
       gap: 20px;
       border-right: 1px solid rgba(255, 255, 255, 0.05);
+      transform: translateX(-50px);
       opacity: 0;
-      animation: fadeIn 0.5s ease-out forwards;
+      animation: slideInLeft 0.8s ease-out 0.3s forwards;
     }
     .main {
       flex: 1;
@@ -31,12 +41,25 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      transform: translateY(50px);
       opacity: 0;
-      animation: fadeIn 0.5s ease-out 0.2s forwards;
+      animation: slideInUp 0.8s ease-out 0.6s forwards;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes slideInLeft {
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideInUp {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    @keyframes fadeInCard {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
     .sidebar h2 {
       font-family: 'Orbitron', sans-serif;
@@ -64,11 +87,12 @@
       padding: 25px;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      transition: transform 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInCard 0.6s ease-out forwards;
     }
-    .card:hover {
-      transform: translateY(-5px);
-    }
+    .card:nth-child(2) { animation-delay: 1s; }
+    .card:nth-child(3) { animation-delay: 1.2s; }
     h3 {
       margin-bottom: 10px;
       font-size: 20px;
@@ -76,23 +100,25 @@
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>QuantumX</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Statistik</a>
-    <a href="#">Pengguna</a>
-    <a href="#">Pengaturan</a>
-    <a href="#">Logout</a>
-  </div>
-  <div class="main">
-    <div class="header">Selamat datang, Zaim!</div>
-    <div class="card">
-      <h3>Total Pengguna</h3>
-      <p>1.234</p>
+  <div class="container">
+    <div class="sidebar">
+      <h2>QuantumX</h2>
+      <a href="#">Dashboard</a>
+      <a href="#">Statistik</a>
+      <a href="#">Pengguna</a>
+      <a href="#">Pengaturan</a>
+      <a href="#">Logout</a>
     </div>
-    <div class="card">
-      <h3>Aktivitas Hari Ini</h3>
-      <p>87 aksi</p>
+    <div class="main">
+      <div class="header">Selamat datang, Zaim!</div>
+      <div class="card">
+        <h3>Total Pengguna</h3>
+        <p>1.234</p>
+      </div>
+      <div class="card">
+        <h3>Aktivitas Hari Ini</h3>
+        <p>87 aksi</p>
+      </div>
     </div>
   </div>
 </body>
