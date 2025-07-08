@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Langit Galau Anti Kotak</title>
+  <title>Langit Glowing Galau</title>
   <style>
     body, html {
       margin: 0;
@@ -19,6 +19,7 @@
 <body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    // SCENE & CAMERA
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     camera.position.z = 5;
@@ -27,9 +28,32 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Tambah tekstur bintang glowing
-    const starTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/sprites/star.png');
+    // TEKSTUR BINTANG MANUAL PAKAI CANVAS
+    function createStarTexture() {
+      const size = 64;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
 
+      const gradient = ctx.createRadialGradient(
+        size / 2, size / 2, 0,
+        size / 2, size / 2, size / 2
+      );
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.6)');
+      gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.2)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    const starTexture = createStarTexture();
+
+    // GEOMETRI & MATERIAL BINTANG
     const starsGeometry = new THREE.BufferGeometry();
     const starsCount = 1000;
     const positions = [];
@@ -46,7 +70,7 @@
       size: 1.5,
       map: starTexture,
       transparent: true,
-      color: 0xffffff,
+      alphaTest: 0.1,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
@@ -54,6 +78,7 @@
     const stars = new THREE.Points(starsGeometry, starsMaterial);
     scene.add(stars);
 
+    // ANIMASI
     function animate() {
       requestAnimationFrame(animate);
       stars.rotation.x += 0.0005;
@@ -63,6 +88,7 @@
 
     animate();
 
+    // RESPONSIF
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth/window.innerHeight;
       camera.updateProjectionMatrix();
