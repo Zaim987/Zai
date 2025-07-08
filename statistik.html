@@ -66,7 +66,11 @@ function listenMessages() {
     snapshot.forEach((doc) => {
       const data = doc.data();
 
-      if (data.to && data.to !== currentUser.uid && data.sender !== currentUser.uid) return;
+      if (dmTarget) {
+        if (data.to !== currentUser.uid && data.sender !== currentUser.uid) return;
+      } else {
+        if (data.to) return;
+      }
 
       const div = document.createElement("div");
       div.className = "message";
@@ -87,6 +91,7 @@ function listenMessages() {
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
+    dmTarget = null;
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
