@@ -5,7 +5,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";const firebaseConfig = {
   apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
   authDomain: "quantechapp.firebaseapp.com",
@@ -20,19 +20,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let currentUser = null;
-
-function sendMessage() {
-  const input = document.getElementById("msgInput");
-  const msg = input.value.trim();
-  if (msg !== "") {
-    const msgDiv = document.createElement("div");
-    msgDiv.className = "message";
-    msgDiv.textContent = msg;
-    document.getElementById("messages").appendChild(msgDiv);
-    input.value = "";
-    msgDiv.scrollIntoView({ behavior: "smooth" });
-  }
-}
+let currentDisplayName = null;
 
 function goBack() {
   document.querySelector(".chat-wrapper").classList.add("fade-out-up");
@@ -47,16 +35,46 @@ function insertPrivateMessage(name) {
   input.focus();
 }
 
+async function sendMessage() {
+  const input = document.getElementById("msgInput");
+  const msg = input.value.trim();
+  if (msg !== "") {
+    await addDoc(collection(db, "messages"), {
+      text: msg,
+      sender: currentUser.uid,
+      displayName: currentDisplayName,
+      createdAt: serverTimestamp()
+    });
+    input.value = "";
+  }
+}
+
+function listenMessages() {
+  const q = query(collection(db, "messages"), orderBy("createdAt"));
+  const msgList = document.getElementById("messages");
+  onSnapshot(q, (snapshot) => {
+    msgList.innerHTML = "";
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const div = document.createElement("div");
+      div.className = "message";
+      div.textContent = `${data.displayName || "Anon"}: ${data.text}`;
+      msgList.appendChild(div);
+    });
+    msgList.scrollTop = msgList.scrollHeight;
+  });
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
-      const displayName = userSnap.data().displayName || "Pengguna";
+      currentDisplayName = userSnap.data().displayName || "Pengguna";
       const welcomeEl = document.querySelector(".welcome-text");
       if (welcomeEl) {
-        welcomeEl.textContent = `Selamat Datang, ${displayName}!`;
+        welcomeEl.textContent = `Selamat Datang, ${currentDisplayName}!`;
       }
     }
 
@@ -72,6 +90,8 @@ onAuthStateChanged(auth, async (user) => {
       div.addEventListener("click", () => insertPrivateMessage(data.displayName));
       list.appendChild(div);
     });
+
+    listenMessages();
   }
 });
 
