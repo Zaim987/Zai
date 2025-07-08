@@ -1,48 +1,151 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Statistik</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuantumX Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: all 0.3s ease-in-out;
+    }
     body {
       background-color: #020202;
-      color: white;
       font-family: 'Orbitron', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-    h1 {
-      font-size: 2.5rem;
-      text-shadow: 0 0 20px cyan;
-    }
-    p {
-      color: #ccc;
-      margin-top: 1rem;
-    }
-    .back-btn {
-      margin-top: 2rem;
-      background: none;
-      border: 1px solid cyan;
-      padding: 0.5rem 1rem;
       color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background-color: black;
+      box-shadow: 0 0 10px cyan;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px cyan;
+    }
+    .menu-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1rem;
       cursor: pointer;
       text-shadow: 0 0 5px cyan;
     }
-    .back-btn:hover {
+    .chat-wrapper {
+      animation: fadeSlideDown 0.8s ease-out;
+      height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .chat-box {
+      width: 100%;
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px cyan;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .message-list {
+      flex-grow: 1;
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .message {
+      background-color: #111;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      animation: chatFadeIn 0.3s ease forwards;
+      max-width: 75%;
+    }
+    .chat-input {
+      display: flex;
+      gap: 1rem;
+    }
+    .chat-input input {
+      flex-grow: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #111;
+      color: white;
+    }
+    .chat-input button {
+      padding: 0.75rem 1rem;
       background-color: cyan;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
       color: black;
+      font-weight: bold;
+    }
+    @keyframes chatFadeIn {
+      0% { opacity: 0; transform: translateX(10px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeSlideDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-out-up {
+      animation: fadeOutUp 0.6s ease-in-out forwards;
+    }
+    @keyframes fadeOutUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
     }
   </style>
 </head>
 <body>
-  <h1>📊 Statistik QuantumX</h1>
-  <p>Statistik sementara ra ono isiné, durung ditandangi 😅</p>
-  <button class="back-btn" onclick="window.location.href='dashboard.html'">← Balek Dashboard</button>
-</body>
+  <div class="chat-wrapper">
+    <header class="top-bar">
+      <div class="logo">QuantumX</div>
+      <button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
+    </header>
+    <main class="chat-box">
+      <div class="message-list" id="messages">
+        <!-- Pesan muncul nang kene -->
+      </div>
+      <div class="chat-input">
+        <input type="text" id="msgInput" placeholder="Ketik pesenmu..." />
+        <button onclick="sendMessage()">Kirim</button>
+      </div>
+    </main>
+  </div>  <script>
+    function goBack() {
+      document.querySelector(".chat-wrapper").classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 600);
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("msgInput");
+      const msg = input.value.trim();
+      if (msg !== "") {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "message";
+        msgDiv.textContent = msg;
+        document.getElementById("messages").appendChild(msgDiv);
+        input.value = "";
+        msgDiv.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  </script></body>
 </html>
