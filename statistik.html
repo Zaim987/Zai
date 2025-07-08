@@ -138,7 +138,152 @@
     window.sendMessage = sendMessage;
   </script>
   <style>
-    /* CSS skipped for brevity, same as original file */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: all 0.3s ease-in-out;
+    }
+    body {
+      background-color: #020202;
+      font-family: 'Orbitron', sans-serif;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background-color: black;
+      box-shadow: 0 0 10px cyan;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px cyan;
+    }
+    #dm-target-label {
+      font-size: 0.9rem;
+      color: cyan;
+      margin-left: 1rem;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .menu-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      text-shadow: 0 0 5px cyan;
+    }
+    .chat-wrapper {
+      animation: fadeSlideDown 0.8s ease-out;
+      height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .chat-box {
+      width: 100%;
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px cyan;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .message-list {
+      flex-grow: 1;
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .message {
+      background-color: #111;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      animation: chatFadeIn 0.3s ease forwards;
+      max-width: 70%;
+    }
+    .left {
+      align-self: flex-start;
+      background-color: #222;
+    }
+    .right {
+      align-self: flex-end;
+      background-color: cyan;
+      color: black;
+    }
+    .chat-input {
+      display: flex;
+      gap: 1rem;
+    }
+    .chat-input input {
+      flex-grow: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #111;
+      color: white;
+    }
+    .chat-input button {
+      padding: 0.75rem 1rem;
+      background-color: cyan;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: black;
+      font-weight: bold;
+    }
+    #user-list {
+      margin-top: 2rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1rem;
+      border-radius: 10px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 0 10px cyan;
+    }
+    #users {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .user-item {
+      padding: 0.5rem;
+      border-bottom: 1px solid #333;
+    }
+    .user-item:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    @keyframes chatFadeIn {
+      0% { opacity: 0; transform: translateX(10px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeSlideDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-out-up {
+      animation: fadeOutUp 0.6s ease-in-out forwards;
+    }
+    @keyframes fadeOutUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+    }
   </style>
 </head>
 <body>
