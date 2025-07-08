@@ -1,5 +1,4 @@
-import { auth } from './firebase-init.js'; 
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { auth } from './firebase-init.js'; import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 console.log("🔥 wislogin.js aktif");
 
@@ -57,17 +56,19 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Hitung mundur
-const countdown = popup.querySelector('#countdown');
-let seconds = 5;
-const timer = setInterval(() => {
-  seconds--;
-  countdown.textContent = seconds;
-  if (seconds === 0) {
-    clearInterval(timer);
-    window.location.href = "dashboard.html";
-  }
-}, 1000);
+// Hitung mundur dengan delay supaya DOM popup siap
+setTimeout(() => {
+  const countdown = popup.querySelector('#countdown');
+  let seconds = 5;
+  const timer = setInterval(() => {
+    seconds--;
+    if (countdown) countdown.textContent = seconds;
+    if (seconds === 0) {
+      clearInterval(timer);
+      window.location.href = "dashboard.html";
+    }
+  }, 1000);
+}, 50);
 
 } else { console.warn("❌ User durung login!"); } });
 
