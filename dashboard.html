@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaming Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* 3D effect on the sidebar */
+    .sidebar {
+      transform: perspective(600px) rotateY(0deg);
+      transition: transform 0.5s;
+    }
+    .sidebar:hover {
+      transform: perspective(600px) rotateY(-10deg);
+    }
+  </style>
+</head>
+<body class="bg-black text-white">
+
+  <!-- Sidebar -->
+  <div class="sidebar fixed top-0 left-0 h-full w-1/5 bg-gray-900 p-5 space-y-8">
+    <h1 class="text-3xl font-bold text-blue-500">GamerHub</h1>
+    <nav>
+      <ul class="space-y-4">
+        <li class="hover:text-blue-400"><i class="fas fa-home"></i> Dashboard</li>
+        <li class="hover:text-blue-400"><i class="fas fa-gamepad"></i> Games</li>
+        <li class="hover:text-blue-400"><i class="fas fa-users"></i> Players</li>
+        <li class="hover:text-blue-400"><i class="fas fa-cogs"></i> Settings</li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content ml-[20%] p-6">
+    <h2 class="text-4xl mb-5">Player Stats</h2>
+
+    <!-- 3D Game Controller -->
+    <canvas id="game-controller" class="w-80 h-80 mb-6 mx-auto"></canvas>
+
+    <!-- Player Count Chart -->
+    <div id="player-stats" class="w-full max-w-lg mx-auto bg-gray-800 p-5 rounded-lg">
+      <h3 class="text-2xl mb-4">Active Players</h3>
+      <canvas id="player-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- JS Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+
+  <!-- JS Script to render 3D Controller and Chart -->
+  <script>
+    // 3D Game Controller (using Three.js)
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('game-controller') });
+    renderer.setSize(300, 300);
+    const geometry = new THREE.BoxGeometry(1, 0.5, 0.2);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    const controller = new THREE.Mesh(geometry, material);
+    scene.add(controller);
+    camera.position.z = 5;
+    function animate() {
+      requestAnimationFrame(animate);
+      controller.rotation.y += 0.01; // Rotate controller
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Player Stats Chart (using Chart.js)
+    const ctx = document.getElementById('player-chart').getContext('2d');
+    const playerChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Player 1', 'Player 2', 'Player 3', 'Player 4', 'Player 5'],
+        datasets: [{
+          label: 'Active Players',
+          data: [10, 15, 12, 8, 20],
+          backgroundColor: 'rgba(0, 123, 255, 0.6)',
+          borderColor: 'rgba(0, 123, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
