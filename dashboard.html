@@ -1,315 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="jv">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GamerHub - Galaxy Mode</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <title>Langit Galau 3D</title>
   <style>
-    body {
+    body, html {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: white;
-      overflow-x: hidden;
-      background-color: #000000;
+      padding: 0;
+      overflow: hidden;
+      background: black;
     }
-    canvas#stars-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-    }
-    .card-3d {
-      perspective: 2000px;
-      transition: transform 0.3s ease;
-    }
-    .card-inner {
-      transform-style: preserve-3d;
-      transition: transform 0.8s cubic-bezier(.17,.67,.83,.67);
-    }
-    .card-3d:hover .card-inner {
-      transform: rotateY(180deg) scale(1.05);
-    }
-    .card-front, .card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      padding: 2rem;
-      background: rgba(255, 255, 255, 0.05);
-      -webkit-backdrop-filter: blur(20px);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .card-back {
-      transform: rotateY(180deg);
-    }
-    .glow {
-      box-shadow: 0 0 25px #00f0ff88, 0 0 60px #00f0ff55;
+    canvas {
+      display: block;
     }
   </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 </head>
-<body class="text-white font-mono relative z-10 bg-black">
-  <canvas id="stars-bg"></canvas>
-
-  <header class="relative z-10 overflow-hidden h-[90vh] flex flex-col justify-center items-center text-center px-4">
-    <h1 class="text-5xl md:text-7xl font-extrabold text-cyan-300 drop-shadow-[0_0_15px_#00ffff] animate-pulse">
-      WELCOME TO <span class="text-purple-500">GAMERHUB</span>
-    </h1>
-    <p class="mt-4 text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto">
-      Dashboard interaktif paling edan! Pantau stats, pimpin leaderboard, lan conquer game-world.
-    </p>
-
-    <div class="mt-8 flex justify-center gap-4">
-      <button class="warp-btn bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
-        🎮 Start Playing
-      </button>
-      <button class="warp-btn bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
-        📊 View Stats
-      </button>
-    </div>
-  </header>
-
-  <section class="grid grid-cols-1 md:grid-cols-3 gap-10 px-8 py-20 relative z-10">
-    <div class="card-3d h-72 relative hover:rotate-2 hover:scale-105 transition-all duration-500">
-      <div class="card-inner h-full glow">
-        <div class="card-front">📊 Player Statistics</div>
-        <div class="card-back">Kills, Wins, XP, KD Ratio, Rankings, more!</div>
-      </div>
-    </div>
-    <div class="card-3d h-72 relative hover:-rotate-2 hover:scale-105 transition-all duration-500">
-      <div class="card-inner h-full glow">
-        <div class="card-front">🏆 Leaderboard</div>
-        <div class="card-back">Top players by week, monthly records, real-time updates!</div>
-      </div>
-    </div>
-    <div class="card-3d h-72 relative hover:rotate-1 hover:scale-105 transition-all duration-500">
-      <div class="card-inner h-full glow">
-        <div class="card-front">🎮 Game Library</div>
-        <div class="card-back">Access and manage all your games with stats and updates.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="bg-gray-950 py-16 px-6 relative z-10">
-    <h3 class="text-3xl text-center font-bold mb-8 text-cyan-300">🔥 Live Player Stats</h3>
-    <div class="max-w-3xl mx-auto bg-gray-900 p-6 rounded-xl glow">
-      <canvas id="playerChart"></canvas>
-    </div>
-  </section>
-
-  <section class="py-16 bg-black text-center relative z-10">
-    <h3 class="text-3xl mb-6 font-bold text-cyan-300">🌀 Game Controller 3D</h3>
-    <canvas id="threeCanvas" class="mx-auto"></canvas>
-  </section>
-
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // Star canvas animation
-    const canvas = document.getElementById("stars-bg");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const stars = Array.from({ length: 150 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.5,
-      d: Math.random() * 0.5 + 0.2
-    }));
-    function drawStars() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "rgba(0, 255, 255, 0.8)";
-      stars.forEach(star => {
-        ctx.beginPath();
-        ctx.shadowBlur = 5;
-        ctx.shadowColor = "#0ff";
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
-        star.y += star.d;
-        if (star.y > canvas.height) {
-          star.y = 0;
-          star.x = Math.random() * canvas.width;
-        }
-      });
-      requestAnimationFrame(drawStars);
-    }
-    drawStars();
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-
-    // Chart
-    const ctxChart = document.getElementById('playerChart').getContext('2d');
-    new Chart(ctxChart, {
-      type: 'bar',
-      data: {
-        labels: ['Player1', 'Player2', 'Player3', 'Player4'],
-        datasets: [{
-          label: 'Wins',
-          data: [12, 19, 8, 14],
-          backgroundColor: ['#00FFFF88'],
-          borderColor: '#00FFFF',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-
-    // 3D box
+    // Scene
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas') });
-    renderer.setSize(300, 300);
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    camera.position.z = 4;
+
+    // Kamera
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Bintang-bintang
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsCount = 1000;
+    const positions = [];
+
+    for (let i = 0; i < starsCount; i++) {
+      positions.push((Math.random() - 0.5) * 100);
+      positions.push((Math.random() - 0.5) * 100);
+      positions.push((Math.random() - 0.5) * 100);
+    }
+
+    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+    const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(stars);
+
+    // Animasi
     function animate() {
       requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
+
+      stars.rotation.x += 0.0005;
+      stars.rotation.y += 0.001;
+
       renderer.render(scene, camera);
     }
+
     animate();
 
-    // GSAP effects
-    gsap.from("header h1", { duration: 1.2, y: -100, opacity: 0, ease: "bounce" });
-    gsap.from(".card-3d", { duration: 1.2, scale: 0.8, opacity: 0, stagger: 0.3, ease: "back.out(1.7)" });
-  </script>
-</body>
-</html>
-
-.width, starCanvas.height);
-      ctx.fillStyle = "rgba(0, 255, 255, 0.8)";
-      stars.forEach(star => {
-        ctx.beginPath();
-        ctx.shadowBlur = 5;
-        ctx.shadowColor = "#0ff";
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
-        star.y += star.d;
-        if (star.y > starCanvas.height) {
-          star.y = 0;
-          star.x = Math.random() * starCanvas.width;
-        }
-      });
-      requestAnimationFrame(drawStars);
-    }
-    drawStars();
-    window.addEventListener("resize", () => {
-      starCanvas.width = window.innerWidth;
-      starCanvas.height = window.innerHeight;
+    // Responsive resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
-    // Meteors animation
-    const meteorCanvas = document.getElementById("meteors-bg");
-    const mtx = meteorCanvas.getContext("2d");
-    meteorCanvas.width = window.innerWidth;
-    meteorCanvas.height = window.innerHeight;
-    const meteors = Array.from({ length: 20 }, () => ({
-      x: Math.random() * meteorCanvas.width,
-      y: Math.random() * -meteorCanvas.height,
-      length: Math.random() * 20 + 20,
-      speed: Math.random() * 2 + 3,
-      angle: Math.PI / 4
-    }));
-    function drawMeteors() {
-      mtx.clearRect(0, 0, meteorCanvas.width, meteorCanvas.height);
-      mtx.strokeStyle = "rgba(0, 255, 255, 0.8)";
-      mtx.lineWidth = 2;
-      mtx.shadowBlur = 10;
-      mtx.shadowColor = "#00ffff";
-      meteors.forEach(m => {
-        mtx.beginPath();
-        mtx.moveTo(m.x, m.y);
-        mtx.lineTo(m.x - m.length * Math.cos(m.angle), m.y - m.length * Math.sin(m.angle));
-        mtx.stroke();
-        m.x += m.speed * Math.cos(m.angle);
-        m.y += m.speed * Math.sin(m.angle);
-        if (m.y > meteorCanvas.height || m.x > meteorCanvas.width) {
-          m.x = Math.random() * meteorCanvas.width / 2;
-          m.y = Math.random() * -50;
-        }
-      });
-      requestAnimationFrame(drawMeteors);
-    }
-    drawMeteors();
-
-    // Chart.js
-    const ctxChart = document.getElementById('playerChart').getContext('2d');
-    new Chart(ctxChart, {
-      type: 'bar',
-      data: {
-        labels: ['Player1', 'Player2', 'Player3', 'Player4'],
-        datasets: [{
-          label: 'Wins',
-          data: [12, 19, 8, 14],
-          backgroundColor: ['#00FFFF88'],
-          borderColor: '#00FFFF',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-
-    // Three.js
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas') });
-    renderer.setSize(300, 300);
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    camera.position.z = 4;
-    function animate() {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // GSAP planetary transition effect
-    document.querySelectorAll(".warp-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        gsap.to(window, {
-          duration: 1,
-          scrollTo: { y: "max" },
-          ease: "power4.inOut"
-        });
-        gsap.to(btn, {
-          duration: 0.5,
-          scale: 1.4,
-          rotation: 360,
-          yoyo: true,
-          repeat: 1,
-          ease: "back.inOut(2)"
-        });
-      });
-    });
-
-    gsap.from("header h1", { duration: 1.2, y: -100, opacity: 0, ease: "bounce" });
-    gsap.from(".card-3d", { duration: 1.2, scale: 0.8, opacity: 0, stagger: 0.3, ease: "back.out(1.7)" });
   </script>
 </body>
 </html>
