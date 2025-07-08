@@ -121,58 +121,7 @@
     <div class="fade-in fade-delay-5"><a href="login.html">Sudah punya akun? Login</a></div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-      authDomain: "quantechapp.firebaseapp.com",
-      projectId: "quantechapp",
-      storageBucket: "quantechapp.appspot.com",
-      messagingSenderId: "825384610343",
-      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    document.getElementById("registerForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorDiv = document.getElementById("error");
-
-      if (!name || !email || !password) {
-        errorDiv.textContent = "Semua field wajib diisi.";
-        return;
-      }
-
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        await updateProfile(user, { displayName: name });
-        await setDoc(doc(db, "users", user.uid), {
-          displayName: name,
-          email: user.email,
-          createdAt: serverTimestamp(),
-          online: true
-        });
-
-        const regContainer = document.querySelector(".register-container");
-        regContainer.classList.add('fade-out');
-        document.getElementById("overlay").style.opacity = 1;
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 800);
-
-      } catch (error) {
-        errorDiv.textContent = error.message.replace("Firebase:", "").trim();
-      }
-    });
-  </script>
+  
+<script type="module" src="js/register.js"></script>
 </body>
 </html>
