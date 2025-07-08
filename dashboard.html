@@ -8,7 +8,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       height: 100vh;
-      overflow-x: auto;
+      overflow-x: hidden;
       overflow-y: hidden;
       font-family: 'Rajdhani', sans-serif;
       background: linear-gradient(160deg, #000000, #050b1e);
@@ -27,7 +27,7 @@
   text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
   animation: splashFadeOut 2s ease forwards;
   animation-delay: 3s;
-  z-index: 999;
+  z-index: 9999;
 }
 
 @keyframes splashFadeOut {
@@ -57,17 +57,18 @@
   }
 }
 
-.menu-brand {
-  position: absolute;
-  top: 12px;
-  left: 20px;
-  z-index: 10;
+.logo-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(to right, #000000, #041d33);
+  padding: 16px 20px;
   font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
   color: white;
-  font-size: 1.4rem;
-  font-weight: 600;
+  text-shadow: 0 0 10px #00ffff;
   animation: fadeInSoft 1s ease-out forwards, glowText 2s ease-in-out infinite alternate;
-  animation-delay: 3.5s, 4.5s;
+  animation-delay: 3.2s, 4.2s;
 }
 
 .menu-scroll {
@@ -75,7 +76,7 @@
   gap: 16px;
   overflow-x: auto;
   white-space: nowrap;
-  padding: 12px 20px 12px 140px;
+  padding: 12px 20px;
   align-items: center;
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
@@ -94,11 +95,11 @@
   animation: fadeInSoft 1s ease-out forwards;
 }
 
-.menu-scroll a:nth-child(1) { animation-delay: 3.8s; }
-.menu-scroll a:nth-child(2) { animation-delay: 4.1s; }
-.menu-scroll a:nth-child(3) { animation-delay: 4.4s; }
-.menu-scroll a:nth-child(4) { animation-delay: 4.7s; }
-.menu-scroll a:nth-child(5) { animation-delay: 5.0s; }
+.menu-scroll a:nth-child(1) { animation-delay: 3.6s; }
+.menu-scroll a:nth-child(2) { animation-delay: 3.9s; }
+.menu-scroll a:nth-child(3) { animation-delay: 4.2s; }
+.menu-scroll a:nth-child(4) { animation-delay: 4.5s; }
+.menu-scroll a:nth-child(5) { animation-delay: 4.8s; }
 
 .menu-scroll a.active {
   background: rgba(255,255,255,0.1);
@@ -108,7 +109,7 @@
 
 .main {
   padding: 40px;
-  height: calc(100vh - 65px);
+  height: calc(100vh - 150px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -116,7 +117,7 @@
   align-items: flex-start;
   opacity: 0;
   animation: fadeInSoft 1s ease-out forwards;
-  animation-delay: 5.3s;
+  animation-delay: 5.1s;
 }
 
 @media (max-width: 600px) {
@@ -125,13 +126,13 @@
   }
   .menu-scroll {
     gap: 10px;
-    padding: 10px 10px 10px 140px;
+    padding: 10px;
   }
 }
 
   </style>
 </head>
-<body>  <!-- Splash Loader -->  <div class="splash">QuantumX</div>  <!-- Brand Static Logo -->  <div class="menu-brand">QuantumX</div>  <!-- Menu Scroll (Geser Kiri-Kanan) -->  <div class="menu-scroll">
+<body>  <!-- Splash Loader -->  <div class="splash">QuantumX</div>  <!-- Logo Header Tetap -->  <div class="logo-header">QuantumX</div>  <!-- Menu Scroll (Geser Kiri-Kanan) -->  <div class="menu-scroll">
     <a class="active">Dashboard</a>
     <a onclick="loadPage('statistik.html')">Statistik</a>
     <a onclick="loadPage('pengguna.html')">Pengguna</a>
