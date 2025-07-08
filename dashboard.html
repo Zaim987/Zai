@@ -2,15 +2,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GamerHub - Ultimate Gaming Dashboard</title>
+  <title>GamerHub - Cosmic Gaming Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
   <style>
     body {
-      background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0c29 100%);
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
       overflow-x: hidden;
+      background: black;
+    }
+    .stars {
+      background: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/star.png');
+      animation: moveStars 100s linear infinite;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      opacity: 0.2;
+    }
+    @keyframes moveStars {
+      from { transform: translateY(0); }
+      to { transform: translateY(-2000px); }
     }
     .card-3d {
       perspective: 1500px;
@@ -47,33 +65,24 @@
     }
   </style>
 </head>
-<body class="text-white font-mono">  <!-- HERO GAMING HEADER -->  <header class="relative overflow-hidden h-[90vh] flex flex-col justify-center items-center text-center px-4 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]">
-    <!-- Animated Background SVG -->
-    <div class="absolute inset-0 z-0 opacity-20">
-      <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 320">
-        <path fill="#00ffff" fill-opacity="0.3" d="M0,160L60,165.3C120,171,240,181,360,176C480,171,600,149,720,149.3C840,149,960,171,1080,181.3C1200,192,1320,192,1380,192L1440,192V320H0Z"></path>
-      </svg>
-    </div><!-- Content -->
-<div class="relative z-10">
-  <h1 class="text-5xl md:text-7xl font-extrabold text-cyan-300 drop-shadow-[0_0_15px_#00ffff] animate-pulse">
-    WELCOME TO <span class="text-purple-500">GAMERHUB</span>
-  </h1>
-  <p class="mt-4 text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto">
-    Dashboard interaktif paling edan! Pantau stats, pimpin leaderboard, lan conquer game-world.
-  </p>
-
-  <!-- Action Button -->
-  <div class="mt-8 flex justify-center gap-4">
-    <button class="bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
-      🎮 Start Playing
-    </button>
-    <button class="bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
-      📊 View Stats
-    </button>
-  </div>
+<body class="text-white font-mono relative">
+  <div class="stars"></div>  <!-- HERO GAMING HEADER -->  <header class="relative z-10 overflow-hidden h-[90vh] flex flex-col justify-center items-center text-center px-4">
+    <h1 class="text-5xl md:text-7xl font-extrabold text-cyan-300 drop-shadow-[0_0_15px_#00ffff] animate-pulse">
+      WELCOME TO <span class="text-purple-500">GAMERHUB</span>
+    </h1>
+    <p class="mt-4 text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto">
+      Dashboard interaktif paling edan! Pantau stats, pimpin leaderboard, lan conquer game-world.
+    </p><!-- Action Button -->
+<div class="mt-8 flex justify-center gap-4">
+  <button class="bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
+    🎮 Start Playing
+  </button>
+  <button class="bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
+    📊 View Stats
+  </button>
 </div>
 
-  </header>  <!-- 3D Card Section -->  <section class="grid grid-cols-1 md:grid-cols-3 gap-10 px-8 py-20">
+  </header>  <!-- 3D Card Section -->  <section class="grid grid-cols-1 md:grid-cols-3 gap-10 px-8 py-20 relative z-10">
     <div class="card-3d h-72 relative">
       <div class="card-inner h-full">
         <div class="card-front bg-gradient-to-br from-cyan-500 to-blue-800 glass glow">📊 Player Statistics</div>
@@ -92,16 +101,15 @@
         <div class="card-back bg-gray-900 glass glow">Access and manage all your games with stats and updates.</div>
       </div>
     </div>
-  </section>  <!-- Chart Section -->  <section class="bg-gray-950 py-16 px-6">
+  </section>  <!-- Chart Section -->  <section class="bg-gray-950 py-16 px-6 relative z-10">
     <h3 class="text-3xl text-center font-bold mb-8 text-cyan-300">🔥 Live Player Stats</h3>
     <div class="max-w-3xl mx-auto bg-gray-900 p-6 rounded-xl glow">
       <canvas id="playerChart"></canvas>
     </div>
-  </section>  <!-- Animated Canvas (3D Box) -->  <section class="py-16 bg-black text-center">
+  </section>  <!-- Animated Canvas (3D Box) -->  <section class="py-16 bg-black text-center relative z-10">
     <h3 class="text-3xl mb-6 font-bold text-cyan-300">🌀 Game Controller 3D</h3>
     <canvas id="threeCanvas" class="mx-auto"></canvas>
   </section>  <script>
-    // Chart.js Example
     const ctx = document.getElementById('playerChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
@@ -123,7 +131,6 @@
       }
     });
 
-    // Three.js Example - Spinning Box
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas') });
@@ -142,7 +149,6 @@
     }
     animate();
 
-    // GSAP Animation on Load
     gsap.from("header h1", { duration: 1.2, y: -100, opacity: 0, ease: "bounce" });
     gsap.from(".card-3d", { duration: 1, y: 100, opacity: 0, stagger: 0.2, ease: "power4.out" });
   </script></body>
