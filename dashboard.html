@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -52,72 +53,74 @@
       justify-content: center;
       font-size: 1.25rem;
       padding: 2rem;
-    }
-    .card-front {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
     }
     .card-back {
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(20px);
-      border: 2px solid rgba(0, 255, 255, 0.4);
       transform: rotateY(180deg);
-    }
-    .glass {
-      backdrop-filter: blur(15px);
-      background-color: rgba(255, 255, 255, 0.05);
     }
     .glow {
       box-shadow: 0 0 25px #00f0ff88, 0 0 60px #00f0ff55;
     }
   </style>
 </head>
-<body class="text-white font-mono relative">
-  <div class="stars"></div>  <!-- HERO GAMING HEADER -->  <header class="relative z-10 overflow-hidden h-[90vh] flex flex-col justify-center items-center text-center px-4">
+<body class="text-white font-mono relative bg-black">
+  <div class="stars"></div>
+
+  <header class="relative z-10 overflow-hidden h-[90vh] flex flex-col justify-center items-center text-center px-4">
     <h1 class="text-5xl md:text-7xl font-extrabold text-cyan-300 drop-shadow-[0_0_15px_#00ffff] animate-pulse">
       WELCOME TO <span class="text-purple-500">GAMERHUB</span>
     </h1>
     <p class="mt-4 text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto">
       Dashboard interaktif paling edan! Pantau stats, pimpin leaderboard, lan conquer game-world.
-    </p><!-- Action Button -->
-<div class="mt-8 flex justify-center gap-4">
-  <button class="bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
-    🎮 Start Playing
-  </button>
-  <button class="bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
-    📊 View Stats
-  </button>
-</div>
+    </p>
 
-  </header>  <!-- 3D Card Section -->  <section class="grid grid-cols-1 md:grid-cols-3 gap-10 px-8 py-20 relative z-10">
+    <div class="mt-8 flex justify-center gap-4">
+      <button class="bg-cyan-400 text-black px-6 py-3 rounded-full font-bold text-lg hover:scale-110 hover:shadow-[0_0_30px_#00ffffaa] transition-all duration-300">
+        🎮 Start Playing
+      </button>
+      <button class="bg-transparent border-2 border-cyan-300 text-cyan-300 px-6 py-3 rounded-full hover:bg-cyan-300 hover:text-black transition duration-300">
+        📊 View Stats
+      </button>
+    </div>
+  </header>
+
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-10 px-8 py-20 relative z-10">
     <div class="card-3d h-72 relative hover:rotate-2 hover:scale-105 transition-all duration-500">
-      <div class="card-inner h-full">
-        <div class="card-front glass glow">📊 Player Statistics</div>
-        <div class="card-back glow">Kills, Wins, XP, KD Ratio, Rankings, more!</div>
+      <div class="card-inner h-full glow">
+        <div class="card-front">📊 Player Statistics</div>
+        <div class="card-back">Kills, Wins, XP, KD Ratio, Rankings, more!</div>
       </div>
     </div>
     <div class="card-3d h-72 relative hover:-rotate-2 hover:scale-105 transition-all duration-500">
-      <div class="card-inner h-full">
-        <div class="card-front glass glow">🏆 Leaderboard</div>
-        <div class="card-back glow">Top players by week, monthly records, real-time updates!</div>
+      <div class="card-inner h-full glow">
+        <div class="card-front">🏆 Leaderboard</div>
+        <div class="card-back">Top players by week, monthly records, real-time updates!</div>
       </div>
     </div>
     <div class="card-3d h-72 relative hover:rotate-1 hover:scale-105 transition-all duration-500">
-      <div class="card-inner h-full">
-        <div class="card-front glass glow">🎮 Game Library</div>
-        <div class="card-back glow">Access and manage all your games with stats and updates.</div>
+      <div class="card-inner h-full glow">
+        <div class="card-front">🎮 Game Library</div>
+        <div class="card-back">Access and manage all your games with stats and updates.</div>
       </div>
     </div>
-  </section>  <!-- Chart Section -->  <section class="bg-gray-950 py-16 px-6 relative z-10">
+  </section>
+
+  <section class="bg-gray-950 py-16 px-6 relative z-10">
     <h3 class="text-3xl text-center font-bold mb-8 text-cyan-300">🔥 Live Player Stats</h3>
     <div class="max-w-3xl mx-auto bg-gray-900 p-6 rounded-xl glow">
       <canvas id="playerChart"></canvas>
     </div>
-  </section>  <!-- Animated Canvas (3D Box) -->  <section class="py-16 bg-black text-center relative z-10">
+  </section>
+
+  <section class="py-16 bg-black text-center relative z-10">
     <h3 class="text-3xl mb-6 font-bold text-cyan-300">🌀 Game Controller 3D</h3>
     <canvas id="threeCanvas" class="mx-auto"></canvas>
-  </section>  <script>
+  </section>
+
+  <script>
     const ctx = document.getElementById('playerChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
@@ -126,16 +129,14 @@
         datasets: [{
           label: 'Wins',
           data: [12, 19, 8, 14],
-          backgroundColor: ['#00FFFF88', '#00FFFF88', '#00FFFF88', '#00FFFF88'],
+          backgroundColor: ['#00FFFF88'],
           borderColor: '#00FFFF',
           borderWidth: 1
         }]
       },
       options: {
         responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
+        scales: { y: { beginAtZero: true } }
       }
     });
 
@@ -159,5 +160,6 @@
 
     gsap.from("header h1", { duration: 1.2, y: -100, opacity: 0, ease: "bounce" });
     gsap.from(".card-3d", { duration: 1.2, scale: 0.8, opacity: 0, stagger: 0.3, ease: "back.out(1.7)" });
-  </script></body>
+  </script>
+</body>
 </html>
