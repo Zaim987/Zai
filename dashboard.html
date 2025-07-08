@@ -130,12 +130,11 @@
       <div id="user-list"></div>
     </main>
   </div>  <script type="module" src="js/auth-guard.js"></script>  <script type="module" src="js/load-users.js"></script>  <script type="module" src="js/logout.js"></script>  <script>
-    // Tampilno dashboard sawise splash ilang
     setTimeout(() => {
       document.getElementById("main-content").classList.remove("hidden");
     }, 3000);
 
-    // Animasi ngilang alon-alon
+    // Animasi ilang siji-siji terus redirect
     document.getElementById("statistik-btn").addEventListener("click", () => {
       const dashboard = document.getElementById("dashboard-content");
       const children = dashboard.children;
@@ -147,6 +146,12 @@
         }, delay);
         delay += 300;
       }
+
+      // Total delay nganti redirect
+      const totalDelay = delay + 800;
+      setTimeout(() => {
+        window.location.href = "statistik.html";
+      }, totalDelay);
     });
   </script></body>
 </html>
