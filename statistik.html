@@ -21,6 +21,7 @@ const auth = getAuth(app);
 
 let currentUser = null;
 let currentDisplayName = null;
+let dmTarget = null;
 
 function goBack() {
   document.querySelector(".chat-wrapper").classList.add("fade-out-up");
@@ -29,10 +30,17 @@ function goBack() {
   }, 600);
 }
 
-function insertPrivateMessage(name) {
+function insertPrivateMessage(name, uid) {
   const input = document.getElementById("msgInput");
   input.value = `@${name} `;
   input.focus();
+  dmTarget = { uid, name };
+
+  const dmLabel = document.getElementById("dm-target-label");
+  dmLabel.textContent = `• Message to ${name} •`;
+
+  const welcomeEl = document.querySelector(".welcome-text");
+  welcomeEl.textContent = `Obrolan Pribadi karo ${name}`;
 }
 
 async function sendMessage() {
@@ -42,7 +50,8 @@ async function sendMessage() {
     await addDoc(collection(db, "messages"), {
       text: msg,
       sender: currentUser.uid,
-      displayName: currentDisplayName,
+      senderName: currentDisplayName,
+      to: dmTarget ? dmTarget.uid : null,
       createdAt: serverTimestamp()
     });
     input.value = "";
@@ -56,9 +65,21 @@ function listenMessages() {
     msgList.innerHTML = "";
     snapshot.forEach((doc) => {
       const data = doc.data();
+
+      // Filter pesan sesuai mode: umum atau DM
+      if (data.to && data.to !== currentUser.uid && data.sender !== currentUser.uid) return;
+
       const div = document.createElement("div");
       div.className = "message";
-      div.textContent = `${data.displayName || "Anon"}: ${data.text}`;
+      div.textContent = `${data.senderName || "Anon"}: ${data.text}`;
+
+      // Atur posisi kiri/kanan
+      if (data.sender === currentUser.uid) {
+        div.classList.add("right");
+      } else {
+        div.classList.add("left");
+      }
+
       msgList.appendChild(div);
     });
     msgList.scrollTop = msgList.scrollHeight;
@@ -87,7 +108,7 @@ onAuthStateChanged(auth, async (user) => {
       div.className = "user-item";
       div.textContent = `${data.displayName || 'Tanpa Nama'}`;
       div.style.cursor = "pointer";
-      div.addEventListener("click", () => insertPrivateMessage(data.displayName));
+      div.addEventListener("click", () => insertPrivateMessage(data.displayName, docSnap.id));
       list.appendChild(div);
     });
 
@@ -125,6 +146,16 @@ window.sendMessage = sendMessage;
       font-size: 1.5rem;
       font-weight: bold;
       text-shadow: 0 0 10px cyan;
+    }
+    #dm-target-label {
+      font-size: 0.9rem;
+      color: cyan;
+      margin-left: 1rem;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
     .menu-btn {
       background: none;
@@ -167,7 +198,16 @@ window.sendMessage = sendMessage;
       padding: 0.75rem 1rem;
       border-radius: 8px;
       animation: chatFadeIn 0.3s ease forwards;
-      max-width: 75%;
+      max-width: 70%;
+    }
+    .left {
+      align-self: flex-start;
+      background-color: #222;
+    }
+    .right {
+      align-self: flex-end;
+      background-color: cyan;
+      color: black;
     }
     .chat-input {
       display: flex;
@@ -232,14 +272,12 @@ window.sendMessage = sendMessage;
 <body>
   <div class="chat-wrapper">
     <header class="top-bar">
-      <div class="logo">QuantumX</div>
+      <div class="logo">QuantumX <span id="dm-target-label"></span></div>
       <button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
     </header>
     <main class="chat-box">
       <h2 class="welcome-text">Selamat Datang, Zaim!</h2>
-      <div class="message-list" id="messages">
-        <!-- Pesan muncul nang kene -->
-      </div>
+      <div class="message-list" id="messages"></div>
       <div class="chat-input">
         <input type="text" id="msgInput" placeholder="Ketik pesenmu..." />
         <button onclick="sendMessage()">Kirim</button>
