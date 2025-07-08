@@ -1,123 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gaming Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GamerHub - Ultimate Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
-    .sidebar {
-      transition: transform 0.3s ease;
+    body {
+      background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
     }
-    .sidebar-hidden {
-      transform: translateX(-100%);
+    .card-3d {
+      perspective: 1000px;
     }
-    .sidebar-visible {
-      transform: translateX(0);
+    .card-inner {
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .card-3d:hover .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 1rem;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+    .glow {
+      box-shadow: 0 0 20px rgba(0,255,255,0.6), 0 0 40px rgba(0,255,255,0.4);
+    }
+    .glass {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
-<body class="bg-black text-white font-sans">
-
-  <!-- Mobile Navbar -->
-  <div class="md:hidden flex justify-between items-center bg-gray-900 p-4">
-    <h1 class="text-xl font-bold text-blue-400">GamerHub</h1>
-    <button id="toggleSidebar" class="text-white text-2xl">
-      ☰
-    </button>
-  </div>
-
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar sidebar-hidden fixed top-0 left-0 h-full w-2/3 bg-gray-900 p-5 space-y-6 z-50 md:w-1/5 md:relative md:translate-x-0 md:sidebar-visible">
-    <h1 class="text-2xl font-bold text-blue-400 hidden md:block">GamerHub</h1>
-    <ul class="space-y-4 text-lg">
-      <li class="hover:text-blue-400"><i class="fas fa-home"></i> Dashboard</li>
-      <li class="hover:text-blue-400"><i class="fas fa-gamepad"></i> Games</li>
-      <li class="hover:text-blue-400"><i class="fas fa-users"></i> Players</li>
-      <li class="hover:text-blue-400"><i class="fas fa-cogs"></i> Settings</li>
+<body class="text-white font-mono overflow-x-hidden">  <!-- Navigation -->  <nav class="flex items-center justify-between px-6 py-4 bg-gray-900 bg-opacity-50 glass sticky top-0 z-50">
+    <h1 class="text-3xl font-extrabold text-cyan-400">🎮 GamerHub</h1>
+    <ul class="flex gap-6 text-lg">
+      <li class="hover:text-cyan-300 transition-all duration-300">Dashboard</li>
+      <li class="hover:text-cyan-300 transition-all duration-300">Games</li>
+      <li class="hover:text-cyan-300 transition-all duration-300">Players</li>
+      <li class="hover:text-cyan-300 transition-all duration-300">Settings</li>
     </ul>
-  </div>
-
-  <!-- Overlay for mobile -->
-  <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
-
-  <!-- Main Content -->
-  <div class="md:ml-[20%] p-5">
-    <h2 class="text-3xl md:text-4xl mb-4 text-center md:text-left">🎮 Player Stats</h2>
-
-    <!-- 3D Game Controller -->
-    <canvas id="game-controller" class="w-full max-w-xs h-64 mx-auto mb-6"></canvas>
-
-    <!-- Player Chart -->
-    <div class="bg-gray-800 p-4 rounded-lg max-w-xl mx-auto">
-      <h3 class="text-xl mb-3">Active Players</h3>
-      <canvas id="player-chart"></canvas>
+  </nav>  <!-- Hero Section -->  <section class="text-center py-20 animate-fade-in">
+    <h2 class="text-4xl md:text-6xl font-bold mb-4 animate-pulse">Welcome to the Arena</h2>
+    <p class="text-lg text-gray-300 max-w-xl mx-auto">Track your performance, dominate leaderboards, and customize your game world like never before.</p>
+  </section>  <!-- 3D Cards Section -->  <section class="grid grid-cols-1 md:grid-cols-3 gap-8 px-10 pb-20">
+    <div class="card-3d w-full h-64 relative">
+      <div class="card-inner w-full h-full">
+        <div class="card-front bg-cyan-700 flex items-center justify-center text-2xl font-bold">Player Stats</div>
+        <div class="card-back bg-gray-800 flex items-center justify-center text-center p-4">Level up! XP, K/D Ratio, win rate, and more insights await.</div>
+      </div>
     </div>
-  </div>
-
-  <!-- JS Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-
-  <!-- Sidebar Toggle Script -->
-  <script>
-    const toggleBtn = document.getElementById("toggleSidebar");
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-
-    toggleBtn?.addEventListener("click", () => {
-      sidebar.classList.toggle("sidebar-hidden");
-      sidebar.classList.toggle("sidebar-visible");
-      overlay.classList.toggle("hidden");
+    <div class="card-3d w-full h-64 relative">
+      <div class="card-inner w-full h-full">
+        <div class="card-front bg-pink-600 flex items-center justify-center text-2xl font-bold">Leaderboard</div>
+        <div class="card-back bg-gray-800 flex items-center justify-center text-center p-4">See top players, climb ranks, and claim your throne!</div>
+      </div>
+    </div>
+    <div class="card-3d w-full h-64 relative">
+      <div class="card-inner w-full h-full">
+        <div class="card-front bg-indigo-700 flex items-center justify-center text-2xl font-bold">Game Library</div>
+        <div class="card-back bg-gray-800 flex items-center justify-center text-center p-4">Access your favorite games, view stats, and achievements.</div>
+      </div>
+    </div>
+  </section>  <!-- Glow & Animate Section -->  <section class="bg-gray-900 py-16 px-8">
+    <h3 class="text-3xl text-center mb-10 font-bold text-cyan-300 animate-fade-in-up">Live Match Highlights</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="p-6 bg-gray-800 rounded-xl glow animate-bounce-in glass">🔥 24-Kill Solo Win in Apex Legends</div>
+      <div class="p-6 bg-gray-800 rounded-xl glow animate-bounce-in glass">🏆 Team Victory in Valorant with 89% accuracy</div>
+    </div>
+  </section>  <script>
+    // Optional JS Animations or Interactive Elements
+    document.addEventListener('DOMContentLoaded', () => {
+      // You can hook in Chart.js, Three.js, or GSAP here
+      console.log("Dashboard Loaded");
     });
-
-    overlay?.addEventListener("click", () => {
-      sidebar.classList.add("sidebar-hidden");
-      sidebar.classList.remove("sidebar-visible");
-      overlay.classList.add("hidden");
-    });
-  </script>
-
-  <!-- 3D Object -->
-  <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("game-controller") });
-    renderer.setSize(250, 250);
-    const geometry = new THREE.BoxGeometry(1, 0.5, 0.2);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ffcc, wireframe: true });
-    const controller = new THREE.Mesh(geometry, material);
-    scene.add(controller);
-    camera.position.z = 3;
-    function animate() {
-      requestAnimationFrame(animate);
-      controller.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-    animate();
-  </script>
-
-  <!-- Chart.js -->
-  <script>
-    const ctx = document.getElementById('player-chart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
-        datasets: [{
-          label: 'Score',
-          data: [12, 19, 3, 5],
-          backgroundColor: 'rgba(59, 130, 246, 0.5)',
-          borderColor: 'rgba(59, 130, 246, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-  </script>
-</body>
+  </script></body>
 </html>
