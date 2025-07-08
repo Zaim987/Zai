@@ -134,26 +134,34 @@
       color: #ccc;
       line-height: 1.6;
     }
+@keyframes fadeOutUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+}
+.fade-out-up {
+  animation: fadeOutUp 0.6s ease-in-out forwards;
+}
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const menuBtns = document.querySelectorAll(".menu-btn");
-      const mainContent = document.getElementById("main-content");menuBtns.forEach((btn) => {
+  const menuBtns = document.querySelectorAll(".menu-btn");
+  const mainContent = document.getElementById("main-content");
+
+  menuBtns.forEach((btn) => {
     if (btn.textContent.trim() === "Statistik") {
       btn.addEventListener("click", () => {
         const elementsToFade = mainContent.querySelectorAll(".dashboard > *");
         let delay = 0;
-        elementsToFade.forEach((el) => {
+        elementsToFade.forEach((el, i) => {
           setTimeout(() => {
-            el.classList.add("fade-out");
+            el.classList.add("fade-out-up");
           }, delay);
-          delay += 200;
+          delay += 300; // jeda antar elemen
         });
 
-        // Tambah delay dikit sebelum redirect
         setTimeout(() => {
           window.location.href = "statistik.html";
-        }, delay + 800);
+        }, delay + 700); // delay total
       });
     }
   });
