@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,95 +11,121 @@
       background: linear-gradient(160deg, #000000, #050b1e);
       color: white;
       overflow: hidden;
-    }
+    }.splash {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(160deg, #000000, #050b1e);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  text-shadow: 0 0 20px #58a6ff, 0 0 40px #58a6ff;
+  animation: splashFadeOut 2s ease forwards;
+  animation-delay: 3s;
+  z-index: 999;
+}
 
-    .splash {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(160deg, #000000, #050b1e);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 3rem;
-      text-shadow: 0 0 20px #58a6ff, 0 0 40px #58a6ff;
-      animation: splashFadeOut 2s ease forwards;
-      animation-delay: 3s;
-      z-index: 999;
-    }
+@keyframes splashFadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
 
-    @keyframes splashFadeOut {
-      to {
-        opacity: 0;
-        visibility: hidden;
-      }
-    }
+.container {
+  display: flex;
+  height: 100vh;
+  opacity: 0;
+  animation: fadeInContainer 1s ease-out forwards;
+  animation-delay: 4s;
+}
 
-    .container {
-      display: flex;
-      height: 100vh;
-      opacity: 0;
-      animation: fadeInContainer 1s ease-out forwards;
-      animation-delay: 4s;
-    }
+@keyframes fadeInContainer {
+  to { opacity: 1; }
+}
 
-    @keyframes fadeInContainer {
-      to { opacity: 1; }
-    }
+.sidebar {
+  width: 240px;
+  padding: 20px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  transform: translateX(-30px);
+  opacity: 0;
+  animation: slideInSidebar 1s ease-out forwards;
+  animation-delay: 4.5s;
+}
 
-    .sidebar {
-      width: 240px;
-      padding: 20px;
-      background: transparent;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      border-right: 1px solid rgba(255,255,255,0.1);
-    }
+@keyframes slideInSidebar {
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
-    .sidebar h2 {
-      font-family: 'Orbitron', sans-serif;
-      color: #58a6ff;
-      margin-bottom: 20px;
-    }
+.sidebar h2 {
+  font-family: 'Orbitron', sans-serif;
+  color: #58a6ff;
+  margin-bottom: 20px;
+  transform: translateY(-20px);
+  opacity: 0;
+  animation: fadeInDown 0.8s ease-out forwards;
+  animation-delay: 4.8s;
+}
 
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      cursor: pointer;
-      padding: 10px;
-      border-radius: 8px;
-      transition: background 0.2s, transform 0.2s;
-    }
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.2s;
+  transform: translateY(10px);
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
 
-    .sidebar a:hover {
-      background: rgba(255, 255, 255, 0.05);
-      transform: translateX(5px);
-    }
+.sidebar a:nth-child(2) { animation-delay: 5.0s; }
+.sidebar a:nth-child(3) { animation-delay: 5.2s; }
+.sidebar a:nth-child(4) { animation-delay: 5.4s; }
+.sidebar a:nth-child(5) { animation-delay: 5.6s; }
+.sidebar a:nth-child(6) { animation-delay: 5.8s; }
 
-    .main {
-      flex: 1;
-      padding: 40px;
-      overflow-y: auto;
-      opacity: 0;
-      animation: fadeInMain 1s ease-out forwards;
-      animation-delay: 4.5s;
-    }
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-    @keyframes fadeInMain {
-      to { opacity: 1; }
-    }
+@keyframes fadeInDown {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  opacity: 0;
+  animation: fadeInMain 1s ease-out forwards;
+  animation-delay: 5.5s;
+}
+
+@keyframes fadeInMain {
+  to { opacity: 1; }
+}
+
   </style>
 </head>
-<body>
-
-  <!-- Splash Loader -->
-  <div class="splash">QuantumX</div>
-
-  <!-- Dashboard Layout -->
-  <div class="container">
+<body>  <!-- Splash Loader -->  <div class="splash">QuantumX</div>  <!-- Dashboard Layout -->  <div class="container">
     <div class="sidebar">
       <h2>QuantumX</h2>
       <a onclick="loadPage('dashboard-content.html')">Dashboard</a>
@@ -112,9 +137,7 @@
     <div class="main" id="main-content">
       <!-- Konten bakal dimuat di sini -->
     </div>
-  </div>
-
-  <script>
+  </div>  <script>
     function loadPage(file) {
       fetch(file)
         .then(res => res.text())
@@ -124,7 +147,7 @@
           setTimeout(() => {
             content.innerHTML = data;
             content.style.opacity = 1;
-          }, 200); // kasih efek fade
+          }, 200);
         });
     }
 
@@ -132,12 +155,10 @@
       alert("Metu sek cuk! 😎");
     }
 
-    // Otomatis load dashboard-content.html pas pertama
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         loadPage('dashboard-content.html');
-      }, 4000); // nunggu splash ilang
+      }, 4000);
     });
-  </script>
-</body>
+  </script></body>
 </html>
