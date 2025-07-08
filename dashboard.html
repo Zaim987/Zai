@@ -6,35 +6,12 @@
   <title>Dashboard - QuantumX</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
-    @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeUpOut {
-      from { opacity: 1; transform: translateY(0); }
-      to { opacity: 0; transform: translateY(-30px); }
-    }
-    @keyframes spin {
-      to { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #0d1117;
       color: white;
       font-family: 'Rajdhani', sans-serif;
-      overflow-x: hidden;
       padding: 2rem;
     }
-
-    .fade-in { opacity: 0; animation: fadeSlideUp 0.8s ease forwards; }
-    .fade-delay-1 { animation-delay: 0.3s; }
-    .fade-delay-2 { animation-delay: 0.6s; }
-
-    .fade-up-out {
-      animation: fadeUpOut 0.5s ease forwards;
-    }
-
     h1 {
       font-family: 'Orbitron', sans-serif;
       font-size: 2rem;
@@ -42,43 +19,15 @@
       text-shadow: 0 0 10px #00f0ff;
       margin-bottom: 2rem;
     }
-
     .logout-btn {
       padding: 0.75rem 1.5rem;
       font-size: 1rem;
-      font-weight: bold;
       border: none;
       border-radius: 8px;
       background: #00f0ff;
       color: black;
       cursor: pointer;
-      box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-      transition: transform 0.2s ease;
-      position: relative;
     }
-
-    .logout-btn:hover { transform: scale(1.05); }
-
-    .logout-btn.loading {
-      color: transparent !important;
-      pointer-events: none;
-    }
-
-    .logout-btn.loading::after {
-      content: "";
-      width: 20px;
-      height: 20px;
-      border: 3px solid white;
-      border-top: 3px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    /* Chat */
     #chatMessages {
       height: 300px;
       overflow-y: auto;
@@ -92,26 +41,24 @@
     #chatMessages div {
       margin-bottom: 0.75rem;
     }
+    #chatForm {
+      display: flex;
+      gap: 0.5rem;
+    }
     #chatInput {
       flex: 1;
       padding: 0.75rem;
       border-radius: 8px;
       border: none;
-      outline: none;
       background: #0d1117;
       color: white;
-    }
-    #chatForm {
-      display: flex;
-      gap: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <h1 class="fade-in fade-delay-1">Selamat datang di Dashboard</h1>
-  <button id="logoutBtn" class="logout-btn fade-in fade-delay-2">Logout</button>
-
-  <div id="chatArea" class="fade-in fade-delay-2">
+  <h1>Selamat datang di Dashboard</h1>
+  <button id="logoutBtn" class="logout-btn">Logout</button>
+  <div id="chatArea">
     <div id="chatMessages"></div>
     <form id="chatForm">
       <input id="chatInput" type="text" placeholder="Tulis pertanyaan..." required />
@@ -119,79 +66,35 @@
     </form>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-      authDomain: "quantechapp.firebaseapp.com",
-      projectId: "quantechapp",
-      storageBucket: "quantechapp.appspot.com",
-      messagingSenderId: "825384610343",
-      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const logoutBtn = document.getElementById("logoutBtn");
+  <script>
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
     const chatMessages = document.getElementById("chatMessages");
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
-    });
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) return;
+      chatMessages.innerHTML += `<div><strong>Kamu:</strong> ${message}</div>`;
+      chatInput.value = "";
+      chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    logoutBtn.addEventListener("click", async () => {
-      logoutBtn.classList.add("loading");
       try {
-        const user = auth.currentUser;
-        if (user) {
-          await setDoc(doc(db, "users", user.uid), { online: false }, { merge: true });
-        }
-        await signOut(auth);
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1000);
-      } catch (error) {
-        console.error("Logout error:", error);
-        logoutBtn.classList.remove("loading");
+        const res = await fetch("https://gpt-backend-tan.vercel.app/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        console.log("RAW OpenAI Response:", data);
+        let reply = data.reply || JSON.stringify(data, null, 2);
+        chatMessages.innerHTML += `<div><strong>AI:</strong><br><code style="white-space:pre-wrap;">${reply}</code></div>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      } catch (err) {
+        chatMessages.innerHTML += `<div style="color:red;">Gagal sambung ke AI: ${err.message}</div>`;
       }
     });
-
-    // ChatGPT Fetch
-chatForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const message = chatInput.value.trim();
-  if (!message) return;
-
-  chatMessages.innerHTML += `<div><strong>Kamu:</strong> ${message}</div>`;
-  chatInput.value = "";
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
-  try {
-    const res = await fetch("https://gpt-backend-tan.vercel.app/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await res.json();
-
-    // 🧠 Tampilkan isi raw JSON kalau kosong
-    let reply = data.reply || JSON.stringify(data, null, 2);
-    chatMessages.innerHTML += `<div><strong>AI:</strong> <pre>${reply}</pre></div>`;
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  } catch (err) {
-    chatMessages.innerHTML += `<div style="color:red;">Gagal sambung ke AI: ${err.message}</div>`;
-  }
-});
   </script>
 </body>
 </html>
