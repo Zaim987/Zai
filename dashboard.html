@@ -264,9 +264,17 @@
 <!-- # END: Konten Utama -->
 <!-- # START: Script Auth Guard -->
 <script src="js/auth-guard.js" type="module"> </script>
-<!-- # END: Script Interaktif -->
+
+<!-- # Script load-users (displayName & daftar user) -->
 <script src="js/load-users.js" type="module"> </script>
-<!-- # END: Script Interaktif -->
+
+<!-- ✅ Tambah script pemanggil -->
+<script type="module">
+  import { loadUsers } from "./js/load-users.js";
+  loadUsers();
+</script>
+
+<!-- # Script Logout -->
 <script src="js/logout.js" type="module"> </script>
 <!-- # END: Script Interaktif -->
 <!-- # END: Bagian <body> -->
