@@ -1,46 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gaming Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
-    /* 3D effect on the sidebar */
     .sidebar {
-      transform: perspective(600px) rotateY(0deg);
-      transition: transform 0.5s;
+      transition: transform 0.3s ease;
     }
-    .sidebar:hover {
-      transform: perspective(600px) rotateY(-10deg);
+    .sidebar-hidden {
+      transform: translateX(-100%);
+    }
+    .sidebar-visible {
+      transform: translateX(0);
     }
   </style>
 </head>
-<body class="bg-black text-white">
+<body class="bg-black text-white font-sans">
 
-  <!-- Sidebar -->
-  <div class="sidebar fixed top-0 left-0 h-full w-1/5 bg-gray-900 p-5 space-y-8">
-    <h1 class="text-3xl font-bold text-blue-500">GamerHub</h1>
-    <nav>
-      <ul class="space-y-4">
-        <li class="hover:text-blue-400"><i class="fas fa-home"></i> Dashboard</li>
-        <li class="hover:text-blue-400"><i class="fas fa-gamepad"></i> Games</li>
-        <li class="hover:text-blue-400"><i class="fas fa-users"></i> Players</li>
-        <li class="hover:text-blue-400"><i class="fas fa-cogs"></i> Settings</li>
-      </ul>
-    </nav>
+  <!-- Mobile Navbar -->
+  <div class="md:hidden flex justify-between items-center bg-gray-900 p-4">
+    <h1 class="text-xl font-bold text-blue-400">GamerHub</h1>
+    <button id="toggleSidebar" class="text-white text-2xl">
+      ☰
+    </button>
   </div>
 
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar sidebar-hidden fixed top-0 left-0 h-full w-2/3 bg-gray-900 p-5 space-y-6 z-50 md:w-1/5 md:relative md:translate-x-0 md:sidebar-visible">
+    <h1 class="text-2xl font-bold text-blue-400 hidden md:block">GamerHub</h1>
+    <ul class="space-y-4 text-lg">
+      <li class="hover:text-blue-400"><i class="fas fa-home"></i> Dashboard</li>
+      <li class="hover:text-blue-400"><i class="fas fa-gamepad"></i> Games</li>
+      <li class="hover:text-blue-400"><i class="fas fa-users"></i> Players</li>
+      <li class="hover:text-blue-400"><i class="fas fa-cogs"></i> Settings</li>
+    </ul>
+  </div>
+
+  <!-- Overlay for mobile -->
+  <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
+
   <!-- Main Content -->
-  <div class="main-content ml-[20%] p-6">
-    <h2 class="text-4xl mb-5">Player Stats</h2>
+  <div class="md:ml-[20%] p-5">
+    <h2 class="text-3xl md:text-4xl mb-4 text-center md:text-left">🎮 Player Stats</h2>
 
     <!-- 3D Game Controller -->
-    <canvas id="game-controller" class="w-80 h-80 mb-6 mx-auto"></canvas>
+    <canvas id="game-controller" class="w-full max-w-xs h-64 mx-auto mb-6"></canvas>
 
-    <!-- Player Count Chart -->
-    <div id="player-stats" class="w-full max-w-lg mx-auto bg-gray-800 p-5 rounded-lg">
-      <h3 class="text-2xl mb-4">Active Players</h3>
+    <!-- Player Chart -->
+    <div class="bg-gray-800 p-4 rounded-lg max-w-xl mx-auto">
+      <h3 class="text-xl mb-3">Active Players</h3>
       <canvas id="player-chart"></canvas>
     </div>
   </div>
@@ -49,45 +60,62 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 
-  <!-- JS Script to render 3D Controller and Chart -->
+  <!-- Sidebar Toggle Script -->
   <script>
-    // 3D Game Controller (using Three.js)
+    const toggleBtn = document.getElementById("toggleSidebar");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+
+    toggleBtn?.addEventListener("click", () => {
+      sidebar.classList.toggle("sidebar-hidden");
+      sidebar.classList.toggle("sidebar-visible");
+      overlay.classList.toggle("hidden");
+    });
+
+    overlay?.addEventListener("click", () => {
+      sidebar.classList.add("sidebar-hidden");
+      sidebar.classList.remove("sidebar-visible");
+      overlay.classList.add("hidden");
+    });
+  </script>
+
+  <!-- 3D Object -->
+  <script>
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('game-controller') });
-    renderer.setSize(300, 300);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("game-controller") });
+    renderer.setSize(250, 250);
     const geometry = new THREE.BoxGeometry(1, 0.5, 0.2);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ffcc, wireframe: true });
     const controller = new THREE.Mesh(geometry, material);
     scene.add(controller);
-    camera.position.z = 5;
+    camera.position.z = 3;
     function animate() {
       requestAnimationFrame(animate);
-      controller.rotation.y += 0.01; // Rotate controller
+      controller.rotation.y += 0.01;
       renderer.render(scene, camera);
     }
     animate();
+  </script>
 
-    // Player Stats Chart (using Chart.js)
+  <!-- Chart.js -->
+  <script>
     const ctx = document.getElementById('player-chart').getContext('2d');
-    const playerChart = new Chart(ctx, {
+    new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Player 1', 'Player 2', 'Player 3', 'Player 4', 'Player 5'],
+        labels: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
         datasets: [{
-          label: 'Active Players',
-          data: [10, 15, 12, 8, 20],
-          backgroundColor: 'rgba(0, 123, 255, 0.6)',
-          borderColor: 'rgba(0, 123, 255, 1)',
+          label: 'Score',
+          data: [12, 19, 3, 5],
+          backgroundColor: 'rgba(59, 130, 246, 0.5)',
+          borderColor: 'rgba(59, 130, 246, 1)',
           borderWidth: 1
         }]
       },
       options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
+        responsive: true,
+        maintainAspectRatio: false
       }
     });
   </script>
