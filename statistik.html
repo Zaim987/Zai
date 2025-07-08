@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="id"><head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuantumX Chat</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
-  <script type="module">
+<!DOCTYPE html>
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuantumX Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -145,7 +146,7 @@ let unsubscribeMessages = null;
     window.goBack = goBack;
     window.sendMessage = sendMessage;
   </script>
-  <style>
+<style>
     * {
       margin: 0;
       padding: 0;
@@ -191,25 +192,27 @@ let unsubscribeMessages = null;
       text-shadow: 0 0 5px cyan;
     }
     .chat-wrapper {
-      animation: fadeSlideDown 0.8s ease-out;
-      height: calc(100vh - 64px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-    }
+  animation: fadeSlideDown 0.8s ease-out;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0;
+}
     .chat-box {
-      width: 100%;
-      max-width: 800px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px cyan;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 0 20px cyan;
+  gap: 1rem;
+}
     .message-list {
       flex-grow: 1;
       max-height: 400px;
@@ -235,9 +238,15 @@ let unsubscribeMessages = null;
       color: black;
     }
     .chat-input {
-      display: flex;
-      gap: 1rem;
-    }
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  width: 100%;
+  max-width: 800px;
+  background-color: #000000;
+  box-shadow: 0 -3px 20px cyan;
+  border-top: 1px solid cyan;
+}
     .chat-input input {
       flex-grow: 1;
       padding: 0.75rem;
@@ -295,26 +304,26 @@ let unsubscribeMessages = null;
   </style>
 </head>
 <body>
-  <div class="chat-wrapper">
-    <header class="top-bar">
-      <div class="logo">QuantumX <span id="dm-target-label"></span></div>
-      <div>
-        <button class="menu-btn" onclick="resetDM()">🌐 Umum</button>
-        <button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
-      </div>
-    </header>
-    <main class="chat-box">
-      <h2 class="welcome-text">Selamat Datang!</h2>
-      <div class="message-list" id="messages"></div>
-      <div class="chat-input">
-        <input type="text" id="msgInput" placeholder="Ketik pesenmu..." />
-        <button onclick="sendMessage()">Kirim</button>
-      </div>
-    </main>
-    <div id="user-list">
-      <h3>Daftar Pengguna</h3>
-      <div id="users"></div>
-    </div>
-  </div>
+<div class="chat-wrapper">
+<header class="top-bar">
+<div class="logo">QuantumX <span id="dm-target-label"></span></div>
+<div>
+<button class="menu-btn" onclick="resetDM()">🌐 Umum</button>
+<button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
+</div>
+</header>
+<main class="chat-box">
+<h2 class="welcome-text">Selamat Datang!</h2>
+<div class="message-list" id="messages"></div>
+
+</main><div class="chat-input">
+<input id="msgInput" placeholder="Ketik pesenmu..." type="text"/>
+<button onclick="sendMessage()">Kirim</button>
+</div>
+<div id="user-list">
+<h3>Daftar Pengguna</h3>
+<div id="users"></div>
+</div>
+</div>
 </body>
 </html>
