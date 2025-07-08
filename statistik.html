@@ -148,7 +148,7 @@
 
     function insertPrivateMessage(name, uid) {
       const input = document.getElementById("msgInput");
-      input.value = `@${name} `;
+      // input.value = `@${name} `; // Dibuang ben ora langsung mlebu DM otomatis
       input.focus();
       dmTarget = { uid, name };
       document.getElementById("dm-target-label").textContent = `• Message to ${name} •`;
