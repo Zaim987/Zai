@@ -2,17 +2,14 @@
 <html lang="jv">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Langit Galau Glowing 🌌</title>
-
+  <title>Langit + Black Hole Nyedot</title>
   <!-- #css -->
   <style>
     body {
       margin: 0;
-      background: black;
       overflow: hidden;
+      background: black;
     }
-
     canvas {
       display: block;
     }
@@ -23,22 +20,31 @@
 
   <!-- #js -->
   <script>
-    var canvas = document.getElementById('space');
-    var ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('space');
+    const ctx = canvas.getContext('2d');
 
-    var stars = [];
-    var numStars = 1000;
-    var w, h;
+    let stars = [];
+    const numStars = 1000;
+    let w, h;
+
+    let blackHole = {
+      x: 0,
+      y: 0,
+      r: 40,
+      angle: 0
+    };
 
     function resize() {
       w = canvas.width = window.innerWidth;
       h = canvas.height = window.innerHeight;
+      blackHole.x = w / 2;
+      blackHole.y = h / 2;
     }
 
-    resize();
     window.addEventListener('resize', resize);
+    resize();
 
-    for (var i = 0; i < numStars; i++) {
+    for (let i = 0; i < numStars; i++) {
       stars.push({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -49,16 +55,45 @@
 
     function draw() {
       ctx.clearRect(0, 0, w, h);
-      for (var i = 0; i < stars.length; i++) {
-        var s = stars[i];
-        s.a += (Math.random() - 0.5) * 0.1;
-        s.a = Math.max(0, Math.min(1, s.a));
+
+      // Draw black hole muter
+      blackHole.angle += 0.01;
+      ctx.save();
+      ctx.translate(blackHole.x, blackHole.y);
+      ctx.rotate(blackHole.angle);
+      ctx.beginPath();
+      ctx.arc(0, 0, blackHole.r, 0, Math.PI * 2);
+      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, blackHole.r);
+      grad.addColorStop(0, "rgba(0,0,0,1)");
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
+
+      // Bintang
+      for (let i = 0; i < stars.length; i++) {
+        let s = stars[i];
+
+        // Flicker
+        s.a += (Math.random() - 0.5) * 0.05;
+        s.a = Math.max(0.2, Math.min(1, s.a));
+
+        // Efek disedot
+        const dx = blackHole.x - s.x;
+        const dy = blackHole.y - s.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 300) {
+          s.x += dx * 0.0005;
+          s.y += dy * 0.0005;
+        }
 
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
         ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
         ctx.fill();
       }
+
       requestAnimationFrame(draw);
     }
 
