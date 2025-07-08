@@ -25,17 +25,6 @@ onAuthStateChanged(auth, (user) => {
     // Tambah style popup + animasi
     const style = document.createElement('style');
     style.textContent = `
-      @keyframes fadeSlideIn {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, -60%);
-        }
-        100% {
-          opacity: 1;
-          transform: translate(-50%, -50%);
-        }
-      }
-
       .modal-login-popup {
         position: fixed;
         top: 50%;
@@ -50,7 +39,11 @@ onAuthStateChanged(auth, (user) => {
         font-size: 1.1rem;
         z-index: 999;
         opacity: 0;
-        animation: fadeSlideIn 0.6s ease-out forwards;
+        transition: opacity 0.4s ease;
+      }
+
+      .modal-login-popup.show {
+        opacity: 1;
       }
 
       .modal-login-popup .popup-content > div:first-child {
@@ -61,30 +54,34 @@ onAuthStateChanged(auth, (user) => {
     `;
     document.head.appendChild(style);
 
-    // Tunggu popup masuk DOM, lalu cari countdown dan mulai timer
+    // Aktifkan animasi
+    requestAnimationFrame(() => {
+      popup.classList.add('show');
+    });
+
+    // Countdown
     setTimeout(() => {
       const countdown = document.getElementById('countdown');
-      console.log("⏳ Countdown element:", countdown);
-
       if (!countdown) {
         console.error("❌ Countdown element NOT FOUND");
         return;
       }
 
       let seconds = 5;
+      countdown.textContent = seconds;
+
       const timer = setInterval(() => {
         seconds--;
         countdown.textContent = seconds;
         console.log("⏳ Countdown:", seconds);
 
-        if (seconds === 0) {
+        if (seconds <= 0) {
           clearInterval(timer);
           console.log("➡️ Redirecting to dashboard...");
           window.location.href = "dashboard.html";
         }
       }, 1000);
-    }, 100); // Delay 100ms supaya DOM popup siap
-
+    }, 100);
   } else {
     console.warn("❌ User durung login!");
   }
