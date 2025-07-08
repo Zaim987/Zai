@@ -1,131 +1,78 @@
-<!DOCTYPE html>
-<html lang="jv">
+<!DOCTYPE html><html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Langit Kenangan</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuantumX Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      margin: 0;
-      overflow: hidden;
-      background: black;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #0d1117;
+      color: white;
     }
-
-    canvas {
-      display: block;
+    .sidebar {
+      width: 250px;
+      background: #161b22;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
-
-    .mantan {
-      position: absolute;
-      top: 50%;
-      left: 100%;
-      transform: translate(-50%, -50%);
-      font-size: 30px;
-      color: pink;
-      animation: mlebu 10s linear forwards;
+    .sidebar h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #58a6ff;
     }
-
-    @keyframes mlebu {
-      0% { left: 100%; opacity: 1; }
-      80% { left: 30%; opacity: 1; }
-      100% { left: 30%; opacity: 0; }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.2s;
     }
-
-    .blackhole {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #000000, #222222, #000000);
-      box-shadow: 0 0 100px #000;
-      transform: translate(-50%, -50%);
-      animation: spin 4s linear infinite;
+    .sidebar a:hover {
+      background: #21262d;
     }
-
-    @keyframes spin {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    .main {
+      flex: 1;
+      padding: 30px;
+      background: #0d1117;
     }
-
+    .header {
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .card {
+      background: #161b22;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
-
-<canvas id="space"></canvas>
-<div class="blackhole"></div>
-<div class="mantan">👩‍🦰 Mantan</div>
-
-<audio id="lagu" autoplay loop hidden>
-  <source src="https://raw.githubusercontent.com/Zaim987/Zai/main/lirik%20kalah%20meydarahma.mp3" type="audio/mpeg">
-</audio>
-
-<script>
-  // 🔊 Biar autoplay jalan pas klik user
-  document.addEventListener("click", () => {
-    const audio = document.getElementById("lagu");
-    if (audio.paused) audio.play();
-  });
-
-  // 🌌 Bintang
-  const canvas = document.getElementById("space");
-  const ctx = canvas.getContext("2d");
-  let w = canvas.width = window.innerWidth;
-  let h = canvas.height = window.innerHeight;
-  let stars = [];
-
-  for (let i = 0; i < 400; i++) {
-    stars.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      size: Math.random() * 2,
-      speed: Math.random() * 0.5 + 0.2
-    });
-  }
-
-  // ☄️ Meteor
-  let meteors = [];
-  setInterval(() => {
-    meteors.push({
-      x: Math.random() * w,
-      y: -20,
-      size: Math.random() * 3 + 1,
-      speedX: (Math.random() - 0.5) * 2,
-      speedY: Math.random() * 3 + 2
-    });
-  }, 300);
-
-  function draw() {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, w, h);
-
-    // Stars
-    ctx.fillStyle = "white";
-    for (let s of stars) {
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-      ctx.fill();
-      s.y += s.speed;
-      if (s.y > h) s.y = 0;
-    }
-
-    // Meteors
-    ctx.fillStyle = "orange";
-    for (let m of meteors) {
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
-      ctx.fill();
-      m.x += m.speedX;
-      m.y += m.speedY;
-    }
-
-    meteors = meteors.filter(m => m.y < h);
-
-    requestAnimationFrame(draw);
-  }
-
-  draw();
-</script>
-
+  <div class="sidebar">
+    <h2>QuantumX</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Statistik</a>
+    <a href="#">Pengguna</a>
+    <a href="#">Pengaturan</a>
+    <a href="#">Logout</a>
+  </div>
+  <div class="main">
+    <div class="header">Selamat datang, Zaim!</div>
+    <div class="card">
+      <h3>Total Pengguna</h3>
+      <p>1.234</p>
+    </div>
+    <div class="card">
+      <h3>Aktivitas Hari Ini</h3>
+      <p>87 aksi</p>
+    </div>
+  </div>
 </body>
 </html>
