@@ -13,11 +13,46 @@
       color: white;
       overflow: hidden;
     }
+    .splash {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, #000000, #050b1e);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      animation: fadeOutSplash 2s ease forwards;
+      animation-delay: 3.5s;
+      z-index: 99;
+    }
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3rem;
+      color: white;
+      opacity: 0;
+      animation: fadeInGlow 1s ease forwards;
+      animation-delay: 1s;
+      text-shadow: 0 0 20px #58a6ff, 0 0 40px #58a6ff;
+    }
+    @keyframes fadeInGlow {
+      to {
+        opacity: 1;
+        text-shadow: 0 0 20px #58a6ff, 0 0 40px #58a6ff, 0 0 60px #58a6ff;
+      }
+    }
+    @keyframes fadeOutSplash {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
     .container {
       display: flex;
       height: 100%;
       opacity: 0;
       animation: fadeInContainer 1s ease-out forwards;
+      animation-delay: 4s;
     }
     @keyframes fadeInContainer {
       to { opacity: 1; }
@@ -33,7 +68,7 @@
       border-right: 1px solid rgba(255, 255, 255, 0.05);
       transform: translateX(-50px);
       opacity: 0;
-      animation: slideInLeft 1.4s ease-out 0.6s forwards;
+      animation: slideInLeft 1.4s ease-out 4.4s forwards;
     }
     .main {
       flex: 1;
@@ -43,7 +78,7 @@
       gap: 20px;
       transform: translateY(50px);
       opacity: 0;
-      animation: slideInUp 1.4s ease-out 1.2s forwards;
+      animation: slideInUp 1.4s ease-out 4.8s forwards;
     }
     @keyframes slideInLeft {
       to {
@@ -81,6 +116,9 @@
       font-size: 28px;
       font-family: 'Orbitron', sans-serif;
       color: #58a6ff;
+      opacity: 0;
+      animation: fadeInGlow 1s ease forwards;
+      animation-delay: 5.2s;
     }
     .card {
       background: rgba(22, 27, 34, 0.7);
@@ -91,8 +129,8 @@
       transform: translateY(20px);
       animation: fadeInCard 1s ease-out forwards;
     }
-    .card:nth-child(2) { animation-delay: 2s; }
-    .card:nth-child(3) { animation-delay: 2.4s; }
+    .card:nth-child(2) { animation-delay: 5.6s; }
+    .card:nth-child(3) { animation-delay: 6s; }
     h3 {
       margin-bottom: 10px;
       font-size: 20px;
@@ -100,6 +138,9 @@
   </style>
 </head>
 <body>
+  <div class="splash">
+    <div class="logo">QuantumX</div>
+  </div>
   <div class="container">
     <div class="sidebar">
       <h2>QuantumX</h2>
