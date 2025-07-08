@@ -150,18 +150,21 @@
   menuBtns.forEach((btn) => {
     if (btn.textContent.trim() === "Statistik") {
       btn.addEventListener("click", () => {
-        const elementsToFade = mainContent.querySelectorAll(".dashboard > *");
+        const dashboardItems = mainContent.querySelectorAll(".dashboard > *");
+        const topBarItems = mainContent.querySelectorAll(".top-bar > *");
+        const elementsToFade = [...dashboardItems, ...topBarItems];
+
         let delay = 0;
         elementsToFade.forEach((el, i) => {
           setTimeout(() => {
             el.classList.add("fade-out-up");
           }, delay);
-          delay += 300; // jeda antar elemen
+          delay += 300;
         });
 
         setTimeout(() => {
           window.location.href = "statistik.html";
-        }, delay + 700); // delay total
+        }, delay + 700);
       });
     }
   });
