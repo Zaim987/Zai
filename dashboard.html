@@ -1,109 +1,36 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard QuantumX</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family:'Orbitron',sans-serif;
-      background:radial-gradient(ellipse at bottom,#0a0a0a,#000);
-      color:#fff;
-      overflow:hidden;
-    }
-
-    /* Splash Screen */
-    .splash {
-      position:fixed;top:0;left:0;
-      width:100vw;height:100vh;
-      display:flex;justify-content:center;align-items:center;
-      font-size:3rem;
-      color:#fff;
-      text-shadow:0 0 20px cyan,0 0 40px cyan;
-      animation:fadeOutSplash 1s ease forwards;
-      animation-delay:2.5s;
-      background:transparent;
-      z-index:9999;
-    }
-    @keyframes fadeOutSplash {
-      0% { opacity:1; }
-      100% { opacity:0; visibility:hidden; }
-    }
-
-    header {
-      display:flex;justify-content:space-between;align-items:center;
-      padding:20px; opacity:0;
-      animation:fadeInHeader 1s ease forwards;
-      animation-delay:2.5s;
-    }
-    @keyframes fadeInHeader {
-      0% { opacity:0; transform:translateY(-20px); }
-      100% { opacity:1; transform:translateY(0); }
-    }
-
-    .logo {
-      font-size:2rem; font-weight:700;
-      text-shadow:0 0 10px cyan,0 0 20px cyan;
-    }
-    nav {
-      display:flex;gap:20px;
-      overflow-x:auto;
-    }
-    nav button {
-      background:none;border:none;color:#fff;
-      padding:10px 20px;border-radius:10px;
-      cursor:pointer;transition:background .3s;
-      opacity:0; transform:translateY(-20px);
-      animation:fadeInUp 0.5s ease forwards;
-    }
-    nav button:hover, nav button.active {
-      background:#1c1f26; color:#6ec1ff;
-    }
-    nav button:nth-child(1){animation-delay:2.7s;}
-    nav button:nth-child(2){animation-delay:2.9s;}
-    nav button:nth-child(3){animation-delay:3.1s;}
-    nav button:nth-child(4){animation-delay:3.3s;}
-    nav button:nth-child(5){animation-delay:3.5s;}
-
-    @keyframes fadeInUp {
-      0% { opacity:0; transform:translateY(20px); }
-      100% { opacity:1; transform:translateY(0); }
-    }
-
-    main {
-      padding:40px 20px; text-align:center;
-      opacity:0; animation:fadeInUp 1s ease forwards;
-      animation-delay:3.7s;
-    }
-    h1 {font-size:2rem; margin-bottom:20px;}
-    p {color:#ccc;}
-
-    @media (max-width:768px) {
-      nav {white-space:nowrap;}
-      nav button {flex-shrink:0;}
-    }
-
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantumX Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="splash">QuantumX</div>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <h1 class="splash-logo">QuantumX</h1>
+  </div>
 
-  <header>
-    <div class="logo">QuantumX</div>
-    <nav>
-      <button class="active">Dashboard</button>
-      <button>Statistik</button>
-      <button>Pengguna</button>
-      <button>Pengaturan</button>
-      <button>Logout</button>
-    </nav>
-  </header>
+  <!-- Main Content -->
+  <div id="main-content" class="hidden">
+    <header class="top-bar">
+      <div class="logo no-scroll">QuantumX</div>
+      <nav class="menu-bar">
+        <button class="menu-btn" id="btn-dashboard">Dashboard</button>
+        <button class="menu-btn" id="btn-statistik">Statistik</button>
+        <button class="menu-btn" id="btn-pengguna">Pengguna</button>
+        <button class="menu-btn" id="btn-pengaturan">Pengaturan</button>
+        <button class="menu-btn" id="btn-logout">Logout</button>
+      </nav>
+    </header>
 
-  <main>
-    <h1>Selamat Datang, Zaim!</h1>
-    <p>Iki tampilan utama dashboard mu sing wis digodok karo efek animasi alus 😎</p>
-  </main>
+    <main class="dashboard">
+      <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+      <p class="desc-text">Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
