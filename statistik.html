@@ -157,9 +157,8 @@
     }
 
     function exitPrivateMessage() {
-      dmTarget = null;
-      document.getElementById("dm-target-label").textContent = "";
-      document.querySelector(".welcome-text").textContent = `Selamat Datang, ${currentDisplayName}!`;
+  window.location.reload();
+}!`;
       listenMessages();
     }
 
