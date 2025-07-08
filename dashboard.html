@@ -2,7 +2,7 @@
 <html lang="jv">
 <head>
   <meta charset="UTF-8">
-  <title>Langit Kalah - Versi Pedot Ultimate</title>
+  <title>Langit Kalah - Suara Dijamin Muncul</title>
   <style>
     body {
       margin: 0;
@@ -23,22 +23,40 @@
       animation: munculHilang 6s infinite ease-in-out;
       pointer-events: none;
       white-space: nowrap;
+      z-index: 10;
     }
     @keyframes munculHilang {
       0%, 100% { color: rgba(255,255,255,0); }
       30% { color: rgba(255,255,255,0.7); }
       60% { color: rgba(255,255,255,0); }
     }
+
+    /* Tombol transparan full layar */
+    #klikPlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999;
+      opacity: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <canvas id="space"></canvas>
-  <div id="mantan">👻 "Aku kalah ning ngarepmu, menang ning kenanganku..."</div>
 
-  <!-- 🎶 Lagu Kalah Auto Play -->
-  <audio autoplay loop hidden>
+  <!-- Tombol klik transparan -->
+  <button id="klikPlay"></button>
+
+  <canvas id="space"></canvas>
+  <div id="mantan">ASU ASU "Aku kalah ning ngarepmu, menang ning kenanganku..."</div>
+
+  <!-- Lagu Kalah -->
+  <audio id="lagu" loop>
     <source src="https://github.com/Zaim987/Zai/raw/main/videoplayback.m4a" type="audio/mp4">
-    Browsermu ora ndhukung audio cuk 😢
   </audio>
 
   <script>
@@ -138,6 +156,12 @@
     }
 
     draw();
+
+    // Klik layar sekali, langsung muter lagu
+    document.getElementById("klikPlay").addEventListener("click", () => {
+      document.getElementById("lagu").play();
+      document.getElementById("klikPlay").style.display = "none"; // ilangno tombol
+    });
   </script>
 </body>
 </html>
