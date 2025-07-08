@@ -1,7 +1,10 @@
 import { auth, db } from './firebase-init.js';
-import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  collection, getDocs,
+  doc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Fungsi: Nampilin daftar semua user
+// Fungsi utama: nampilin user lan update teks welcome
 export async function loadUsers() {
   const querySnapshot = await getDocs(collection(db, "users"));
   const list = document.getElementById("user-list");
@@ -15,24 +18,22 @@ export async function loadUsers() {
     div.style.animationDelay = `${delay + index * 0.3}s`;
     list.appendChild(div);
   });
-}
 
-// Fungsi: Ganti teks "Selamat Datang, Zaim!" dadi nama asli user login
-document.addEventListener("DOMContentLoaded", async () => {
-  const waitForAuth = () =>
-    new Promise(resolve => {
-      const unsub = auth.onAuthStateChanged(user => {
-        if (user) {
-          unsub();
-          resolve(user);
-        }
-      });
-    });
-
-  const user = auth.currentUser || await waitForAuth();
-  if (!user) return;
-
+  // Tambahan: Ganti teks "Selamat Datang, Zaim!"
   try {
+    const waitForAuth = () =>
+      new Promise(resolve => {
+        const unsub = auth.onAuthStateChanged(user => {
+          if (user) {
+            unsub();
+            resolve(user);
+          }
+        });
+      });
+
+    const user = auth.currentUser || await waitForAuth();
+    if (!user) return;
+
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
@@ -48,4 +49,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (err) {
     console.error("Gagal ambil displayName:", err);
   }
-});
+}
