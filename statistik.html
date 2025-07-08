@@ -22,6 +22,7 @@
     const auth = getAuth(app);
 
     let currentUser = null;
+let unsubscribeMessages = null;
     let currentDisplayName = null;
     let dmTarget = null;
 
@@ -72,34 +73,39 @@
     }
 
     function listenMessages() {
-      const q = query(collection(db, "messages"), orderBy("createdAt"));
-      const msgList = document.getElementById("messages");
-      onSnapshot(q, (snapshot) => {
-        msgList.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const data = doc.data();
+  if (unsubscribeMessages) {
+    unsubscribeMessages(); // remove previous listener
+  }
 
-          if (dmTarget) {
-            if (data.to !== currentUser.uid && data.sender !== currentUser.uid) return;
-          } else {
-            if (data.to) return;
-          }
+  const q = query(collection(db, "messages"), orderBy("createdAt"));
+  const msgList = document.getElementById("messages");
 
-          const div = document.createElement("div");
-          div.className = "message";
-          div.textContent = `${data.senderName || "Anon"}: ${data.text}`;
+  unsubscribeMessages = onSnapshot(q, (snapshot) => {
+    msgList.innerHTML = "";
+    snapshot.forEach((doc) => {
+      const data = doc.data();
 
-          if (data.sender === currentUser.uid) {
-            div.classList.add("right");
-          } else {
-            div.classList.add("left");
-          }
+      if (dmTarget) {
+        if (data.to !== currentUser.uid && data.sender !== currentUser.uid) return;
+      } else {
+        if (data.to) return;
+      }
 
-          msgList.appendChild(div);
-        });
-        msgList.scrollTop = msgList.scrollHeight;
-      });
-    }
+      const div = document.createElement("div");
+      div.className = "message";
+      div.textContent = `${data.senderName || "Anon"}: ${data.text}`;
+
+      if (data.sender === currentUser.uid) {
+        div.classList.add("right");
+      } else {
+        div.classList.add("left");
+      }
+
+      msgList.appendChild(div);
+    });
+    msgList.scrollTop = msgList.scrollHeight;
+  });
+}
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
