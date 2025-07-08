@@ -1,162 +1,145 @@
-<!DOCTYPE html><html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuantumX Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100vh;
-      overflow-x: hidden;
-      overflow-y: hidden;
-      font-family: 'Rajdhani', sans-serif;
-      background: linear-gradient(160deg, #000000, #050b1e);
-      color: white;
-    }.splash {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(160deg, #000000, #050b1e);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }body {
   font-family: 'Orbitron', sans-serif;
-  font-size: 3rem;
-  text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
-  animation: splashFadeOut 2s ease forwards;
-  animation-delay: 3s;
-  z-index: 9999;
+  background: radial-gradient(ellipse at bottom, #0a0a0a 0%, #000000 100%);
+  color: white;
+  overflow: hidden;
 }
 
-@keyframes splashFadeOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
+header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  justify-content: space-between;
 }
 
-@keyframes fadeInSoft {
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+  animation: fadeIn 1s ease forwards;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+nav button:hover,
+nav button.active {
+  background: #1c1f26;
+  color: #6ec1ff;
+}
+
+nav button:nth-child(1) {
+  animation-delay: 1.1s;
+}
+
+nav button:nth-child(2) {
+  animation-delay: 1.3s;
+}
+
+nav button:nth-child(3) {
+  animation-delay: 1.5s;
+}
+
+nav button:nth-child(4) {
+  animation-delay: 1.7s;
+}
+
+nav button:nth-child(5) {
+  animation-delay: 1.9s;
+}
+
+main {
+  padding: 40px 20px;
+  text-align: center;
+  animation: fadeInUp 1s ease forwards;
+  opacity: 0;
+  animation-delay: 2.3s;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+@keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@keyframes glowText {
-  from {
-    text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
   }
-  to {
-    text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+
+  100% {
+    opacity: 1;
   }
 }
 
-.logo-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: linear-gradient(to right, #000000, #041d33);
-  padding: 16px 20px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.8rem;
-  color: white;
-  text-shadow: 0 0 10px #00ffff;
-  animation: fadeInSoft 1s ease-out forwards, glowText 2s ease-in-out infinite alternate;
-  animation-delay: 3.2s, 4.2s;
-}
-
-.menu-scroll {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding: 12px 20px;
-  align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.menu-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.menu-scroll a {
-  opacity: 0;
-  color: white;
-  text-decoration: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  transition: background 0.2s;
-  animation: fadeInSoft 1s ease-out forwards;
-}
-
-.menu-scroll a:nth-child(1) { animation-delay: 3.6s; }
-.menu-scroll a:nth-child(2) { animation-delay: 3.9s; }
-.menu-scroll a:nth-child(3) { animation-delay: 4.2s; }
-.menu-scroll a:nth-child(4) { animation-delay: 4.5s; }
-.menu-scroll a:nth-child(5) { animation-delay: 4.8s; }
-
-.menu-scroll a.active {
-  background: rgba(255,255,255,0.1);
-  color: #58a6ff;
-  font-weight: bold;
-}
-
-.main {
-  padding: 40px;
-  height: calc(100vh - 150px);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  opacity: 0;
-  animation: fadeInSoft 1s ease-out forwards;
-  animation-delay: 5.1s;
-}
-
-@media (max-width: 600px) {
-  .main {
-    padding: 20px;
+@media (max-width: 768px) {
+  nav {
+    overflow-x: auto;
+    white-space: nowrap;
   }
-  .menu-scroll {
-    gap: 10px;
-    padding: 10px;
+
+  nav button {
+    flex-shrink: 0;
   }
 }
 
   </style>
-</head>
-<body>  <!-- Splash Loader -->  <div class="splash">QuantumX</div>  <!-- Logo Header Tetap -->  <div class="logo-header">QuantumX</div>  <!-- Menu Scroll (Geser Kiri-Kanan) -->  <div class="menu-scroll">
-    <a class="active">Dashboard</a>
-    <a onclick="loadPage('statistik.html')">Statistik</a>
-    <a onclick="loadPage('pengguna.html')">Pengguna</a>
-    <a onclick="loadPage('pengaturan.html')">Pengaturan</a>
-    <a onclick="logout()">Logout</a>
-  </div>  <!-- Main Dashboard Content (Tetep Anteng) -->  <div class="main" id="main-content">
+</head><body>
+  <header>
+    <div class="logo">QuantumX</div>
+    <nav>
+      <button class="active">Dashboard</button>
+      <button>Statistik</button>
+      <button>Pengguna</button>
+      <button>Pengaturan</button>
+      <button>Logout</button>
+    </nav>
+  </header>
+  <main>
     <h1>Selamat Datang, Zaim!</h1>
     <p>Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
-  </div>  <script>
-    function loadPage(file) {
-      fetch(file)
-        .then(res => res.text())
-        .then(data => {
-          const content = document.getElementById("main-content");
-          content.style.opacity = 0;
-          setTimeout(() => {
-            content.innerHTML = data;
-            content.style.opacity = 1;
-          }, 200);
-        });
-    }
-
-    function logout() {
-      alert("Metu sek cuk! 😎");
-    }
-  </script></body>
-</html>
+  </main>
+</body></html>
