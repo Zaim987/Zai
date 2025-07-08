@@ -193,3 +193,122 @@
   </script>
 </body>
 </html>
+
+.width, starCanvas.height);
+      ctx.fillStyle = "rgba(0, 255, 255, 0.8)";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "#0ff";
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.d;
+        if (star.y > starCanvas.height) {
+          star.y = 0;
+          star.x = Math.random() * starCanvas.width;
+        }
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+    window.addEventListener("resize", () => {
+      starCanvas.width = window.innerWidth;
+      starCanvas.height = window.innerHeight;
+    });
+
+    // Meteors animation
+    const meteorCanvas = document.getElementById("meteors-bg");
+    const mtx = meteorCanvas.getContext("2d");
+    meteorCanvas.width = window.innerWidth;
+    meteorCanvas.height = window.innerHeight;
+    const meteors = Array.from({ length: 20 }, () => ({
+      x: Math.random() * meteorCanvas.width,
+      y: Math.random() * -meteorCanvas.height,
+      length: Math.random() * 20 + 20,
+      speed: Math.random() * 2 + 3,
+      angle: Math.PI / 4
+    }));
+    function drawMeteors() {
+      mtx.clearRect(0, 0, meteorCanvas.width, meteorCanvas.height);
+      mtx.strokeStyle = "rgba(0, 255, 255, 0.8)";
+      mtx.lineWidth = 2;
+      mtx.shadowBlur = 10;
+      mtx.shadowColor = "#00ffff";
+      meteors.forEach(m => {
+        mtx.beginPath();
+        mtx.moveTo(m.x, m.y);
+        mtx.lineTo(m.x - m.length * Math.cos(m.angle), m.y - m.length * Math.sin(m.angle));
+        mtx.stroke();
+        m.x += m.speed * Math.cos(m.angle);
+        m.y += m.speed * Math.sin(m.angle);
+        if (m.y > meteorCanvas.height || m.x > meteorCanvas.width) {
+          m.x = Math.random() * meteorCanvas.width / 2;
+          m.y = Math.random() * -50;
+        }
+      });
+      requestAnimationFrame(drawMeteors);
+    }
+    drawMeteors();
+
+    // Chart.js
+    const ctxChart = document.getElementById('playerChart').getContext('2d');
+    new Chart(ctxChart, {
+      type: 'bar',
+      data: {
+        labels: ['Player1', 'Player2', 'Player3', 'Player4'],
+        datasets: [{
+          label: 'Wins',
+          data: [12, 19, 8, 14],
+          backgroundColor: ['#00FFFF88'],
+          borderColor: '#00FFFF',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // Three.js
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threeCanvas') });
+    renderer.setSize(300, 300);
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    camera.position.z = 4;
+    function animate() {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // GSAP planetary transition effect
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        gsap.to(window, {
+          duration: 1,
+          scrollTo: { y: "max" },
+          ease: "power4.inOut"
+        });
+        gsap.to(btn, {
+          duration: 0.5,
+          scale: 1.4,
+          rotation: 360,
+          yoyo: true,
+          repeat: 1,
+          ease: "back.inOut(2)"
+        });
+      });
+    });
+
+    gsap.from("header h1", { duration: 1.2, y: -100, opacity: 0, ease: "bounce" });
+    gsap.from(".card-3d", { duration: 1.2, scale: 0.8, opacity: 0, stagger: 0.3, ease: "back.out(1.7)" });
+  </script>
+</body>
+</html>
