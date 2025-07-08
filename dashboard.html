@@ -1,11 +1,11 @@
 <!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuantumX Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {margin: 0; padding: 0; box-sizing: border-box;}
     body {
       font-family: 'Rajdhani', sans-serif;
       height: 100vh;
@@ -70,22 +70,11 @@
     .main {
       flex: 1;
       padding: 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      transform: translateY(50px);
-      opacity: 0;
-      animation: slideInUp 1.4s ease-out 4.8s forwards;
+      overflow-y: auto;
     }
     @keyframes slideInLeft {
       to {
         transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    @keyframes slideInUp {
-      to {
-        transform: translateY(0);
         opacity: 1;
       }
     }
@@ -100,33 +89,11 @@
       padding: 10px;
       border-radius: 8px;
       transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
     }
     .sidebar a:hover {
       background: rgba(255, 255, 255, 0.05);
       transform: translateX(5px);
-    }
-    .header {
-      font-size: 28px;
-      font-family: 'Orbitron', sans-serif;
-      color: #58a6ff;
-      opacity: 0;
-      animation: fadeInGlow 1s ease forwards;
-      animation-delay: 5.2s;
-    }
-    .info {
-      font-size: 18px;
-      line-height: 1.6;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInInfo 1s ease-out forwards;
-    }
-    .info:nth-of-type(2) { animation-delay: 5.6s; }
-    .info:nth-of-type(3) { animation-delay: 6s; }
-    @keyframes fadeInInfo {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
   </style>
 </head>
@@ -137,17 +104,30 @@
   <div class="container">
     <div class="sidebar">
       <h2>QuantumX</h2>
-      <a href="#">Dashboard</a>
-      <a href="#">Statistik</a>
+      <a onclick="loadPage('dashboard.html')">Dashboard</a>
+      <a onclick="loadPage('statistik.html')">Statistik</a>
       <a href="#">Pengguna</a>
       <a href="#">Pengaturan</a>
       <a href="#">Logout</a>
     </div>
-    <div class="main">
-      <div class="header">Selamat datang, Zaim!</div>
-      <div class="info">Total Pengguna: 1.234</div>
-      <div class="info">Aktivitas Hari Ini: 87 aksi</div>
+    <div class="main" id="main-content">
+      <!-- Konten bakal dimuat dari file luar -->
     </div>
   </div>
+  <script>
+    function loadPage(file) {
+      fetch(file)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById("main-content").innerHTML = html;
+        });
+    }// Muat dashboard pas awal dibuka
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    loadPage('dashboard.html');
+  }, 4000); // pas splash ilang
+});
+
+  </script>
 </body>
 </html>
