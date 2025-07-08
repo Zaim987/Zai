@@ -2,7 +2,7 @@
 <html lang="jv">
 <head>
   <meta charset="UTF-8">
-  <title>Langit Kenangan - Pedot Edition</title>
+  <title>Langit Kalah - Versi Paling Pedot</title>
   <style>
     body {
       margin: 0;
@@ -33,7 +33,13 @@
 </head>
 <body>
   <canvas id="space"></canvas>
-  <div id="mantan">👻 "Aku ora ninggalmu, mung wis lali..."</div>
+  <div id="mantan">👻 "Aku kalah ning ngarepmu, menang ning kenanganku..."</div>
+
+  <!-- 🎶 #LaguKalah -->
+  <audio autoplay loop hidden>
+    <source src="https://example.com/kalah.mp3" type="audio/mpeg">
+    Browsermu ra iso muter lagu, cuk 😢
+  </audio>
 
   <script>
     const canvas = document.getElementById('space');
@@ -76,8 +82,6 @@
 
     function draw() {
       ctx.clearRect(0, 0, w, h);
-
-      // BLACK HOLE MUTER
       blackHole.angle += 0.01;
       ctx.save();
       ctx.translate(blackHole.x, blackHole.y);
@@ -91,7 +95,6 @@
       ctx.fill();
       ctx.restore();
 
-      // BINTANG
       for (let i = 0; i < stars.length; i++) {
         let s = stars[i];
         s.a += (Math.random() - 0.5) * 0.05;
@@ -109,7 +112,6 @@
         ctx.fill();
       }
 
-      // METEOR
       for (let i = meteors.length - 1; i >= 0; i--) {
         let m = meteors[i];
         m.x += m.vx;
