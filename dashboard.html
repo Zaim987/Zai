@@ -20,13 +20,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Cek login
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = "login.html";
-  }
-});
-
 async function loadUsers() {
   const querySnapshot = await getDocs(collection(db, "users"));
   const list = document.getElementById("user-list");
@@ -42,12 +35,6 @@ async function loadUsers() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    document.getElementById('splash-screen').style.display = 'none';
-    document.getElementById('main-content').classList.remove('hidden');
-    loadUsers();
-  }, 3500);
-
   const logoutBtn = document.querySelector(".menu-btn.logout");
   logoutBtn?.addEventListener("click", () => {
     onAuthStateChanged(auth, async (user) => {
@@ -62,6 +49,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+  });
+
+  // Cek login + splash delay hanya jika login sukses
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+    } else {
+      setTimeout(() => {
+        document.getElementById('splash-screen').style.display = 'none';
+        document.getElementById('main-content').classList.remove('hidden');
+        loadUsers();
+      }, 3500);
+    }
   });
 });
 
