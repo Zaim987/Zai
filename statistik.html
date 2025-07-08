@@ -154,12 +154,14 @@ let unsubscribeMessages = null;
       transition: all 0.3s ease-in-out;
     }
     body {
-      background-color: #020202;
-      font-family: 'Orbitron', sans-serif;
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-    }
+  background-color: #020202;
+  font-family: 'Orbitron', sans-serif;
+  color: white;
+  height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
     .top-bar {
       display: flex;
       align-items: center;
@@ -192,14 +194,14 @@ let unsubscribeMessages = null;
       text-shadow: 0 0 5px cyan;
     }
     .chat-wrapper {
-  animation: fadeSlideDown 0.8s ease-out;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 0;
-}
+      animation: fadeSlideDown 0.8s ease-out;
+      height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
     .chat-box {
   flex-grow: 1;
   display: flex;
@@ -212,15 +214,17 @@ let unsubscribeMessages = null;
   border-radius: 12px;
   box-shadow: 0 0 20px cyan;
   gap: 1rem;
+  max-height: 400px;
+  overflow: hidden;
 }
     .message-list {
-      flex-grow: 1;
-      max-height: 400px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+  flex-grow: 1;
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
     .message {
       background-color: #111;
       padding: 0.75rem 1rem;
@@ -238,15 +242,9 @@ let unsubscribeMessages = null;
       color: black;
     }
     .chat-input {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  width: 100%;
-  max-width: 800px;
-  background-color: #000000;
-  box-shadow: 0 -3px 20px cyan;
-  border-top: 1px solid cyan;
-}
+      display: flex;
+      gap: 1rem;
+    }
     .chat-input input {
       flex-grow: 1;
       padding: 0.75rem;
@@ -274,11 +272,14 @@ let unsubscribeMessages = null;
       box-shadow: 0 0 10px cyan;
     }
     #users {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
     .user-item {
       padding: 0.5rem;
       border-bottom: 1px solid #333;
@@ -315,11 +316,11 @@ let unsubscribeMessages = null;
 <main class="chat-box">
 <h2 class="welcome-text">Selamat Datang!</h2>
 <div class="message-list" id="messages"></div>
-
-</main><div class="chat-input">
+<div class="chat-input">
 <input id="msgInput" placeholder="Ketik pesenmu..." type="text"/>
 <button onclick="sendMessage()">Kirim</button>
 </div>
+</main>
 <div id="user-list">
 <h3>Daftar Pengguna</h3>
 <div id="users"></div>
