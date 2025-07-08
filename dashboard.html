@@ -139,30 +139,37 @@
   padding: 2rem;
   text-align: center;
   opacity: 0;
-  animation: demoFade 2s ease-in-out 5s forwards;
+  animation: demoFade 0.5s ease-in-out 5s forwards;
 }
 
 .welcome-text {
   font-size: 2rem;
   margin-bottom: 1rem;
-  animation: typing 2.5s steps(30, end) 5s forwards;
-  white-space: nowrap;
-  overflow: hidden;
-  border-right: 2px solid cyan;
-  display: inline-block;
-  width: 0;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  animation: welcomeAnim 1.2s ease-out 5.5s forwards;
+  text-shadow: 0 0 10px cyan;
 }
 
 .desc-text {
   font-size: 1rem;
   color: #ccc;
   opacity: 0;
-  animation: fadeInText 1.2s ease-in-out 7.6s forwards;
+  transform: translateY(20px);
+  animation: descAnim 1s ease-out 6.5s forwards;
 }
 
-@keyframes fadeInText {
+@keyframes welcomeAnim {
   to {
     opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes descAnim {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -172,9 +179,10 @@
   }
 }
 
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+@keyframes fadeInText {
+  to {
+    opacity: 1;
+  }
 }
 
   </style>
