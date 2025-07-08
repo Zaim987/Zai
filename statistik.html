@@ -207,13 +207,21 @@
     }
 
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          currentDisplayName = userSnap.data().displayName || "Pengguna";
-          document.querySelector(".welcome-text").textContent = `Selamat Datang, ${currentDisplayName}!`;
+  if (user) {
+    currentUser = user;
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      currentDisplayName = userSnap.data().displayName || "Pengguna";
+    }
+
+    // 🧼 Reset UI DM sak login ben ora mode DM
+    dmTarget = null;
+    currentModeUid = null;
+    document.getElementById("dm-target-label").textContent = "";
+    document.querySelector(".welcome-text").textContent = `Selamat Datang, ${currentDisplayName}!`;
+  }!`;
         }
 
         const snapshot = await getDocs(collection(db, "users"));
