@@ -286,5 +286,20 @@ document.addEventListener("DOMContentLoaded", () => {
     el.style.opacity = "0"; // jaga-jaga overwrite manual inline style
   });
 });
-</script></body>
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const pengaturanBtn = [...document.querySelectorAll(".menu-btn")]
+      .find(btn => btn.textContent.trim() === "Pengaturan");
+
+    pengaturanBtn?.addEventListener("click", () => {
+      document.body.classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "set.html";
+      }, 700);
+    });
+  });
+</script>
+
+</body>
 </html>
