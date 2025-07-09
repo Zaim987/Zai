@@ -6,6 +6,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
 <!-- # START: CSS Internal -->
 <style>
+
+#toggleGlow {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 10000;
+  background: rgba(0,0,0,0.6);
+  color: cyan;
+  border: 1px solid cyan;
+  padding: 5px 10px;
+  font-family: monospace;
+  cursor: pointer;
+  border-radius: 5px;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+#toggleGlow:hover {
+  background: rgba(0,255,255,0.2);
+  color: #0ff;
+  border-color: #0ff;
+}
+.hidden {
+  display: none !important;
+}
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       width: 100%; height: 100%; background-color: #020202; color: white;
@@ -287,18 +312,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const pengaturanBtn = [...document.querySelectorAll(".menu-btn")]
-      .find(btn => btn.textContent.trim() === "Pengaturan");
+<button id="toggleGlow" onclick="toggleGlow()">💡 Border OFF</button>
 
-    pengaturanBtn?.addEventListener("click", () => {
-      document.body.classList.add("fade-out-up");
-      setTimeout(() => {
-        window.location.href = "set.html";
-      }, 700);
-    });
-  });
+<script>
+function toggleGlow() {
+  const border = document.querySelector('.glow-border');
+  if (border) {
+    border.classList.toggle('hidden');
+    const label = border.classList.contains('hidden') ? '💡 Border ON' : '💡 Border OFF';
+    document.getElementById("toggleGlow").textContent = label;
+  }
+}
 </script>
 
 </body>
