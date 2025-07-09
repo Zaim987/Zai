@@ -13,43 +13,33 @@
       font-family: 'Orbitron', sans-serif;
       overflow: hidden;
     }
-
     #splash-screen {
-      position: fixed; inset: 0;
-      background: black;
+      position: fixed; inset: 0; background: black;
       display: flex; align-items: center; justify-content: center;
-      flex-direction: column;
       z-index: 999;
       animation: splashOut 3s ease-in-out forwards;
     }
-
     .splash-logo {
-      font-size: 2.5rem;
-      color: white;
-      text-shadow: 0 0 15px cyan;
+      font-size: 2.5rem; color: white; text-shadow: 0 0 15px cyan;
       opacity: 0;
       animation: splashGlow 3s ease-in-out forwards;
     }
-
     @keyframes splashGlow {
       0% { opacity: 0; transform: scale(0.8); }
       50% { opacity: 1; transform: scale(1.05); }
       100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px cyan; }
     }
-
     @keyframes splashOut {
       0% { opacity: 1; }
       80% { opacity: 1; }
       100% { opacity: 0; visibility: hidden; }
     }
-
     .main-content {
       display: none;
       padding: 2rem;
       max-width: 600px;
       margin: 0 auto;
     }
-
     h1 {
       font-size: 2.5rem;
       color: cyan;
@@ -57,7 +47,6 @@
       margin-bottom: 2rem;
       opacity: 0;
     }
-
     .settings-container {
       background: rgba(0, 255, 255, 0.05);
       border: 1px solid cyan;
@@ -66,7 +55,6 @@
       box-shadow: 0 0 25px cyan;
       opacity: 0;
     }
-
     label, input, select, button, .back-link {
       display: block;
       width: 100%;
@@ -74,7 +62,6 @@
       font-family: inherit;
       font-size: 1rem;
     }
-
     input, select {
       padding: 10px;
       background: #111;
@@ -83,7 +70,6 @@
       border-radius: 5px;
       box-shadow: 0 0 5px cyan;
     }
-
     button {
       margin-top: 2rem;
       padding: 12px;
@@ -94,9 +80,7 @@
       font-weight: bold;
       cursor: pointer;
     }
-
     button:hover { background: #00e0e0; }
-
     .back-link {
       color: #ccc;
       font-size: 0.9rem;
@@ -105,16 +89,12 @@
       text-decoration: underline;
       cursor: pointer;
     }
-
     .back-link:hover { color: cyan; }
-
-    /* Animasi delay stagger */
     .stagger {
       opacity: 0;
       transform: translateY(20px);
       animation: fadeInUp 0.6s ease-out forwards;
     }
-
     .stagger:nth-child(1) { animation-delay: 3.2s; }
     .stagger:nth-child(2) { animation-delay: 3.4s; }
     .stagger:nth-child(3) { animation-delay: 3.6s; }
@@ -124,20 +104,13 @@
     .stagger:nth-child(7) { animation-delay: 4.4s; }
 
     @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splash-screen">
-    <div class="splash-logo">QuantumX</div>
-  </div>
+  <div id="splash-screen"><div class="splash-logo">QuantumX</div></div>
 
-  <!-- Main Content -->
   <div class="main-content" id="main-content">
     <h1 class="stagger">⚙️ Pengaturan Akun</h1>
     <div class="settings-container stagger">
@@ -163,19 +136,58 @@
       window.location.href = "dashboard.html";
     }
 
-    document.getElementById("settings-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const nama = document.getElementById("username").value || "Zaim";
-      const tema = document.getElementById("theme").value;
-
-      alert(`✅ Disimpen!\nNama: ${nama}\nTema: ${tema}`);
-    });
-
-    // Tampilke konten sawise splash ilang
     window.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         document.getElementById("main-content").style.display = "block";
-      }, 3100); // sakdurunge animasi splashOut rampung
+      }, 3100);
+    });
+  </script>
+
+  <!-- FIREBASE SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const usernameInput = document.getElementById("username");
+    const themeSelect = document.getElementById("theme");
+    const form = document.getElementById("settings-form");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const displayName = usernameInput.value || "Zaim";
+          const theme = themeSelect.value;
+
+          try {
+            await setDoc(doc(db, "users", user.uid), {
+              displayName,
+              theme
+            });
+            alert("✅ Pengaturan Disimpen ke Firestore!");
+          } catch (err) {
+            console.error("❌ Gagal nyimpen:", err);
+            alert("❌ Gagal nyimpen pengaturan!");
+          }
+        });
+      } else {
+        alert("⚠️ Belum login! Arahke login page.");
+        window.location.href = "login.html";
+      }
     });
   </script>
 </body>
