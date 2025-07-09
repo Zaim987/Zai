@@ -200,8 +200,10 @@ body[data-theme="cyberpunk"] {
     const form = document.getElementById("settings-form");
 
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-    console.log(\"👤 UID LOGIN:\", user.uid);
+      const docRef = doc(db, \"users\", user.uid);
+const docSnap = await getDoc(docRef);
+if (user) {
+    console.log("👤 UID LOGIN:", user.uid);
     if (docSnap.exists()) {
       const data = docSnap.data();
       const theme = data.theme || "default";
