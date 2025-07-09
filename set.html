@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pengaturan QuantumX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #010101; color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
+    }
+
+    #splash-screen {
+      position: fixed; inset: 0;
+      background: black;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+      animation: splashOut 3s ease-in-out forwards;
+    }
+
+    .splash-logo {
+      font-size: 2.5rem;
+      color: white;
+      text-shadow: 0 0 15px cyan;
+      opacity: 0;
+      animation: splashGlow 3s ease-in-out forwards;
+    }
+
+    @keyframes splashGlow {
+      0% { opacity: 0; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px cyan; }
+    }
+
+    @keyframes splashOut {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    .main-content {
+      display: none;
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: cyan;
+      text-shadow: 0 0 20px cyan;
+      margin-bottom: 2rem;
+      opacity: 0;
+    }
+
+    .settings-container {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid cyan;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 25px cyan;
+      opacity: 0;
+    }
+
+    label, input, select, button, .back-link {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    input, select {
+      padding: 10px;
+      background: #111;
+      border: 1px solid cyan;
+      color: white;
+      border-radius: 5px;
+      box-shadow: 0 0 5px cyan;
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 12px;
+      background: cyan;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover { background: #00e0e0; }
+
+    .back-link {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .back-link:hover { color: cyan; }
+
+    /* Animasi delay stagger */
+    .stagger {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .stagger:nth-child(1) { animation-delay: 3.2s; }
+    .stagger:nth-child(2) { animation-delay: 3.4s; }
+    .stagger:nth-child(3) { animation-delay: 3.6s; }
+    .stagger:nth-child(4) { animation-delay: 3.8s; }
+    .stagger:nth-child(5) { animation-delay: 4s; }
+    .stagger:nth-child(6) { animation-delay: 4.2s; }
+    .stagger:nth-child(7) { animation-delay: 4.4s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <div class="splash-logo">QuantumX</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="main-content">
+    <h1 class="stagger">⚙️ Pengaturan Akun</h1>
+    <div class="settings-container stagger">
+      <form id="settings-form">
+        <label for="username" class="stagger">Nama Pengguna</label>
+        <input type="text" id="username" placeholder="Zaim Moder Handal" class="stagger"/>
+
+        <label for="theme" class="stagger">Tema Tampilan</label>
+        <select id="theme" class="stagger">
+          <option value="default">Default (Neon)</option>
+          <option value="dark">Dark Mode</option>
+          <option value="cyberpunk">Cyberpunk</option>
+        </select>
+
+        <button type="submit" class="stagger">💾 Simpen Pengaturan</button>
+        <div class="back-link stagger" onclick="goBack()">⬅️ Kembali ke Dashboard</div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = "dashboard.html";
+    }
+
+    document.getElementById("settings-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const nama = document.getElementById("username").value || "Zaim";
+      const tema = document.getElementById("theme").value;
+
+      alert(`✅ Disimpen!\nNama: ${nama}\nTema: ${tema}`);
+    });
+
+    // Tampilke konten sawise splash ilang
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        document.getElementById("main-content").style.display = "block";
+      }, 3100); // sakdurunge animasi splashOut rampung
+    });
+  </script>
+</body>
+</html>
