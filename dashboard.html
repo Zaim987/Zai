@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-<!-- # START: Bagian <head> - metadata lan CSS --> <meta charset="utf-8"/>
+<meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>QuantumX Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
-<!-- # START: CSS Internal -->
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -158,8 +157,6 @@
   }
 }
 </style>
-<!-- # END: CSS Internal -->
-<!-- # START: Script Interaktif -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
   const menuBtns = document.querySelectorAll(".menu-btn");
@@ -189,19 +186,12 @@
 });
 
     </script>
-<!-- # END: Script Interaktif -->
-<!-- # END: Bagian <head> -->
 </head>
 <body>
-<!-- # START: Bagian <body> -->
-<!-- # START: Splash Screen -->
 <div id="splash-screen">
 <h1 class="splash-logo">QuantumX</h1>
 </div>
-<!-- # END: Splash Screen -->
-<!-- # START: Konten Utama -->
 <div class="hidden" id="main-content">
-<!-- # START: Header Navigasi -->
 <header class="top-bar">
 <div class="logo">QuantumX</div>
 <div class="scroll-wrapper">
@@ -214,13 +204,10 @@
 </nav>
 </div>
 </header>
-<!-- # END: Header Navigasi -->
-<!-- # START: Dashboard Utama -->
 <main class="dashboard">
 <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
 <p class="desc-text">Iki Perubahan Dunia Modern Ini Sekarang Bukan Nanti</p>
-<div id="user-list"></div>
-<!-- # START: Artikel Extra -->
+
 <div class="extra-content-wrapper">
 <div class="extra-content">
 <h2 class="stagger-item" style="animation-delay: 0.00s;">Artikel Menarik</h2>
@@ -257,27 +244,11 @@
 <p class="stagger-item" style="animation-delay: 3.75s;">ROG dudu mung laptop, iki mimpi anak cilik sing wis kesel dicibir PC rakitan. Kowe pengin menang ngelawan musuh, opo kalah karo lag? Nek isih nge-lag nganggo ROG, berarti setan ono nang RAM-mu, asu! 🐶</p>
 </div>
 </div>
-<!-- # END: Artikel Extra -->
 </main>
-<!-- # END: Dashboard Utama -->
 </div>
-<!-- # END: Konten Utama -->
-<!-- # START: Script Auth Guard -->
 <script src="js/auth-guard.js" type="module"> </script>
 
-<!-- # Script load-users (displayName & daftar user) -->
-<script src="js/load-users.js" type="module"> </script>
-
-<!-- ✅ Tambah script pemanggil -->
-<script type="module">
-  import { loadUsers } from "./js/load-users.js";
-  loadUsers();
-</script>
-
-<!-- # Script Logout -->
 <script src="js/logout.js" type="module"> </script>
-<!-- # END: Script Interaktif -->
-<!-- # END: Bagian <body> -->
 <script>
 // # Staggered Ninja Reveal Artikel ROG
 document.addEventListener("DOMContentLoaded", () => {
