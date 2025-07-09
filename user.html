@@ -176,38 +176,66 @@
     
     <script src="js/logout.js" type="module"></script>
 
-    <script type="module">
-        // Import fungsi yang diperlukan dari Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    <!-- ✅ GANTI DENGAN INI -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
-// Tambahkan ini di akhir
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-const auth = getAuth(app);
+  const firebaseConfig = {
+    apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+    authDomain: "quantechapp.firebaseapp.com",
+    projectId: "quantechapp",
+    storageBucket: "quantechapp.appspot.com",
+    messagingSenderId: "825384610343",
+    appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+  };
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    fetchAndDisplayUsers(); // login valid, gas fetch
-  } else {
-    window.location.href = "login.html"; // belum login? diusirrr
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  async function fetchAndDisplayUsers() {
+    const container = document.getElementById('user-list-container');
+    container.innerHTML = '';
+    let delay = 2.5;
+
+    try {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      querySnapshot.forEach((doc) => {
+        const user = doc.data();
+        const role = user.role || 'member';
+        const roleClass = role.toLowerCase() === 'admin' ? 'admin' : 'member';
+
+        const userCard = document.createElement('div');
+        userCard.className = 'user-card stagger-item';
+        userCard.style.animationDelay = `${delay}s`;
+        userCard.innerHTML = `
+          <div class="avatar">👤</div>
+          <div class="user-info">
+            <h3>${user.displayName || 'Tanpa Nama'}</h3>
+            <p>${user.email || 'Tanpa Email'}</p>
+          </div>
+          <span class="role ${roleClass}">${role}</span>
+        `;
+        container.appendChild(userCard);
+        delay += 0.2;
+      });
+    } catch (error) {
+      console.error("Error fetching users: ", error);
+      container.innerHTML = `<p style="color: red; text-align: center;">Gagal memuat data pengguna. Cek console (F12).</p>`;
+    }
   }
-});
 
-        // GANTI DENGAN KONFIGURASI FIREBASE ANDA
-        
-const firebaseConfig = {
-  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-  authDomain: "quantechapp.firebaseapp.com",
-  projectId: "quantechapp",
-  storageBucket: "quantechapp.appspot.com",
-  messagingSenderId: "825384610343",
-  appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-};
-
-        // Inisialisasi Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      fetchAndDisplayUsers();
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+</script>
+<!-- ✅ SAMPAI SINI -->
         // Fungsi untuk mengambil dan menampilkan data pengguna
         async function fetchAndDisplayUsers() {
             const container = document.getElementById('user-list-container');
