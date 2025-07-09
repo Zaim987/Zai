@@ -161,42 +161,34 @@
 <!-- # END: CSS Internal -->
 <!-- # START: Script Interaktif -->
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
   const menuBtns = document.querySelectorAll(".menu-btn");
   const mainContent = document.getElementById("main-content");
 
   menuBtns.forEach((btn) => {
-    const text = btn.textContent.trim();
+    if (btn.textContent.trim() === "Chat") {
+      btn.addEventListener("click", () => {
+        const dashboardItems = mainContent.querySelectorAll(".dashboard > *");
+        const topBarItems = mainContent.querySelectorAll(".top-bar > *");
+        const elementsToFade = [...dashboardItems, ...topBarItems];
 
-    const handleRedirect = (target) => {
-      const dashboardItems = mainContent.querySelectorAll(".dashboard > *");
-      const topBarItems = mainContent.querySelectorAll(".top-bar > *");
-      const elementsToFade = [...dashboardItems, ...topBarItems];
+        let delay = 0;
+        elementsToFade.forEach((el, i) => {
+          setTimeout(() => {
+            el.classList.add("fade-out-up");
+          }, delay);
+          delay += 300;
+        });
 
-      let delay = 0;
-      elementsToFade.forEach((el) => {
         setTimeout(() => {
-          el.classList.add("fade-out-up");
-        }, delay);
-        delay += 300;
+          window.location.href = "statistik.html";
+        }, delay + 700);
       });
-
-      setTimeout(() => {
-        window.location.href = target;
-      }, delay + 700);
-    };
-
-    if (text === "Chat") {
-      btn.addEventListener("click", () => handleRedirect("statistik.html"));
-    }
-
-    // ✅ Tombol Pengaturan redirect ke set.html
-    if (text === "Pengaturan") {
-      btn.addEventListener("click", () => handleRedirect("set.html"));
     }
   });
 });
-</script>
+
+    </script>
 <!-- # END: Script Interaktif -->
 <!-- # END: Bagian <head> -->
 </head>
