@@ -148,51 +148,8 @@
             <h1 class="welcome-text">Manajemen Pengguna</h1>
             <p class="desc-text">Kelola semua pengguna yang terdaftar di sistem QuantumX.</p>
 
-            <div class="user-list-container">
-                <div class="user-card stagger-item" style="animation-delay: 2.5s;">
-                    <div class="avatar">👤</div>
-                    <div class="user-info">
-                        <h3>Zaim Milzam</h3>
-                        <p>zaim.milzam@email.com</p>
-                    </div>
-                    <span class="role admin">Admin</span>
+            <div class="user-list-container" id="user-list-container">
                 </div>
-
-                <div class="user-card stagger-item" style="animation-delay: 2.7s;">
-                    <div class="avatar">👤</div>
-                    <div class="user-info">
-                        <h3>Budi Santoso</h3>
-                        <p>budi.s@email.com</p>
-                    </div>
-                    <span class="role member">Member</span>
-                </div>
-
-                <div class="user-card stagger-item" style="animation-delay: 2.9s;">
-                    <div class="avatar">👤</div>
-                    <div class="user-info">
-                        <h3>Citra Lestari</h3>
-                        <p>citra.l@email.com</p>
-                    </div>
-                    <span class="role member">Member</span>
-                </div>
-
-                <div class="user-card stagger-item" style="animation-delay: 3.1s;">
-                    <div class="avatar">👤</div>
-                    <div class="user-info">
-                        <h3>David Gunawan</h3>
-                        <p>david.g@email.com</p>
-                    </div>
-                    <span class="role member">Member</span>
-                </div>
-                 <div class="user-card stagger-item" style="animation-delay: 3.3s;">
-                    <div class="avatar">👤</div>
-                    <div class="user-info">
-                        <h3>Eka Putri</h3>
-                        <p>eka.p@email.com</p>
-                    </div>
-                    <span class="role member">Member</span>
-                </div>
-            </div>
         </main>
     </div>
 
@@ -204,18 +161,13 @@
             .find(btn => btn.textContent.trim() === buttonText);
 
           button?.addEventListener("click", () => {
-            // Jika sudah di halaman yang dituju, jangan lakukan apa-apa
             if (window.location.href.endsWith(targetUrl)) return;
-            
             document.body.classList.add("fade-out-up");
-            setTimeout(() => {
-              window.location.href = targetUrl;
-            }, 700);
+            setTimeout(() => { window.location.href = targetUrl; }, 700);
           });
         };
 
-        // Mengatur navigasi untuk setiap tombol
-        handleNavClick("Dashboard", "dashboard.html"); // Ganti "dashboard.html" dengan nama file dashboard utama Anda
+        handleNavClick("Dashboard", "dashboard.html");
         handleNavClick("Chat", "statistik.html");
         handleNavClick("Pengaturan", "set.html");
         handleNavClick("Pengguna", "user.html");
@@ -223,5 +175,75 @@
     </script>
     
     <script src="js/logout.js" type="module"></script>
+
+    <script type="module">
+        // Import fungsi yang diperlukan dari Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+        // GANTI DENGAN KONFIGURASI FIREBASE ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "quantechapp.firebaseapp.com",
+            projectId: "quantechapp",
+            storageBucket: "quantechapp.appspot.com",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Fungsi untuk mengambil dan menampilkan data pengguna
+        async function fetchAndDisplayUsers() {
+            const container = document.getElementById('user-list-container');
+            // Kosongkan kontainer dari data statis
+            container.innerHTML = '';
+            
+            // Atur delay awal untuk animasi stagger
+            let animationDelay = 2.5; 
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+
+                    // Buat elemen div utama untuk kartu pengguna
+                    const userCard = document.createElement('div');
+                    userCard.className = 'user-card stagger-item';
+                    userCard.style.animationDelay = `${animationDelay}s`;
+
+                    // Tentukan kelas untuk role (default 'member' jika tidak ada)
+                    const role = user.role || 'member'; // Asumsi ada field 'role'
+                    const roleClass = role.toLowerCase() === 'admin' ? 'admin' : 'member';
+
+                    // Isi HTML untuk kartu pengguna
+                    userCard.innerHTML = `
+                        <div class="avatar">👤</div>
+                        <div class="user-info">
+                            <h3>${user.displayName || 'Nama Tidak Ada'}</h3>
+                            <p>${user.email || 'Email Tidak Ada'}</p>
+                        </div>
+                        <span class="role ${roleClass}">${role}</span>
+                    `;
+
+                    // Tambahkan kartu ke kontainer
+                    container.appendChild(userCard);
+
+                    // Tambah delay untuk kartu berikutnya
+                    animationDelay += 0.2;
+                });
+
+            } catch (error) {
+                console.error("Error fetching users: ", error);
+                container.innerHTML = `<p style="color: #ff4757; text-align: center;">Gagal memuat data pengguna. Cek konsol (F12).</p>`;
+            }
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        fetchAndDisplayUsers();
+    </script>
 </body>
 </html>
