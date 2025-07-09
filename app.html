@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuantumX Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; background-color: #020202; color: white;
+      font-family: 'Orbitron', sans-serif; overflow: hidden;
+    }
+    .hidden { display: none; }
+    #splash-screen {
+      position: fixed; inset: 0; background-color: black;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 999;
+      animation: splashIntro 3s ease-in-out forwards;
+    }
+    .splash-logo {
+      font-size: 2.5rem; color: white; opacity: 0;
+      text-shadow: 0 0 15px cyan;
+      animation: splashGlow 3s ease-in-out forwards;
+    }
+    @keyframes splashGlow {
+      0% { opacity: 0; transform: scale(0.8); text-shadow: none; }
+      50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 5px cyan; }
+      100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px cyan; }
+    }
+    @keyframes splashIntro {
+      0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; }
+    }
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem; background-color: black; gap: 1rem;
+      overflow: hidden; opacity: 0;
+      animation: fadeInText 1s ease-out 3.5s forwards;
+    }
+    .logo {
+      font-size: 1.5rem; font-weight: bold;
+      text-shadow: 0 0 10px cyan; white-space: nowrap;
+      pointer-events: none;
+    }
+    .scroll-wrapper { overflow-x: auto; flex-grow: 1; }
+    .scroll-wrapper::-webkit-scrollbar { display: none; }
+    .menu-bar {
+      display: flex; gap: 1rem; width: max-content;
+    }
+    .menu-btn {
+      background: none; color: white; border: none; font-size: 1rem;
+      cursor: pointer; opacity: 0; transform: translateY(-10px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .menu-btn:nth-child(1) { animation-delay: 3.8s; }
+    .menu-btn:nth-child(2) { animation-delay: 4s; }
+    .menu-btn:nth-child(3) { animation-delay: 4.2s; }
+    .menu-btn:nth-child(4) { animation-delay: 4.4s; }
+    .menu-btn:nth-child(5) { animation-delay: 4.6s; }
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dashboard {
+      padding: 2rem; text-align: center;
+      opacity: 0; animation: demoFade 0.5s ease-in-out 5s forwards;
+    }
+    .welcome-text {
+      font-size: 2rem; margin-bottom: 1rem;
+      opacity: 0; transform: translateY(20px) scale(0.95);
+      animation: welcomeAnim 1.2s ease-out 5.5s forwards;
+      text-shadow: 0 0 10px cyan;
+    }
+    .desc-text {
+      font-size: 1rem; color: #ccc;
+      opacity: 0; transform: translateY(20px);
+      animation: descAnim 1s ease-out 6.5s forwards;
+    }
+    #user-list {
+      margin-top: 1rem;
+      text-align: left;
+      max-width: 600px;
+      margin-inline: auto;
+    }
+    .user-item {
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: fadeLine 0.6s ease-out forwards;
+      padding: 4px 0;
+    }
+    @keyframes welcomeAnim {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes descAnim {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeLine {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes demoFade {
+      to { opacity: 1; }
+    }
+    @keyframes fadeInText {
+      to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    .fade-out {
+      animation: fadeOut 0.6s ease-in-out forwards;
+    }
+    .extra-content-wrapper {
+  margin-top: 3rem;
+  height: 400px;
+  overflow-y: auto;
+  max-width: 700px;
+  margin-inline: auto;
+  background-color: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+    .extra-content {
+      padding: 1rem 1rem 3rem;
+      text-align: left;
+      animation: fadeInText 1s ease-out 7s forwards;
+      opacity: 0;
+    }
+    .extra-content h2 {
+      color: #00f0ff;
+      margin-bottom: 1rem;
+    }
+    .extra-content h3 {
+      color: #00d2ff;
+      margin-top: 1.2rem;
+    }
+    .extra-content p {
+      color: #ccc;
+      line-height: 1.6;
+    }
+@keyframes fadeOutUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+}
+.fade-out-up {
+  animation: fadeOutUp 0.6s ease-in-out forwards;
+}
+    
+/* # Animasi Staggered Ninja ROG */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: staggerFadeUp 0.6s ease-out forwards;
+}
+@keyframes staggerFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const menuBtns = document.querySelectorAll(".menu-btn");
+  const mainContent = document.getElementById("main-content");
+
+  menuBtns.forEach((btn) => {
+    if (btn.textContent.trim() === "Chat") {
+      btn.addEventListener("click", () => {
+        const dashboardItems = mainContent.querySelectorAll(".dashboard > *");
+        const topBarItems = mainContent.querySelectorAll(".top-bar > *");
+        const elementsToFade = [...dashboardItems, ...topBarItems];
+
+        let delay = 0;
+        elementsToFade.forEach((el, i) => {
+          setTimeout(() => {
+            el.classList.add("fade-out-up");
+          }, delay);
+          delay += 300;
+        });
+
+        setTimeout(() => {
+          window.location.href = "statistik.html";
+        }, delay + 700);
+      });
+    }
+  });
+});
+
+    </script>
+</head>
+<body>
+  <nav>
+    <!-- Nav bisa diganti dinamis, contoh button logout, link dashboard, dll -->
+    <a href="#login">Login</a> |
+    <a href="#register">Register</a> |
+    <a href="#dashboard">Dashboard</a> |
+    <a href="#user">User</a> |
+    <a href="#set">Set</a> |
+    <a href="#statistik">Statistik</a>
+  </nav>
+
+  <div id="app"></div>
+
+  
+<template id="page-login">
+<body>
+  <div class="login-container">
+    <div id="logo" class="logo-text fade-in fade-delay-1">QuantumX</div>
+    <div id="headline" class="headline fade-in fade-delay-2">Selamat datang kembali</div>
+    <form id="loginForm" class="fade-in fade-delay-3">
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <div id="error" class="error"></div>
+    </form>
+    <div id="registerLink" class="fade-in fade-delay-4">
+      <a id="toRegister" href="register.html">Belum Punya Akun, Register</a>
+    </div>
+  </div>  <!-- ✅ Auto login notice -->  <div id="autoLoginNotice">
+    <div>✅ Sudah masuk</div>
+    <div id="countdown">8</div>
+  </div>  <!-- ✅ Fix: Tambahkan firebase-init lebih dulu -->  <script type="module" src="js/firebase-init.js"></script>  <script type="module" src="js/wislogin.js"></script>  <script type="module" src="js/login.js"></script>
+</template>
+
+<template id="page-register">
+<body>
+  <div id="overlay"></div>
+  <div class="register-container">
+    <div class="logo-text fade-in fade-delay-1">QuantumX</div>
+    <div class="headline fade-in fade-delay-2">Buat akun baru</div>
+    <form id="registerForm" class="fade-in fade-delay-3">
+      <input id="name" type="text" placeholder="Nama lengkap" required />
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <button type="submit">Daftar</button>
+      <div id="error" class="error"></div>
+    </form>
+    <div class="fade-in fade-delay-5"><a href="login.html">Sudah punya akun? Login</a></div>
+  </div>
+
+  
+<script type="module" src="js/register.js"></script>
+
+</template>
+
+<template id="page-dashboard">
+<body>
+<div id="splash-screen">
+<h1 class="splash-logo">QuantumX</h1>
+</div>
+<div class="hidden" id="main-content">
+<header class="top-bar">
+<div class="logo">QuantumX</div>
+<div class="scroll-wrapper">
+<nav class="menu-bar">
+<button class="menu-btn">Dashboard</button>
+<button class="menu-btn">Chat</button>
+<button class="menu-btn">Pengguna</button>
+<button class="menu-btn">Pengaturan</button>
+<button class="menu-btn logout">Logout</button>
+</nav>
+</div>
+</header>
+<main class="dashboard">
+<h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+<p class="desc-text">Iki Perubahan Dunia Modern Ini Sekarang Bukan Nanti</p>
+
+<div class="extra-content-wrapper">
+<div class="extra-content">
+<h2 class="stagger-item" style="animation-delay: 0.00s;">Artikel Menarik</h2>
+<h3 class="stagger-item" style="animation-delay: 0.15s;">ROG: Raja Gaming Hardware</h3>
+<p class="stagger-item" style="animation-delay: 0.30s;">Republic of Gamers (ROG) wis dadi legenda ning dunia gaming hardware. Wiwit GPU, motherboard, nganti laptop, kabeh produké ROG nduweni performa edan lan desain sing futuristik. Nek kowe gamer sejati, ROG mesthi ana nang wishlist-mu!</p>
+<h3 class="stagger-item" style="animation-delay: 0.45s;">5 Tips Merawat Laptop Gaming</h3>
+<p class="stagger-item" style="animation-delay: 0.60s;">Laptop gaming butuh perhatian ekstra. Jaga suhu tetep adem nganggo cooling pad, bersihin kipas secara berkala, gunakake charger asli, lan aja nganti main sambil nutupi ventilasi. Rawat apik, performane tetep ndrodok!</p>
+<h3 class="stagger-item" style="animation-delay: 0.75s;">Sejarah ROG lan Inovasi Edan</h3>
+<p class="stagger-item" style="animation-delay: 0.90s;">ROG lahir tahun 2006 minangka sub-brand ASUS kanggo para gamer hardcore. Saka motherboard munggah dadi laptop, nganti peripheral kabeh disemproti teknologi canggih. Contohe? Sistem pendingin liquid chamber, RGB addressable, keyboard opto-mechanical, sampe layar mini-LED 240Hz.</p>
+<p class="stagger-item" style="animation-delay: 1.05s;">Inovasi ora mandeg. ROG nyedekake AI cooling, teknologi mux switch dinamis, lan desain portable tanpa ngorbanke performa. ROG ngerteni apa sing gamer butuh: performa, gaya, lan kontrol total. Iki alasan kenapa ROG terus ana ning papan paling dhuwur industri gaming hardware.</p>
+<h3 class="stagger-item" style="animation-delay: 1.20s;">Apa Bedane ROG karo Sing Liyane?</h3>
+<p class="stagger-item" style="animation-delay: 1.35s;">ROG ora mung kuat, tapi uga tampil beda. Build quality premium, fitur eksklusif kaya Armoury Crate lan Keystone, aesthetic desain cyberpunk, kabeh digabung karo spek ganas. Siji tembung: karismatik. Nek nguripke ROG, rasane kaya nguripke tank modern sing bisa joget. 😎</p>
+<h3 class="stagger-item" style="animation-delay: 1.50s;">Worth it ora ROG kuwi?</h3>
+<p class="stagger-item" style="animation-delay: 1.65s;">Yen budgetmu cukup lan kowe pengin perangkat sing ora mung sekadar ngangkat game, tapi uga ngangkat gengsimu... ROG iku jawabane. Saka casual gamer nganti pro e-sport, ROG menehi pengalaman maksimal — ora mung fps tinggi, tapi rasa bangga ning saben ketik tombol lan klik mouse.</p>
+<h3 class="stagger-item" style="animation-delay: 1.80s;">Ngapa Aku Pilih ROG, Dudu Laptop Biasa?</h3>
+<p class="stagger-item" style="animation-delay: 1.95s;">Nek kowe ngerti bedane mie rebus karo mie instan + toping telur + kornet + cabe 5, yo kuwi bedane laptop biasa karo ROG. Laptop biasa? Yo mung iso buka browser, nulis tugas. Tapi ROG? Nguripke game sak jagad, render Blender, ngedit video sambil ngrokok ngidul. Nganti BIOS wae glowing, ngecas rasane kayak ngisi chakra.</p>
+<h3 class="stagger-item" style="animation-delay: 2.10s;">Game Sing Cocok Nek Wis Duwe ROG</h3>
+<ul class="stagger-item" style="animation-delay: 2.25s;">
+<li class="stagger-item" style="animation-delay: 2.40s;"><strong>Cyberpunk 2077</strong> – iso ultra tanpa ritual tolak bala</li>
+<li class="stagger-item" style="animation-delay: 2.55s;"><strong>Valorant</strong> – crosshair gerak luwih cepet ketimbang pikiran</li>
+<li class="stagger-item" style="animation-delay: 2.70s;"><strong>Elden Ring</strong> – mlayu-mlayu ning alam semesta, fps stabil</li>
+<li class="stagger-item" style="animation-delay: 2.85s;"><strong>Minecraft RTX</strong> – omah desa rasa villa Bali</li>
+</ul>
+<h3 class="stagger-item" style="animation-delay: 3.00s;">Tips Supaya ROGmu Ora Mlethek Awal</h3>
+<p class="stagger-item" style="animation-delay: 3.15s;">- Aja digowo turu, ojo ngeteh bareng adaptor<br/>
+          - Charger asli, nek ilang... mending ilang mantan<br/>
+          - Kipas dudu sarang laba-laba, kudu disayang<br/>
+          - RGB apik, tapi ojo nganti ngalahne cahayane masa depanmu</p>
+<h3 class="stagger-item" style="animation-delay: 3.30s;">Rasa Bangga Sing Muncul Nek Nggowo ROG</h3>
+<p class="stagger-item" style="animation-delay: 3.45s;">Kanca: “Wah iki laptop-mu murup dewe?”<br/>
+          Tukang servis: “Iki gak usah tak oprek, tak pujani wae.”<br/>
+          Loading screen? Wis ilang sadurunge sampeyan ndelok</p>
+<h3 class="stagger-item" style="animation-delay: 3.60s;">Penutup</h3>
+<p class="stagger-item" style="animation-delay: 3.75s;">ROG dudu mung laptop, iki mimpi anak cilik sing wis kesel dicibir PC rakitan. Kowe pengin menang ngelawan musuh, opo kalah karo lag? Nek isih nge-lag nganggo ROG, berarti setan ono nang RAM-mu, asu! 🐶</p>
+</div>
+</div>
+</main>
+</div>
+<script src="js/auth-guard.js" type="module"> </script>
+
+<script src="js/logout.js" type="module"> </script>
+<script>
+// # Staggered Ninja Reveal Artikel ROG
+document.addEventListener("DOMContentLoaded", () => {
+  const items = document.querySelectorAll(".stagger-item");
+  items.forEach((el) => {
+    el.style.opacity = "0"; // jaga-jaga overwrite manual inline style
+  });
+});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const pengaturanBtn = [...document.querySelectorAll(".menu-btn")]
+      .find(btn => btn.textContent.trim() === "Pengaturan");
+
+    pengaturanBtn?.addEventListener("click", () => {
+      document.body.classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "set.html";
+      }, 700);
+    });
+  });
+</script>
+
+<script>
+  // Skrip untuk tombol Pengguna
+  document.addEventListener("DOMContentLoaded", () => {
+    const penggunaBtn = [...document.querySelectorAll(".menu-btn")]
+      .find(btn => btn.textContent.trim() === "Pengguna");
+
+    penggunaBtn?.addEventListener("click", () => {
+      document.body.classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "user.html";
+      }, 700);
+    });
+  });
+</script>
+
+
+</template>
+
+<template id="page-user">
+<body>
+  <div class="top-bar">
+    <div class="logo">QuantumX</div>
+    <div class="menu-bar">
+      <button class="menu-btn">Dashboard</button>
+      <button class="menu-btn">Chat</button>
+      <button class="menu-btn">Pengguna</button>
+      <button class="menu-btn">Pengaturan</button>
+      <button class="menu-btn logout">Logout</button>
+    </div>
+  </div>
+
+  <main class="dashboard">
+    <h1 class="welcome-text">Manajemen Pengguna</h1>
+    <p class="desc-text">Kelola semua pengguna yang terdaftar di sistem QuantumX.</p>
+
+    <div style="text-align:center; margin-bottom: 1rem;">
+      <button class="role-filter" data-role="all">Semua</button>
+      <button class="role-filter" data-role="admin">Admin</button>
+      <button class="role-filter" data-role="member">Member</button>
+      <button id="export-csv"> Export CSV</button>
+    </div>
+
+    <div id="loading-spinner"><div class="spinner-circle"></div></div>
+    <div class="user-list-container" id="user-list-container"></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    async function fetchAndDisplayUsers(filterRole = "all") {
+      const container = document.getElementById('user-list-container');
+      const loader = document.getElementById('loading-spinner');
+      container.innerHTML = '';
+      loader.style.display = 'flex';
+      let delay = 2.5;
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+          const user = doc.data();
+          const role = user.role || 'member';
+          if (filterRole !== "all" && role.toLowerCase() !== filterRole.toLowerCase()) return;
+          const roleClass = role.toLowerCase() === 'admin' ? 'admin' : 'member';
+          const userCard = document.createElement('div');
+          userCard.className = 'user-card stagger-item';
+          userCard.style.animationDelay = `${delay}s`;
+
+          const avatarHTML = user.photoURL
+            ? `<img src="${user.photoURL}" alt="Avatar" class="avatar-img" />`
+            : `<div class="avatar"></div>`;
+
+          userCard.innerHTML = `
+            ${avatarHTML}
+            <div class="user-info">
+              <h3>${user.displayName || 'Tanpa Nama'}</h3>
+              <p>${user.email || 'Tanpa Email'}</p>
+            </div>
+            <span class="role ${roleClass}">${role}</span>
+          `;
+          container.appendChild(userCard);
+          delay += 0.2;
+        });
+      } catch (error) {
+        console.error("Error fetching users: ", error);
+        container.innerHTML = `<p style="color: red; text-align: center;">Gagal memuat data pengguna. Cek console (F12).</p>`;
+      } finally {
+        loader.style.display = 'none';
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+          alert("Data pengguna tidak ditemukan.");
+          window.location.href = "dashboard.html";
+          return;
+        }
+        const userData = userSnap.data();
+        const role = (userData.role || "member").toLowerCase();
+        if (role !== "admin") {
+          showAdminAlert(); setTimeout(() => { window.location.href = "dashboard.html"; }, 2000);
+          window.location.href = "dashboard.html";
+          return;
+        }
+        fetchAndDisplayUsers();
+      } catch (error) {
+        console.error("Gagal mengambil data user:", error);
+        alert("Terjadi kesalahan. Coba lagi.");
+        window.location.href = "dashboard.html";
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('.role-filter').forEach(button => {
+        button.addEventListener('click', () => {
+          const role = button.getAttribute('data-role');
+          fetchAndDisplayUsers(role);
+        });
+      });
+    });
+
+    document.getElementById("export-csv").addEventListener("click", async () => {
+      const csvRows = [["Display Name", "Email", "Role"]];
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+          const user = doc.data();
+          const row = [
+            `"${user.displayName || 'Tanpa Nama'}"`,
+            `"${user.email || 'Tanpa Email'}"`,
+            `"${user.role || 'member'}"`
+          ];
+          csvRows.push(row);
+        });
+        const csvContent = csvRows.map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "users.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error("Gagal export CSV:", err);
+        alert("Gagal export data. Cek console.");
+      }
+    });
+  
+function showAdminAlert() {
+  document.getElementById('adminAlert').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('adminAlert').classList.add('hidden');
+}
+
+</script>
+
+<!-- MODAL ADMIN GLOWING ENABLED -->
+<div id="adminAlert" class="custom-modal hidden">
+  <div class="modal-content">
+    <h3>⚠️ Akses Ditolak</h3>
+    <p>Hanya admin yang boleh masuk.</p>
+    <button onclick="closeModal()">Oke</button>
+  </div>
+</div>
+
+
+</template>
+
+<template id="page-set">
+<body>
+  <div id="splash-screen"><div class="splash-logo">QuantumX</div></div>
+
+  <div class="main-content" id="main-content">
+    <h1 class="stagger">⚙️ Pengaturan Akun</h1>
+    <div class="settings-container stagger">
+      <form id="settings-form">
+        <label for="username" class="stagger">Nama Pengguna</label>
+        <input type="text" id="username" placeholder="Zaim Moder Handal" class="stagger"/>
+
+        <label for="theme" class="stagger">Tema Tampilan</label>
+        <select id="theme" class="stagger">
+          <option value="default">Default (Neon)</option>
+          <option value="dark">Dark Mode</option>
+          <option value="cyberpunk">Cyberpunk</option>
+        </select>
+
+        <button type="submit" class="stagger">💾 Simpen Pengaturan</button>
+        <div class="back-link stagger" onclick="goBack()">⬅️ Kembali ke Dashboard</div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = "dashboard.html";
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        document.getElementById("main-content").style.display = "block";
+      }, 3100);
+    });
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const usernameInput = document.getElementById("username");
+    const themeSelect = document.getElementById("theme");
+    const form = document.getElementById("settings-form");
+
+    onAuthStateChanged(auth, async (user) => {
+      const docRef = doc(db, "users", user.uid);
+const docSnap = await getDoc(docRef);
+if (user) {
+    console.log("👤 UID LOGIN:", user.uid);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const theme = data.theme || "default";
+      document.body.dataset.theme = theme;
+      document.getElementById("theme").value = theme;
+    }
+
+    // Preview tema langsung saat dropdown diganti
+    const themeSelect = document.getElementById("theme");
+    themeSelect.addEventListener("change", function () {
+      document.body.dataset.theme = this.value;
+    });
+
+    form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const displayName = usernameInput.value || "Zaim";
+          const theme = themeSelect.value;
+  console.log("⏺️ DISIMPEN:", displayName, theme);
+
+          try {
+            await setDoc(doc(db, "users", user.uid), {
+              displayName,
+              theme
+            }, { merge: true });
+            alert("✅ Pengaturan Disimpen ke Firestore!");
+          } catch (err) {
+            console.error("❌ Gagal nyimpen:", err);
+            alert("❌ Gagal nyimpen pengaturan!");
+          }
+        });
+      } else {
+        alert("⚠️ Belum login! Arahke login page.");
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+
+</template>
+
+<template id="page-cek">
+<body>
+  <div class="login-container">
+    <div id="logo" class="logo-text fade-in fade-delay-1">QuantumX</div>
+    <div id="headline" class="headline fade-in fade-delay-2">Selamat datang kembali</div>
+    <form id="loginForm" class="fade-in fade-delay-3">
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <div id="error" class="error"></div>
+    </form>
+    <div id="registerLink" class="fade-in fade-delay-4">
+      <a id="toRegister" href="#">Belum punya akun? Daftar</a>
+    </div>
+  </div>  <!-- ✅ Auto login notice -->  <div id="autoLoginNotice">
+    <div>✅ Sudah masuk</div>
+    <div id="countdown">8</div>
+  </div>  <!-- ✅ Fix: Tambahkan firebase-init lebih dulu -->  <script type="module" src="js/firebase-init.js"></script>  <script type="module" src="js/wislogin.js"></script>  <script type="module" src="js/login.js"></script>
+<!-- === DASHBOARD START === -->
+<div id="main-content" class="hidden">
+<div id="splash-screen">
+    <h1 class="splash-logo">QuantumX</h1>
+  </div>
+  <div id="main-content" class="hidden">
+    <header class="top-bar">
+      <div class="logo">QuantumX</div>
+      <div class="scroll-wrapper">
+        <nav class="menu-bar">
+          <button class="menu-btn">Dashboard</button>
+          <button class="menu-btn">Statistik</button>
+          <button class="menu-btn">Pengguna</button>
+          <button class="menu-btn">Pengaturan</button>
+          <button class="menu-btn logout">Logout</button>
+        </nav>
+      </div>
+    </header>
+    <main class="dashboard">
+      <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+      <p class="desc-text">Iki tampilan utama dashboardmu sing wis digodok karo efek animasi alus 😎</p>
+      <div id="user-list"></div>
+      <div class="extra-content-wrapper">
+        <div class="extra-content">
+          <h2>Artikel Menarik</h2>
+          <h3>ROG: Raja Gaming Hardware</h3>
+          <p>Republic of Gamers (ROG) wis dadi legenda ning dunia gaming hardware. Wiwit GPU, motherboard, nganti laptop, kabeh produké ROG nduweni performa edan lan desain sing futuristik. Nek kowe gamer sejati, ROG mesthi ana nang wishlist-mu!</p>
+          <h3>5 Tips Merawat Laptop Gaming</h3>
+          <p>Laptop gaming butuh perhatian ekstra. Jaga suhu tetep adem nganggo cooling pad, bersihin kipas secara berkala, gunakake charger asli, lan aja nganti main sambil nutupi ventilasi. Rawat apik, performane tetep ndrodok!</p>
+          <h3>Sejarah ROG lan Inovasi Edan</h3>
+          <p>ROG lahir tahun 2006 minangka sub-brand ASUS kanggo para gamer hardcore. Saka motherboard munggah dadi laptop, nganti peripheral kabeh disemproti teknologi canggih. Contohe? Sistem pendingin liquid chamber, RGB addressable, keyboard opto-mechanical, sampe layar mini-LED 240Hz.</p>
+          <p>Inovasi ora mandeg. ROG nyedekake AI cooling, teknologi mux switch dinamis, lan desain portable tanpa ngorbanke performa. ROG ngerteni apa sing gamer butuh: performa, gaya, lan kontrol total. Iki alasan kenapa ROG terus ana ning papan paling dhuwur industri gaming hardware.</p>
+          <h3>Apa Bedane ROG karo Sing Liyane?</h3>
+          <p>ROG ora mung kuat, tapi uga tampil beda. Build quality premium, fitur eksklusif kaya Armoury Crate lan Keystone, aesthetic desain cyberpunk, kabeh digabung karo spek ganas. Siji tembung: karismatik. Nek nguripke ROG, rasane kaya nguripke tank modern sing bisa joget. 😎</p>
+          <h3>Worth it ora ROG kuwi?</h3>
+          <p>Yen budgetmu cukup lan kowe pengin perangkat sing ora mung sekadar ngangkat game, tapi uga ngangkat gengsimu... ROG iku jawabane. Saka casual gamer nganti pro e-sport, ROG menehi pengalaman maksimal — ora mung fps tinggi, tapi rasa bangga ning saben ketik tombol lan klik mouse.</p>
+          <h3>Ngapa Aku Pilih ROG, Dudu Laptop Biasa?</h3>
+          <p>Nek kowe ngerti bedane mie rebus karo mie instan + toping telur + kornet + cabe 5, yo kuwi bedane laptop biasa karo ROG. Laptop biasa? Yo mung iso buka browser, nulis tugas. Tapi ROG? Nguripke game sak jagad, render Blender, ngedit video sambil ngrokok ngidul. Nganti BIOS wae glowing, ngecas rasane kayak ngisi chakra.</p>
+          <h3>Game Sing Cocok Nek Wis Duwe ROG</h3>
+          <ul>
+            <li><strong>Cyberpunk 2077</strong> – iso ultra tanpa ritual tolak bala</li>
+            <li><strong>Valorant</strong> – crosshair gerak luwih cepet ketimbang pikiran</li>
+            <li><strong>Elden Ring</strong> – mlayu-mlayu ning alam semesta, fps stabil</li>
+            <li><strong>Minecraft RTX</strong> – omah desa rasa villa Bali</li>
+          </ul>
+          <h3>Tips Supaya ROGmu Ora Mlethek Awal</h3>
+          <p>- Aja digowo turu, ojo ngeteh bareng adaptor<br>
+          - Charger asli, nek ilang... mending ilang mantan<br>
+          - Kipas dudu sarang laba-laba, kudu disayang<br>
+          - RGB apik, tapi ojo nganti ngalahne cahayane masa depanmu</p>
+          <h3>Rasa Bangga Sing Muncul Nek Nggowo ROG</h3>
+          <p>Kanca: “Wah iki laptop-mu murup dewe?”<br>
+          Tukang servis: “Iki gak usah tak oprek, tak pujani wae.”<br>
+          Loading screen? Wis ilang sadurunge sampeyan ndelok</p>
+          <h3>Penutup</h3>
+          <p>ROG dudu mung laptop, iki mimpi anak cilik sing wis kesel dicibir PC rakitan. Kowe pengin menang ngelawan musuh, opo kalah karo lag? Nek isih nge-lag nganggo ROG, berarti setan ono nang RAM-mu, asu! 🐶</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="js/auth-guard.js"></script>
+  <script type="module" src="js/load-users.js"></script>
+  <script type="module" src="js/logout.js"></script>
+</div>
+<!-- === DASHBOARD END === -->
+
+<script type="module">
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const auth = getAuth();
+  const loginSection = document.querySelector(".login-container");
+  const autoLoginNotice = document.getElementById("autoLoginNotice");
+  const dashboard = document.getElementById("main-content");
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User wis login
+      if (loginSection) loginSection.style.display = "none";
+      if (autoLoginNotice) autoLoginNotice.style.display = "none";
+      if (dashboard) dashboard.classList.remove("hidden");
+    } else {
+      // User durung login
+      if (loginSection) loginSection.style.display = "";
+      if (autoLoginNotice) autoLoginNotice.style.display = "";
+      if (dashboard) dashboard.classList.add("hidden");
+    }
+  });
+</script>
+
+
+</template>
+
+<template id="page-statistik">
+<body>
+<div class="chat-wrapper">
+<header class="top-bar">
+<div class="logo">QuantumX <span id="dm-target-label"></span></div>
+<div>
+<button class="menu-btn" onclick="resetDM()">🌐 Umum</button>
+<button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
+</div>
+</header>
+<main class="chat-box">
+<h2 class="welcome-text">Selamat Datang!</h2>
+<div class="message-list" id="messages"></div>
+<div class="chat-input">
+<input id="msgInput" placeholder="Ketik pesenmu..." type="text"/>
+<button onclick="sendMessage()">Kirim</button>
+</div>
+</main>
+<div id="user-list">
+<h3>Daftar Pengguna</h3>
+<div id="users"></div>
+</div>
+</div>
+
+</template>
+
+
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/login.js"></script>
+  <script src="js/register.js"></script>
+  <script src="js/logout.js"></script>
+  <script src="js/wislogin.js"></script>
+  <script src="js/load-users.js"></script>
+  <script>
+    // Simple hash router
+    const routes = ['login', 'register', 'dashboard', 'user', 'set', 'statistik'];
+    function loadPage() {
+      const page = location.hash.replace('#', '') || 'login';
+      const template = document.getElementById('page-' + page);
+      if (template) {
+        document.getElementById('app').innerHTML = template.innerHTML;
+      } else {
+        document.getElementById('app').innerHTML = '<h2>404 - Page not found</h2>';
+      }
+    }
+    window.addEventListener('hashchange', loadPage);
+    window.addEventListener('DOMContentLoaded', loadPage);
+  </script>
+</body>
+</html>
