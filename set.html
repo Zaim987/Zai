@@ -8,6 +8,21 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
+  /* Tema default, bisa ditimpa dari data-theme */
+}
+
+body[data-theme="default"] {
+  background-color: #010101;
+  color: white;
+}
+body[data-theme="dark"] {
+  background-color: #111;
+  color: #eee;
+}
+body[data-theme="cyberpunk"] {
+  background-color: #0f001a;
+  color: #00ffff;
+}
       width: 100%; height: 100%;
       background: #010101; color: #fff;
       font-family: 'Orbitron', sans-serif;
@@ -167,7 +182,20 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        form.addEventListener("submit", async (e) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const theme = data.theme || "default";
+      document.body.dataset.theme = theme;
+      document.getElementById("theme").value = theme;
+    }
+
+    // Preview tema langsung saat dropdown diganti
+    const themeSelect = document.getElementById("theme");
+    themeSelect.addEventListener("change", function () {
+      document.body.dataset.theme = this.value;
+    });
+
+    form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const displayName = usernameInput.value || "Zaim";
           const theme = themeSelect.value;
