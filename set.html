@@ -201,6 +201,7 @@ body[data-theme="cyberpunk"] {
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+    console.log(\"👤 UID LOGIN:\", user.uid);
     if (docSnap.exists()) {
       const data = docSnap.data();
       const theme = data.theme || "default";
@@ -218,6 +219,7 @@ body[data-theme="cyberpunk"] {
           e.preventDefault();
           const displayName = usernameInput.value || "Zaim";
           const theme = themeSelect.value;
+  console.log("⏺️ DISIMPEN:", displayName, theme);
 
           try {
             await setDoc(doc(db, "users", user.uid), {
