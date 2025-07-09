@@ -3,15 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manajemen Pengguna - QuantumX</title>
+  <title>QuantumX | Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Orbitron', 'Rajdhani', sans-serif;
       background-color: #020202; color: white;
       width: 100%; height: 100%;
       overflow: hidden;
+
+/* ✨ MODAL ADMIN GLOWING ENABLED ✨ */
+.custom-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.custom-modal .modal-content {
+  background: #111;
+  border: 2px solid #0ff;
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  color: #fff;
+  font-family: 'Orbitron', 'Rajdhani', sans-serif;
+  box-shadow: 0 0 25px #0ff, 0 0 40px #0ff80f;
+  animation: neonBlink 1.5s infinite alternate;
+}
+.custom-modal button {
+  margin-top: 1rem;
+  background: #0ff;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  color: #000;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  transition: background 0.3s ease;
+}
+.custom-modal button:hover {
+  background: #0cc;
+}
+.hidden { display: none; }
+@keyframes neonBlink {
+  from { box-shadow: 0 0 15px #0ff; }
+  to { box-shadow: 0 0 35px #0ff, 0 0 55px #0ff80f; }
+}
+
     }
     .top-bar {
       display: flex; justify-content: space-between; align-items: center;
@@ -220,7 +264,7 @@
         const userData = userSnap.data();
         const role = (userData.role || "member").toLowerCase();
         if (role !== "admin") {
-          alert("Akses ditolak. Hanya admin yang boleh masuk.");
+          showAdminAlert(); setTimeout(() => { window.location.href = "dashboard.html"; }, 2000);
           window.location.href = "dashboard.html";
           return;
         }
@@ -268,6 +312,25 @@
         alert("Gagal export data. Cek console.");
       }
     });
-  </script>
+  
+function showAdminAlert() {
+  document.getElementById('adminAlert').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('adminAlert').classList.add('hidden');
+}
+
+</script>
+
+<!-- MODAL ADMIN GLOWING ENABLED -->
+<div id="adminAlert" class="custom-modal hidden">
+  <div class="modal-content">
+    <h3>⚠️ Akses Ditolak</h3>
+    <p>Hanya admin yang boleh masuk.</p>
+    <button onclick="closeModal()">Oke</button>
+  </div>
+</div>
+
 </body>
 </html>
