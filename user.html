@@ -138,7 +138,7 @@
       <button class="role-filter" data-role="all">Semua</button>
       <button class="role-filter" data-role="admin">Admin</button>
       <button class="role-filter" data-role="member">Member</button>
-      <button id="export-csv">📤 Export CSV</button>
+      <button id="export-csv"> Export CSV</button>
     </div>
 
     <div id="loading-spinner"><div class="spinner-circle"></div></div>
@@ -183,41 +183,16 @@
 
           const avatarHTML = user.photoURL
             ? `<img src="${user.photoURL}" alt="Avatar" class="avatar-img" />`
-            : `<div class="avatar">👤</div>`;
+            : `<div class="avatar"></div>`;
 
-          
-          const avatar = document.createElement("div");
-          avatar.className = "avatar";
-          avatar.innerHTML = "👤";
-          if (user.photoURL) {
-            const img = document.createElement("img");
-            img.src = user.photoURL;
-            img.alt = "Avatar";
-            img.className = "avatar-img";
-            userCard.appendChild(img);
-          } else {
-            userCard.appendChild(avatar);
-          }
-
-          const userInfo = document.createElement("div");
-          userInfo.className = "user-info";
-
-          const h3 = document.createElement("h3");
-          h3.textContent = user.displayName || 'Nama Tidak Ada';
-
-          const p = document.createElement("p");
-          p.textContent = user.email || 'Email Tidak Ada';
-
-          userInfo.appendChild(h3);
-          userInfo.appendChild(p);
-
-          const roleTag = document.createElement("span");
-          roleTag.className = `role ${roleClass}`;
-          roleTag.textContent = role;
-
-          userCard.appendChild(userInfo);
-          userCard.appendChild(roleTag);
-
+          userCard.innerHTML = `
+            ${avatarHTML}
+            <div class="user-info">
+              <h3>${user.displayName || 'Tanpa Nama'}</h3>
+              <p>${user.email || 'Tanpa Email'}</p>
+            </div>
+            <span class="role ${roleClass}">${role}</span>
+          `;
           container.appendChild(userCard);
           delay += 0.2;
         });
