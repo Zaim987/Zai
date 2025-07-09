@@ -272,5 +272,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 </script>
 
+<script>
+  // Skrip untuk tombol Pengguna
+  document.addEventListener("DOMContentLoaded", () => {
+    const penggunaBtn = [...document.querySelectorAll(".menu-btn")]
+      .find(btn => btn.textContent.trim() === "Pengguna");
+
+    penggunaBtn?.addEventListener("click", () => {
+      document.body.classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "user.html";
+      }, 700);
+    });
+  });
+</script>
+
 </body>
 </html>
