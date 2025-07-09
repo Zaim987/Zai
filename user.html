@@ -1,290 +1,274 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Pengguna - QuantumX</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
-    <style>
-        /* SEMUA CSS DARI DASHBOARD DICOPY KE SINI UNTUK KONSISTENSI */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            width: 100%; height: 100%; background-color: #020202; color: white;
-            font-family: 'Orbitron', sans-serif; overflow: hidden;
-        }
-        .top-bar {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 1rem; background-color: black; gap: 1rem;
-            overflow: hidden; opacity: 0;
-            animation: fadeInText 1s ease-out 0.5s forwards; /* Animasi masuk lebih cepat */
-        }
-        .logo {
-            font-size: 1.5rem; font-weight: bold;
-            text-shadow: 0 0 10px cyan; white-space: nowrap;
-            pointer-events: none;
-        }
-        .scroll-wrapper { overflow-x: auto; flex-grow: 1; }
-        .scroll-wrapper::-webkit-scrollbar { display: none; }
-        .menu-bar { display: flex; gap: 1rem; width: max-content; }
-        .menu-btn {
-            background: none; color: white; border: none; font-size: 1rem;
-            cursor: pointer; opacity: 0; transform: translateY(-10px);
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-        .menu-btn:nth-child(1) { animation-delay: 0.8s; }
-        .menu-btn:nth-child(2) { animation-delay: 1.0s; }
-        .menu-btn:nth-child(3) { animation-delay: 1.2s; }
-        .menu-btn:nth-child(4) { animation-delay: 1.4s; }
-        .menu-btn:nth-child(5) { animation-delay: 1.6s; }
-        
-        .dashboard {
-            padding: 2rem; text-align: center;
-            opacity: 0; animation: demoFade 0.5s ease-in-out 1s forwards;
-        }
-        .welcome-text {
-            font-size: 2rem; margin-bottom: 1rem;
-            opacity: 0; transform: translateY(20px) scale(0.95);
-            animation: welcomeAnim 1.2s ease-out 1.5s forwards;
-            text-shadow: 0 0 10px cyan;
-        }
-        .desc-text {
-            font-size: 1rem; color: #ccc;
-            opacity: 0; transform: translateY(20px);
-            animation: descAnim 1s ease-out 2.0s forwards;
-            margin-bottom: 3rem;
-        }
-        
-        /* Gaya khusus untuk daftar pengguna */
-        .user-list-container {
-            max-width: 800px;
-            margin-inline: auto;
-            text-align: left;
-            height: calc(100vh - 250px); /* Tinggi dinamis agar bisa scroll */
-            overflow-y: auto;
-            padding-right: 1rem;
-        }
-        .user-list-container::-webkit-scrollbar { display: none; } /* Sembunyikan scrollbar */
-        
-        .user-card {
-            display: flex;
-            align-items: center;
-            background-color: rgba(20, 20, 20, 0.5);
-            border-left: 3px solid cyan;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 4px;
-            gap: 1rem;
-        }
-        .user-card .avatar {
-            font-size: 2rem;
-            color: cyan;
-        }
-        .user-card .user-info {
-            flex-grow: 1;
-        }
-        .user-card h3 {
-            margin: 0;
-            color: #fff;
-        }
-        .user-card p {
-            margin: 0;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-        .user-card .role {
-            padding: 0.3rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        .role.admin {
-            background-color: #ff4757;
-            color: white;
-            text-shadow: 0 0 5px black;
-        }
-        .role.member {
-            background-color: #2ed573;
-            color: white;
-            text-shadow: 0 0 5px black;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manajemen Pengguna - QuantumX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      font-family: 'Orbitron', sans-serif;
+      background-color: #020202; color: white;
+      width: 100%; height: 100%;
+      overflow: hidden;
+    }
+    .top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem; background-color: black;
+      text-shadow: 0 0 10px cyan;
+    }
+    .logo { font-weight: bold; font-size: 1.5rem; pointer-events: none; }
+    .menu-bar { display: flex; gap: 1rem; white-space: nowrap; overflow-x: auto; }
+    .menu-btn {
+      background: none; border: none; color: white; font-size: 1rem;
+      cursor: pointer; white-space: nowrap;
+    }
+    .dashboard { padding: 2rem; text-align: center; }
+    .desc-text { color: #ccc; margin-bottom: 1rem; }
 
-        /* Animasi yang dibutuhkan */
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes demoFade { to { opacity: 1; } }
-        @keyframes welcomeAnim { to { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes descAnim { to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInText { to { opacity: 1; } }
-        @keyframes fadeOutUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
-        }
-        .fade-out-up { animation: fadeOutUp 0.6s ease-in-out forwards; }
-
-        .stagger-item {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: staggerFadeUp 0.6s ease-out forwards;
-        }
-        @keyframes staggerFadeUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    .user-list-container {
+      max-width: 1000px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+      overflow-y: auto;
+      height: calc(100vh - 250px);
+    }
+    .user-card {
+      background-color: rgba(20, 20, 20, 0.7);
+      border: 2px solid cyan;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 0 10px cyan;
+      transition: transform 0.2s ease-in-out;
+    }
+    .user-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px cyan;
+    }
+    .role.admin { background-color: #ff4757; }
+    .role.member { background-color: #2ed573; }
+    .role {
+      padding: 0.3rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+    .avatar-img {
+      width: 80px; height: 80px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 1rem;
+      box-shadow: 0 0 10px cyan; border: 2px solid cyan;
+    }
+    .avatar {
+      font-size: 2rem; margin-bottom: 1rem; color: cyan;
+    }
+    .role-filter {
+      background-color: transparent;
+      border: 2px solid cyan;
+      color: cyan;
+      padding: 0.5rem 1rem;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: all 0.2s ease-in-out;
+    }
+    .role-filter:hover {
+      background-color: cyan;
+      color: black;
+    }
+    #export-csv {
+      background-color: cyan;
+      color: black;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      margin-left: 1rem;
+    }
+    #export-csv:hover {
+      background-color: white;
+      color: black;
+    }
+    #loading-spinner {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .spinner-circle {
+      border: 5px solid rgba(0, 255, 255, 0.2);
+      border-top: 5px solid cyan;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 15px cyan;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-    <div id="main-content">
-        <header class="top-bar">
-            <div class="logo">QuantumX</div>
-            <div class="scroll-wrapper">
-                <nav class="menu-bar">
-                    <button class="menu-btn">Dashboard</button>
-                    <button class="menu-btn">Chat</button>
-                    <button class="menu-btn">Pengguna</button>
-                    <button class="menu-btn">Pengaturan</button>
-                    <button class="menu-btn logout">Logout</button>
-                </nav>
-            </div>
-        </header>
-        <main class="dashboard">
-            <h1 class="welcome-text">Manajemen Pengguna</h1>
-            <p class="desc-text">Kelola semua pengguna yang terdaftar di sistem QuantumX.</p>
+  <div class="top-bar">
+    <div class="logo">QuantumX</div>
+    <div class="menu-bar">
+      <button class="menu-btn">Dashboard</button>
+      <button class="menu-btn">Chat</button>
+      <button class="menu-btn">Pengguna</button>
+      <button class="menu-btn">Pengaturan</button>
+      <button class="menu-btn logout">Logout</button>
+    </div>
+  </div>
 
-            <div class="user-list-container" id="user-list-container">
-                </div>
-        </main>
+  <main class="dashboard">
+    <h1 class="welcome-text">Manajemen Pengguna</h1>
+    <p class="desc-text">Kelola semua pengguna yang terdaftar di sistem QuantumX.</p>
+
+    <div style="text-align:center; margin-bottom: 1rem;">
+      <button class="role-filter" data-role="all">Semua</button>
+      <button class="role-filter" data-role="admin">Admin</button>
+      <button class="role-filter" data-role="member">Member</button>
+      <button id="export-csv">📤 Export CSV</button>
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // Fungsi umum untuk menangani klik menu
-        const handleNavClick = (buttonText, targetUrl) => {
-          const button = [...document.querySelectorAll(".menu-btn")]
-            .find(btn => btn.textContent.trim() === buttonText);
+    <div id="loading-spinner"><div class="spinner-circle"></div></div>
+    <div class="user-list-container" id="user-list-container"></div>
+  </main>
 
-          button?.addEventListener("click", () => {
-            if (window.location.href.endsWith(targetUrl)) return;
-            document.body.classList.add("fade-out-up");
-            setTimeout(() => { window.location.href = targetUrl; }, 700);
-          });
-        };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
-        handleNavClick("Dashboard", "dashboard.html");
-        handleNavClick("Chat", "statistik.html");
-        handleNavClick("Pengaturan", "set.html");
-        handleNavClick("Pengguna", "user.html");
-      });
-    </script>
-    
-    <script src="js/logout.js" type="module"></script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
 
-    <!-- ✅ GANTI DENGAN INI -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-    authDomain: "quantechapp.firebaseapp.com",
-    projectId: "quantechapp",
-    storageBucket: "quantechapp.appspot.com",
-    messagingSenderId: "825384610343",
-    appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-  };
+    async function fetchAndDisplayUsers(filterRole = "all") {
+      const container = document.getElementById('user-list-container');
+      const loader = document.getElementById('loading-spinner');
+      container.innerHTML = '';
+      loader.style.display = 'flex';
+      let delay = 2.5;
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+          const user = doc.data();
+          const role = user.role || 'member';
+          if (filterRole !== "all" && role.toLowerCase() !== filterRole.toLowerCase()) return;
+          const roleClass = role.toLowerCase() === 'admin' ? 'admin' : 'member';
+          const userCard = document.createElement('div');
+          userCard.className = 'user-card stagger-item';
+          userCard.style.animationDelay = `${delay}s`;
 
-  async function fetchAndDisplayUsers() {
-    const container = document.getElementById('user-list-container');
-    container.innerHTML = '';
-    let delay = 2.5;
+          const avatarHTML = user.photoURL
+            ? `<img src="${user.photoURL}" alt="Avatar" class="avatar-img" />`
+            : `<div class="avatar">👤</div>`;
 
-    try {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      querySnapshot.forEach((doc) => {
-        const user = doc.data();
-        const role = user.role || 'member';
-        const roleClass = role.toLowerCase() === 'admin' ? 'admin' : 'member';
-
-        const userCard = document.createElement('div');
-        userCard.className = 'user-card stagger-item';
-        userCard.style.animationDelay = `${delay}s`;
-        userCard.innerHTML = `
-          <div class="avatar">👤</div>
-          <div class="user-info">
-            <h3>${user.displayName || 'Tanpa Nama'}</h3>
-            <p>${user.email || 'Tanpa Email'}</p>
-          </div>
-          <span class="role ${roleClass}">${role}</span>
-        `;
-        container.appendChild(userCard);
-        delay += 0.2;
-      });
-    } catch (error) {
-      console.error("Error fetching users: ", error);
-      container.innerHTML = `<p style="color: red; text-align: center;">Gagal memuat data pengguna. Cek console (F12).</p>`;
+          userCard.innerHTML = `
+            ${avatarHTML}
+            <div class="user-info">
+              <h3>${user.displayName || 'Tanpa Nama'}</h3>
+              <p>${user.email || 'Tanpa Email'}</p>
+            </div>
+            <span class="role ${roleClass}">${role}</span>
+          `;
+          container.appendChild(userCard);
+          delay += 0.2;
+        });
+      } catch (error) {
+        console.error("Error fetching users: ", error);
+        container.innerHTML = `<p style="color: red; text-align: center;">Gagal memuat data pengguna. Cek console (F12).</p>`;
+      } finally {
+        loader.style.display = 'none';
+      }
     }
-  }
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      fetchAndDisplayUsers();
-    } else {
-      window.location.href = "login.html";
-    }
-  });
-</script>
-<!-- ✅ SAMPAI SINI -->
-        // Fungsi untuk mengambil dan menampilkan data pengguna
-        async function fetchAndDisplayUsers() {
-            const container = document.getElementById('user-list-container');
-            // Kosongkan kontainer dari data statis
-            container.innerHTML = '';
-            
-            // Atur delay awal untuk animasi stagger
-            let animationDelay = 2.5; 
-
-            try {
-                const querySnapshot = await getDocs(collection(db, "users"));
-                
-                querySnapshot.forEach((doc) => {
-                    const user = doc.data();
-
-                    // Buat elemen div utama untuk kartu pengguna
-                    const userCard = document.createElement('div');
-                    userCard.className = 'user-card stagger-item';
-                    userCard.style.animationDelay = `${animationDelay}s`;
-
-                    // Tentukan kelas untuk role (default 'member' jika tidak ada)
-                    const role = user.role || 'member'; // Asumsi ada field 'role'
-                    const roleClass = role.toLowerCase() === 'admin' ? 'admin' : 'member';
-
-                    // Isi HTML untuk kartu pengguna
-                    userCard.innerHTML = `
-                        <div class="avatar">👤</div>
-                        <div class="user-info">
-                            <h3>${user.displayName || 'Nama Tidak Ada'}</h3>
-                            <p>${user.email || 'Email Tidak Ada'}</p>
-                        </div>
-                        <span class="role ${roleClass}">${role}</span>
-                    `;
-
-                    // Tambahkan kartu ke kontainer
-                    container.appendChild(userCard);
-
-                    // Tambah delay untuk kartu berikutnya
-                    animationDelay += 0.2;
-                });
-
-            } catch (error) {
-                console.error("Error fetching users: ", error);
-                container.innerHTML = `<p style="color: #ff4757; text-align: center;">Gagal memuat data pengguna. Cek konsol (F12).</p>`;
-            }
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+          alert("Data pengguna tidak ditemukan.");
+          window.location.href = "dashboard.html";
+          return;
         }
-
-        // Panggil fungsi saat halaman dimuat
+        const userData = userSnap.data();
+        const role = (userData.role || "member").toLowerCase();
+        if (role !== "admin") {
+          alert("Akses ditolak. Hanya admin yang boleh masuk.");
+          window.location.href = "dashboard.html";
+          return;
+        }
         fetchAndDisplayUsers();
-    </script>
+      } catch (error) {
+        console.error("Gagal mengambil data user:", error);
+        alert("Terjadi kesalahan. Coba lagi.");
+        window.location.href = "dashboard.html";
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('.role-filter').forEach(button => {
+        button.addEventListener('click', () => {
+          const role = button.getAttribute('data-role');
+          fetchAndDisplayUsers(role);
+        });
+      });
+    });
+
+    document.getElementById("export-csv").addEventListener("click", async () => {
+      const csvRows = [["Display Name", "Email", "Role"]];
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+          const user = doc.data();
+          const row = [
+            `"${user.displayName || 'Tanpa Nama'}"`,
+            `"${user.email || 'Tanpa Email'}"`,
+            `"${user.role || 'member'}"`
+          ];
+          csvRows.push(row);
+        });
+        const csvContent = csvRows.map(e => e.join(",")).join("
+");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "users.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error("Gagal export CSV:", err);
+        alert("Gagal export data. Cek console.");
+      }
+    });
+  </script>
 </body>
 </html>
