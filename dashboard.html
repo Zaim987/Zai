@@ -205,7 +205,7 @@
 </div>
 </header>
 <main class="dashboard">
-<h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+<h1 class="welcome-text">Selamat Datang, <span id="displayName"></span></h1>
 <p class="desc-text">Iki Perubahan Dunia Modern Ini Sekarang Bukan Nanti</p>
 
 <div class="extra-content-wrapper">
@@ -363,6 +363,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }, { once: true });
     });
   });
+</script>
+<script type="module">
+  import { loadUsers } from "./js/load-users.js";
+  loadUsers();
 </script>
 </body>
 </html>
