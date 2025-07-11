@@ -1,42 +1,24 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>QuantumX Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuantumX Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      width: 100%;
-      height: 100%;
-      background-color: #020202;
-      color: white;
-      font-family: 'Orbitron', sans-serif;
-      overflow: hidden;
+      width: 100%; height: 100%; background-color: #020202; color: white;
+      font-family: 'Orbitron', sans-serif; overflow: hidden;
     }
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
     #splash-screen {
-      position: fixed;
-      inset: 0;
-      background-color: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 999;
+      position: fixed; inset: 0; background-color: black;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 999;
       animation: splashIntro 3s ease-in-out forwards;
     }
     .splash-logo {
-      font-size: 2.5rem;
-      color: white;
-      opacity: 0;
+      font-size: 2.5rem; color: white; opacity: 0;
       text-shadow: 0 0 15px cyan;
       animation: splashGlow 3s ease-in-out forwards;
     }
@@ -46,193 +28,189 @@
       100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px cyan; }
     }
     @keyframes splashIntro {
-      0% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; visibility: hidden; }
+      0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; visibility: hidden; }
     }
-
     .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem;
-      background-color: black;
-      gap: 1rem;
-      overflow: hidden;
-      opacity: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem; background-color: black; gap: 1rem;
+      overflow: hidden; opacity: 0;
       animation: fadeInText 1s ease-out 3.5s forwards;
     }
-
     .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      text-shadow: 0 0 10px cyan;
-      white-space: nowrap;
+      font-size: 1.5rem; font-weight: bold;
+      text-shadow: 0 0 10px cyan; white-space: nowrap;
       pointer-events: none;
     }
-
-    .scroll-wrapper {
-      overflow-x: auto;
-      flex-grow: 1;
-    }
-
-    .scroll-wrapper::-webkit-scrollbar {
-      display: none;
-    }
-
+    .scroll-wrapper { overflow-x: auto; flex-grow: 1; }
+    .scroll-wrapper::-webkit-scrollbar { display: none; }
     .menu-bar {
-      display: flex;
-      gap: 1rem;
-      width: max-content;
+      display: flex; gap: 1rem; width: max-content;
     }
-
     .menu-btn {
-      background: none;
-      color: white;
-      border: none;
-      font-size: 1rem;
-      cursor: pointer;
-      opacity: 0;
-      transform: translateY(-10px);
+      background: none; color: white; border: none; font-size: 1rem;
+      cursor: pointer; opacity: 0; transform: translateY(-10px);
       animation: fadeInUp 0.6s ease-out forwards;
     }
-
     .menu-btn:nth-child(1) { animation-delay: 3.8s; }
     .menu-btn:nth-child(2) { animation-delay: 4s; }
     .menu-btn:nth-child(3) { animation-delay: 4.2s; }
     .menu-btn:nth-child(4) { animation-delay: 4.4s; }
     .menu-btn:nth-child(5) { animation-delay: 4.6s; }
-
     @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      to { opacity: 1; transform: translateY(0); }
     }
-
     .dashboard {
-      padding: 2rem;
-      text-align: center;
-      opacity: 0;
-      animation: demoFade 0.5s ease-in-out 5s forwards;
+      padding: 2rem; text-align: center;
+      opacity: 0; animation: demoFade 0.5s ease-in-out 5s forwards;
     }
-
     .welcome-text {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      opacity: 0;
-      transform: translateY(20px) scale(0.95);
+      font-size: 2rem; margin-bottom: 1rem;
+      opacity: 0; transform: translateY(20px) scale(0.95);
       animation: welcomeAnim 1.2s ease-out 5.5s forwards;
       text-shadow: 0 0 10px cyan;
     }
-
     .desc-text {
-      font-size: 1rem;
-      color: #ccc;
-      opacity: 0;
-      transform: translateY(20px);
+      font-size: 1rem; color: #ccc;
+      opacity: 0; transform: translateY(20px);
       animation: descAnim 1s ease-out 6.5s forwards;
     }
-
-    .extra-content-wrapper {
-      margin-top: 3rem;
-      height: 400px;
-      overflow-y: auto;
-      max-width: 700px;
+    #user-list {
+      margin-top: 1rem;
+      text-align: left;
+      max-width: 600px;
       margin-inline: auto;
     }
-
+    .user-item {
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: fadeLine 0.6s ease-out forwards;
+      padding: 4px 0;
+    }
+    @keyframes welcomeAnim {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes descAnim {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeLine {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes demoFade {
+      to { opacity: 1; }
+    }
+    @keyframes fadeInText {
+      to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    .fade-out {
+      animation: fadeOut 0.6s ease-in-out forwards;
+    }
+    .extra-content-wrapper {
+  margin-top: 3rem;
+  height: 400px;
+  overflow-y: auto;
+  max-width: 700px;
+  margin-inline: auto;
+  background-color: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
     .extra-content {
       padding: 1rem 1rem 3rem;
       text-align: left;
       animation: fadeInText 1s ease-out 7s forwards;
       opacity: 0;
     }
-
-    .extra-content h2, 
-    .extra-content h3, 
-    .extra-content h4 {
+    .extra-content h2 {
       color: #00f0ff;
-      margin: 1.2rem 0 0.5rem;
-    }
-
-    .extra-content p,
-    .extra-content ul {
-      color: #ccc;
-      line-height: 1.8;
       margin-bottom: 1rem;
     }
-
-    .extra-content li {
-      margin-left: 1.5rem;
-      margin-bottom: 0.8rem;
+    .extra-content h3 {
+      color: #00d2ff;
+      margin-top: 1.2rem;
     }
-
-    .stagger-item {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: staggerFadeUp 0.6s ease-out forwards;
+    .extra-content p {
+      color: #ccc;
+      line-height: 1.6;
     }
+@keyframes fadeOutUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+}
+.fade-out-up {
+  animation: fadeOutUp 0.6s ease-in-out forwards;
+}
+    
+/* # Animasi Staggered Ninja ROG */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: staggerFadeUp 0.6s ease-out forwards;
+}
+@keyframes staggerFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const menuBtns = document.querySelectorAll(".menu-btn");
+  const mainContent = document.getElementById("main-content");
 
-    @keyframes staggerFadeUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+  menuBtns.forEach((btn) => {
+    if (btn.textContent.trim() === "Chat") {
+      btn.addEventListener("click", () => {
+        const dashboardItems = mainContent.querySelectorAll(".dashboard > *");
+        const topBarItems = mainContent.querySelectorAll(".top-bar > *");
+        const elementsToFade = [...dashboardItems, ...topBarItems];
 
-    @keyframes demoFade {
-      to { opacity: 1; }
-    }
+        let delay = 0;
+        elementsToFade.forEach((el, i) => {
+          setTimeout(() => {
+            el.classList.add("fade-out-up");
+          }, delay);
+          delay += 300;
+        });
 
-    @keyframes welcomeAnim {
-      to { opacity: 1; transform: translateY(0) scale(1); }
+        setTimeout(() => {
+          window.location.href = "statistik.html";
+        }, delay + 700);
+      });
     }
+  });
+});
 
-    @keyframes descAnim {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeInText {
-      to { opacity: 1; }
-    }
-
-    @keyframes fadeOutUp {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
-    }
-
-    .fade-out-up {
-      animation: fadeOutUp 0.6s ease-in-out forwards;
-    }
-  </style>
+    </script>
 </head>
 <body>
-  <div id="splash-screen">
-    <h1 class="splash-logo">QuantumX</h1>
-  </div>
+<div id="splash-screen">
+<h1 class="splash-logo">QuantumX</h1>
+</div>
+<div class="hidden" id="main-content">
+<header class="top-bar">
+<div class="logo">QuantumX</div>
+<div class="scroll-wrapper">
+<nav class="menu-bar">
+<button class="menu-btn">Dashboard</button>
+<button class="menu-btn">Chat</button>
+<button class="menu-btn">Pengguna</button>
+<button class="menu-btn">Pengaturan</button>
+<button class="menu-btn logout">Logout</button>
+</nav>
+</div>
+</header>
+<main class="dashboard">
+<h1 class="welcome-text">Selamat Datang, Zaim!</h1>
+<p class="desc-text">Iki Perubahan Dunia Modern Ini Sekarang Bukan Nanti</p>
 
-  <div class="hidden" id="main-content">
-    <header class="top-bar">
-      <div class="logo">QuantumX</div>
-      <div class="scroll-wrapper">
-        <nav class="menu-bar">
-          <button class="menu-btn">Dashboard</button>
-          <button class="menu-btn">Chat</button>
-          <button class="menu-btn">Pengguna</button>
-          <button class="menu-btn">Pengaturan</button>
-          <button class="menu-btn logout">Logout</button>
-        </nav>
-      </div>
-    </header>
-
-    <main class="dashboard">
-      <h1 class="welcome-text">Selamat Datang, Zaim!</h1>
-      <p class="desc-text">Iki Perubahan Dunia Modern Ini Sekarang Bukan Nanti</p>
-
-      <div class="extra-content-wrapper">
-        <div class="extra-content">
-          <h2 class="stagger-item">Artikel Menarik</h2>
+<div class="extra-content-wrapper">
+<div class="extra-content">
+<h2 class="stagger-item" style="animation-delay: 0.00s;">Artikel Menarik</h2>
 
           <h3 class="stagger-item">Keluh Kesah: Susah Senang Ngembangke Website</h3>
           <p class="stagger-item"><em>"Soko ora ngerti opo-opo, nganti dadi glowing... kabeh dilakoni bareng."</em></p>
@@ -268,38 +246,96 @@
           <blockquote class="stagger-item"><em>"Ngoding bareng kui ora mung soal ilmu, tapi sabar lan ngakak sak terminal."</em></blockquote>
 
           <p class="stagger-item" style="text-align:center; margin-top:2rem;"><strong>— Dibangun karo tangan, emosi, lan mie instan. —</strong></p>
-        </div>
-      </div>
-    </main>
-  </div>
+<h3 class="stagger-item" style="animation-delay: 0.15s;">ROG: Raja Gaming Hardware</h3>
+<p class="stagger-item" style="animation-delay: 0.30s;">Republic of Gamers (ROG) wis dadi legenda ning dunia gaming hardware. Wiwit GPU, motherboard, nganti laptop, kabeh produké ROG nduweni performa edan lan desain sing futuristik. Nek kowe gamer sejati, ROG mesthi ana nang wishlist-mu!</p>
+<h3 class="stagger-item" style="animation-delay: 0.45s;">5 Tips Merawat Laptop Gaming</h3>
+<p class="stagger-item" style="animation-delay: 0.60s;">Laptop gaming butuh perhatian ekstra. Jaga suhu tetep adem nganggo cooling pad, bersihin kipas secara berkala, gunakake charger asli, lan aja nganti main sambil nutupi ventilasi. Rawat apik, performane tetep ndrodok!</p>
+<h3 class="stagger-item" style="animation-delay: 0.75s;">Sejarah ROG lan Inovasi Edan</h3>
+<p class="stagger-item" style="animation-delay: 0.90s;">ROG lahir tahun 2006 minangka sub-brand ASUS kanggo para gamer hardcore. Saka motherboard munggah dadi laptop, nganti peripheral kabeh disemproti teknologi canggih. Contohe? Sistem pendingin liquid chamber, RGB addressable, keyboard opto-mechanical, sampe layar mini-LED 240Hz.</p>
+<p class="stagger-item" style="animation-delay: 1.05s;">Inovasi ora mandeg. ROG nyedekake AI cooling, teknologi mux switch dinamis, lan desain portable tanpa ngorbanke performa. ROG ngerteni apa sing gamer butuh: performa, gaya, lan kontrol total. Iki alasan kenapa ROG terus ana ning papan paling dhuwur industri gaming hardware.</p>
+<h3 class="stagger-item" style="animation-delay: 1.20s;">Apa Bedane ROG karo Sing Liyane?</h3>
+<p class="stagger-item" style="animation-delay: 1.35s;">ROG ora mung kuat, tapi uga tampil beda. Build quality premium, fitur eksklusif kaya Armoury Crate lan Keystone, aesthetic desain cyberpunk, kabeh digabung karo spek ganas. Siji tembung: karismatik. Nek nguripke ROG, rasane kaya nguripke tank modern sing bisa joget. 😎</p>
+<h3 class="stagger-item" style="animation-delay: 1.50s;">Worth it ora ROG kuwi?</h3>
+<p class="stagger-item" style="animation-delay: 1.65s;">Yen budgetmu cukup lan kowe pengin perangkat sing ora mung sekadar ngangkat game, tapi uga ngangkat gengsimu... ROG iku jawabane. Saka casual gamer nganti pro e-sport, ROG menehi pengalaman maksimal — ora mung fps tinggi, tapi rasa bangga ning saben ketik tombol lan klik mouse.</p>
+<h3 class="stagger-item" style="animation-delay: 1.80s;">Ngapa Aku Pilih ROG, Dudu Laptop Biasa?</h3>
+<p class="stagger-item" style="animation-delay: 1.95s;">Nek kowe ngerti bedane mie rebus karo mie instan + toping telur + kornet + cabe 5, yo kuwi bedane laptop biasa karo ROG. Laptop biasa? Yo mung iso buka browser, nulis tugas. Tapi ROG? Nguripke game sak jagad, render Blender, ngedit video sambil ngrokok ngidul. Nganti BIOS wae glowing, ngecas rasane kayak ngisi chakra.</p>
+<h3 class="stagger-item" style="animation-delay: 2.10s;">Game Sing Cocok Nek Wis Duwe ROG</h3>
+<ul class="stagger-item" style="animation-delay: 2.25s;">
+<li class="stagger-item" style="animation-delay: 2.40s;"><strong>Cyberpunk 2077</strong> – iso ultra tanpa ritual tolak bala</li>
+<li class="stagger-item" style="animation-delay: 2.55s;"><strong>Valorant</strong> – crosshair gerak luwih cepet ketimbang pikiran</li>
+<li class="stagger-item" style="animation-delay: 2.70s;"><strong>Elden Ring</strong> – mlayu-mlayu ning alam semesta, fps stabil</li>
+<li class="stagger-item" style="animation-delay: 2.85s;"><strong>Minecraft RTX</strong> – omah desa rasa villa Bali</li>
+</ul>
+<h3 class="stagger-item" style="animation-delay: 3.00s;">Tips Supaya ROGmu Ora Mlethek Awal</h3>
+<p class="stagger-item" style="animation-delay: 3.15s;">- Aja digowo turu, ojo ngeteh bareng adaptor<br/>
+          - Charger asli, nek ilang... mending ilang mantan<br/>
+          - Kipas dudu sarang laba-laba, kudu disayang<br/>
+          - RGB apik, tapi ojo nganti ngalahne cahayane masa depanmu</p>
+<h3 class="stagger-item" style="animation-delay: 3.30s;">Rasa Bangga Sing Muncul Nek Nggowo ROG</h3>
+<p class="stagger-item" style="animation-delay: 3.45s;">Kanca: “Wah iki laptop-mu murup dewe?”<br/>
+          Tukang servis: “Iki gak usah tak oprek, tak pujani wae.”<br/>
+          Loading screen? Wis ilang sadurunge sampeyan ndelok</p>
+<h3 class="stagger-item" style="animation-delay: 3.60s;">Penutup</h3>
+<p class="stagger-item" style="animation-delay: 3.75s;">ROG dudu mung laptop, iki mimpi anak cilik sing wis kesel dicibir PC rakitan. Kowe pengin menang ngelawan musuh, opo kalah karo lag? Nek isih nge-lag nganggo ROG, berarti setan ono nang RAM-mu, asu! 🐶</p>
+</div>
+</div>
+</main>
+</div>
+<script src="js/auth-guard.js" type="module"> </script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const menuBtns = document.querySelectorAll(".menu-btn");
-      const mainContent = document.getElementById("main-content");
+<script src="js/logout.js" type="module"> </script>
+<script>
+// # Staggered Ninja Reveal Artikel ROG
+document.addEventListener("DOMContentLoaded", () => {
+  const items = document.querySelectorAll(".stagger-item");
+  items.forEach((el) => {
+    el.style.opacity = "0"; // jaga-jaga overwrite manual inline style
+  });
+});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const pengaturanBtn = [...document.querySelectorAll(".menu-btn")]
+      .find(btn => btn.textContent.trim() === "Pengaturan");
 
-      menuBtns.forEach((btn) => {
-        if (btn.textContent.trim() === "Chat") {
-          btn.addEventListener("click", () => {
-            const dashboardItems = mainContent.querySelectorAll(".dashboard > *");
-            const topBarItems = mainContent.querySelectorAll(".top-bar > *");
-            const elementsToFade = [...dashboardItems, ...topBarItems];
-
-            let delay = 0;
-            elementsToFade.forEach((el, i) => {
-              setTimeout(() => {
-                el.classList.add("fade-out-up");
-              }, delay);
-              delay += 300;
-            });
-
-            setTimeout(() => {
-              window.location.href = "statistik.html";
-            }, delay + 700);
-          });
-        }
-      });
+    pengaturanBtn?.addEventListener("click", () => {
+      document.body.classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "set.html";
+      }, 700);
     });
-  </script>
+  });
+</script>
+
+<script>
+  // Skrip untuk tombol Pengguna
+  document.addEventListener("DOMContentLoaded", () => {
+    const penggunaBtn = [...document.querySelectorAll(".menu-btn")]
+      .find(btn => btn.textContent.trim() === "Pengguna");
+
+    penggunaBtn?.addEventListener("click", () => {
+      document.body.classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "user.html";
+      }, 700);
+    });
+  });
+</script>
+<audio id="backsound" autoplay loop>
+  <source src="audio/backsound.mp3" type="audio/mpeg">
+  Browsermu ra iso muter backsound, cuk!
+</audio>
+
+<script>
+  window.addEventListener('load', () => {
+    const audio = document.getElementById('backsound');
+    audio.volume = 0.3; // Iso mbok atur suarane
+    audio.play().catch(() => {
+      document.body.addEventListener('click', () => {
+        audio.play();
+      }, { once: true });
+    });
+  });
+</script>
 </body>
 </html>
