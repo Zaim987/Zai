@@ -1,266 +1,555 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Artikel Otomatis</title>
-    
-    <!-- Memuat Tailwind CSS dari CDN -->
+    <title>Sosial App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Memuat Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
     <style>
-        /* Menggunakan font Inter sebagai default */
-        body {
+        /* Menggunakan font Inter sebagai default dan VT323 untuk tema hacker */
+        :root {
             font-family: 'Inter', sans-serif;
         }
-        /* Style untuk output artikel agar format HTML-nya terlihat rapi */
-        .article-preview h2 {
-            font-size: 1.25rem; /* 20px */
-            font-weight: 600;
-            margin-top: 1.5rem; /* 24px */
-            margin-bottom: 0.5rem; /* 8px */
+
+        /* Definisi variabel warna untuk setiap tema */
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --bg-header-footer: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #1d4ed8;
+            --border-color: #e5e7eb;
+            --font-family: 'Inter', sans-serif;
         }
-        .article-preview p {
-            margin-bottom: 1rem; /* 16px */
-            line-height: 1.6;
+
+        [data-theme="dark"] {
+            --bg-primary: #121212;
+            --bg-secondary: #1f1f1f;
+            --bg-header-footer: #1e1e1e;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --accent-primary: #60a5fa;
+            --accent-secondary: #3b82f6;
+            --border-color: #374151;
+            --font-family: 'Inter', sans-serif;
         }
-        .article-preview strong {
-            font-weight: 700;
+
+        [data-theme="hacker"] {
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-header-footer: #050505;
+            --text-primary: #00ff00;
+            --text-secondary: #00dd00;
+            --accent-primary: #00ff00;
+            --accent-secondary: #00aa00;
+            --border-color: #00ff00;
+            --font-family: 'VT323', monospace;
         }
-        .article-preview ul {
-            list-style-type: disc;
-            padding-left: 1.5rem; /* 24px */
-            margin-bottom: 1rem; /* 16px */
+
+        /* Menerapkan variabel warna ke elemen */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            transition: background-color 0.3s, color 0.3s;
         }
-        .article-preview li {
-            margin-bottom: 0.5rem; /* 8px */
+
+        /* Layout utama aplikasi */
+        #root {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 600px; /* Lebar maksimal untuk tampilan seperti mobile */
+            margin: 0 auto;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        /* Header dan Footer statis */
+        .app-header, .app-footer {
+            flex-shrink: 0;
+            background-color: var(--bg-header-footer);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        .app-footer {
+            border-top: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        /* Konten tengah yang bisa di-scroll */
+        .app-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: var(--bg-secondary);
+        }
+        /* Kustomisasi scrollbar */
+        .app-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .app-content::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        .app-content::-webkit-scrollbar-thumb {
+            background-color: var(--accent-primary);
+            border-radius: 20px;
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+<body>
+    <div id="root"></div>
 
-    <div class="container mx-auto max-w-3xl p-4 sm:p-6 md:p-8">
-        
-        <!-- Header Aplikasi -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">Generator Artikel Otomatis</h1>
-            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Masukkan topik dan biarkan AI menulis untuk Anda.</p>
-        </header>
-
-        <!-- Panel Kontrol Utama -->
-        <main class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
-            <div class="space-y-6">
-                <!-- Input Topik Artikel -->
-                <div>
-                    <label for="topic" class="block text-lg font-semibold mb-2">1. Masukkan Topik Artikel</label>
-                    <textarea id="topic" rows="3" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Contoh: Manfaat teknologi AI dalam pendidikan"></textarea>
-                </div>
-
-                <!-- Pilihan Panjang Artikel -->
-                <div>
-                    <label for="length" class="block text-lg font-semibold mb-2">2. Pilih Panjang Artikel</label>
-                    <select id="length" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="pendek">Pendek (~150 kata)</option>
-                        <option value="sedang" selected>Sedang (~300 kata)</option>
-                        <option value="panjang">Panjang (500+ kata)</option>
-                    </select>
-                </div>
-
-                <!-- Tombol Generate -->
-                <div>
-                    <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition-all duration-300 ease-in-out transform hover:scale-105 disabled:bg-blue-400 disabled:cursor-not-allowed">
-                        <svg id="generateIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                        <span id="generateBtnText">Buat Artikel</span>
-                        <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </main>
-
-        <!-- Area Hasil Artikel -->
-        <section id="resultSection" class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hidden">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hasil Artikel</h2>
-                <button id="copyBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg flex items-center transition-colors duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Salin
-                </button>
-            </div>
-            <div id="preview" class="article-preview p-4 border rounded-lg bg-gray-50 dark:bg-gray-700 min-h-[200px] text-gray-700 dark:text-gray-300">
-                <!-- Konten artikel akan muncul di sini -->
-            </div>
-        </section>
-
-    </div>
-
-    <!-- Notifikasi "Tersalin" -->
-    <div id="copyNotification" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transition-opacity duration-300">
-        Teks berhasil disalin!
-    </div>
-
-    <script>
-        // --- Referensi Elemen DOM ---
-        const topicInput = document.getElementById('topic');
-        const lengthSelect = document.getElementById('length');
-        const generateBtn = document.getElementById('generateBtn');
-        const generateBtnText = document.getElementById('generateBtnText');
-        const generateIcon = document.getElementById('generateIcon');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const resultSection = document.getElementById('resultSection');
-        const previewArea = document.getElementById('preview');
-        const copyBtn = document.getElementById('copyBtn');
-        const copyNotification = document.getElementById('copyNotification');
-
-        // --- Fungsi untuk Mengatur Status Loading ---
-        function setLoading(isLoading) {
-            if (isLoading) {
-                generateBtn.disabled = true;
-                generateBtnText.textContent = 'Menghasilkan...';
-                generateIcon.classList.add('hidden');
-                loadingSpinner.classList.remove('hidden');
-            } else {
-                generateBtn.disabled = false;
-                generateBtnText.textContent = 'Buat Artikel';
-                generateIcon.classList.remove('hidden');
-                loadingSpinner.classList.add('hidden');
+    <script type="importmap">
+        {
+            "imports": {
+                "react": "https://esm.sh/react@18.2.0",
+                "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
             }
         }
+    </script>
 
-        // --- Fungsi untuk Membuat Artikel via Gemini API ---
-        async function generateArticle() {
-            const topic = topicInput.value.trim();
-            if (!topic) {
-                alert('Silakan masukkan topik artikel terlebih dahulu.');
-                return;
-            }
+    <script type="module">
+        import React, { useState, useEffect, useRef, useMemo } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { initializeApp } from 'firebase/app';
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged 
+        } from 'firebase/auth';
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            orderBy, 
+            onSnapshot, 
+            serverTimestamp,
+            doc,
+            setDoc,
+            getDocs
+        } from 'firebase/firestore';
 
-            setLoading(true);
-            resultSection.classList.remove('hidden');
-            previewArea.innerHTML = '<p class="text-center">AI sedang berpikir... mohon tunggu sebentar.</p>';
+        // Konfigurasi Firebase yang Anda berikan
+        const firebaseConfig = {
+            apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+            authDomain: "quantechapp.firebaseapp.com",
+            projectId: "quantechapp",
+            storageBucket: "quantechapp.appspot.com",
+            messagingSenderId: "825384610343",
+            appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+        };
 
-            const lengthOption = lengthSelect.value;
-            let wordCount;
-            switch (lengthOption) {
-                case 'pendek':
-                    wordCount = 150;
-                    break;
-                case 'sedang':
-                    wordCount = 300;
-                    break;
-                case 'panjang':
-                    wordCount = 500;
-                    break;
-            }
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            // Membuat prompt yang detail untuk AI
-            const prompt = `Buatkan saya sebuah artikel blog yang informatif dan menarik dengan topik: "${topic}". 
-            Target panjang artikel adalah sekitar ${wordCount} kata.
-            Struktur artikel harus jelas dan mudah dibaca.
-            Gunakan format HTML yang rapi dengan tag-tag berikut:
-            - Gunakan <h2> untuk judul utama atau sub-judul yang paling penting.
-            - Gunakan <p> untuk setiap paragraf.
-            - Gunakan <strong> untuk menekankan poin-poin atau kata kunci yang penting.
-            - Jika sesuai, boleh tambahkan daftar poin menggunakan <ul> dan <li>.
-            Tolong berikan respons hanya berupa kode HTML dari artikel tersebut, tanpa penjelasan tambahan di luar HTML.`;
+        // Komponen Ikon sederhana
+        const Icon = ({ path, className = "w-6 h-6" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+                <path strokeLinecap="round" strokeLinejoin="round" d={path} />
+            </svg>
+        );
 
-            // Konfigurasi untuk memanggil Gemini API
-            const apiKey = ""; // Kunci API akan di-handle oleh environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [{ text: prompt }]
-                }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topP: 0.95,
-                    topK: 40
+        // Komponen untuk Halaman Autentikasi (Login & Register)
+        const AuthPage = () => {
+            const [isLogin, setIsLogin] = useState(true);
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [username, setUsername] = useState('');
+            const [error, setError] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const handleAuthAction = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+                try {
+                    if (isLogin) {
+                        await signInWithEmailAndPassword(auth, email, password);
+                    } else {
+                        if (!username) {
+                            setError("Username tidak boleh kosong.");
+                            setLoading(false);
+                            return;
+                        }
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                        // Simpan data user ke Firestore
+                        await setDoc(doc(db, "users", userCredential.user.uid), {
+                            username: username,
+                            email: email,
+                            uid: userCredential.user.uid
+                        });
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
                 }
             };
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+            return (
+                <div className="h-screen flex flex-col justify-center items-center p-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
+                    <h1 className="text-4xl font-bold mb-8" style={{ color: 'var(--accent-primary)' }}>Sosial App</h1>
+                    <div className="w-full max-w-sm p-6 rounded-lg shadow-md" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                        <h2 className="text-2xl font-bold text-center mb-4" style={{ color: 'var(--text-primary)' }}>{isLogin ? 'Login' : 'Daftar'}</h2>
+                        <form onSubmit={handleAuthAction}>
+                            {!isLogin && (
+                                <div className="mb-4">
+                                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Username</label>
+                                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full px-3 py-2 rounded" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} placeholder="Username Anda" />
+                                </div>
+                            )}
+                            <div className="mb-4">
+                                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Email</label>
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-3 py-2 rounded" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} placeholder="email@contoh.com" />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Password</label>
+                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-3 py-2 rounded" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} placeholder="********" />
+                            </div>
+                            {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
+                            <button type="submit" disabled={loading} className="w-full font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" style={{ backgroundColor: 'var(--accent-primary)', color: '#fff' }}>
+                                {loading ? 'Memproses...' : (isLogin ? 'Login' : 'Daftar')}
+                            </button>
+                        </form>
+                        <p className="text-center text-sm mt-4" style={{ color: 'var(--text-secondary)' }}>
+                            {isLogin ? "Belum punya akun?" : "Sudah punya akun?"}
+                            <button onClick={() => setIsLogin(!isLogin)} className="font-bold ml-1" style={{ color: 'var(--accent-primary)' }}>
+                                {isLogin ? 'Daftar' : 'Login'}
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            );
+        };
+
+        // Komponen untuk Feed Status
+        const Feed = ({ currentUser }) => {
+            const [statuses, setStatuses] = useState([]);
+            const [newStatus, setNewStatus] = useState('');
+            const [users, setUsers] = useState({});
+
+            useEffect(() => {
+                // Ambil data semua user untuk menampilkan username
+                const fetchUsers = async () => {
+                    const usersCollection = collection(db, 'users');
+                    const userSnapshot = await getDocs(usersCollection);
+                    const userList = {};
+                    userSnapshot.forEach(doc => {
+                        userList[doc.id] = doc.data();
+                    });
+                    setUsers(userList);
+                };
+                fetchUsers();
+
+                // Dapatkan status secara real-time
+                const q = query(collection(db, "statuses"), orderBy("timestamp", "desc"));
+                const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                    const statusesData = [];
+                    querySnapshot.forEach((doc) => {
+                        statusesData.push({ id: doc.id, ...doc.data() });
+                    });
+                    setStatuses(statusesData);
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                return () => unsubscribe();
+            }, []);
 
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0) {
-                    const articleHtml = result.candidates[0].content.parts[0].text;
-                    // Membersihkan jika ada ```html di awal dan ``` di akhir
-                    const cleanHtml = articleHtml.replace(/^```html\n?/, '').replace(/\n?```$/, '');
-                    previewArea.innerHTML = cleanHtml;
-                } else {
-                    previewArea.innerHTML = '<p class="text-red-500">Maaf, gagal menghasilkan artikel. Respon dari AI tidak valid. Silakan coba lagi.</p>';
-                }
+            const handlePostStatus = async (e) => {
+                e.preventDefault();
+                if (newStatus.trim() === '') return;
 
-            } catch (error) {
-                console.error("Error generating article:", error);
-                previewArea.innerHTML = `<p class="text-red-500">Terjadi kesalahan saat menghubungi AI. Silakan periksa koneksi Anda dan coba lagi. <br><br>Detail: ${error.message}</p>`;
-            } finally {
-                setLoading(false);
+                await addDoc(collection(db, "statuses"), {
+                    text: newStatus,
+                    timestamp: serverTimestamp(),
+                    uid: currentUser.uid,
+                });
+                setNewStatus('');
+            };
+            
+            const formatTime = (timestamp) => {
+                if (!timestamp) return 'beberapa saat lalu';
+                return new Date(timestamp.seconds * 1000).toLocaleString('id-ID');
             }
-        }
 
-        // --- Fungsi untuk Menyalin Teks ke Clipboard ---
-        function copyToClipboard() {
-            const contentToCopy = previewArea.innerHTML;
-            if (!contentToCopy) return;
+            return (
+                <div className="p-4">
+                    <form onSubmit={handlePostStatus} className="mb-4">
+                        <textarea
+                            value={newStatus}
+                            onChange={(e) => setNewStatus(e.target.value)}
+                            placeholder="Apa yang kamu pikirkan?"
+                            className="w-full p-2 rounded-lg"
+                            style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
+                        ></textarea>
+                        <button type="submit" className="w-full mt-2 font-bold py-2 px-4 rounded" style={{ backgroundColor: 'var(--accent-primary)', color: '#fff' }}>
+                            Posting
+                        </button>
+                    </form>
+                    <div>
+                        {statuses.map(status => (
+                            <div key={status.id} className="p-4 mb-3 rounded-lg" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
+                                <div className="flex items-center mb-2">
+                                    <div className="font-bold" style={{ color: 'var(--text-primary)' }}>
+                                        {users[status.uid]?.username || 'User Anonim'}
+                                    </div>
+                                    <div className="text-xs ml-auto" style={{ color: 'var(--text-secondary)' }}>
+                                        {formatTime(status.timestamp)}
+                                    </div>
+                                </div>
+                                <p style={{ color: 'var(--text-primary)' }}>{status.text}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+        
+        // Komponen untuk menampilkan daftar user untuk DM
+        const UsersList = ({ setCurrentPage, setRecipient }) => {
+            const [users, setUsers] = useState([]);
+            const [loading, setLoading] = useState(true);
 
-            // Menggunakan metode yang lebih modern dan aman
-            navigator.clipboard.writeText(contentToCopy).then(() => {
-                // Tampilkan notifikasi
-                copyNotification.classList.remove('opacity-0');
-                setTimeout(() => {
-                    copyNotification.classList.add('opacity-0');
-                }, 2000); // Sembunyikan setelah 2 detik
-            }).catch(err => {
-                console.error('Gagal menyalin teks: ', err);
-                // Fallback untuk browser lama atau environment yang tidak aman
-                try {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = contentToCopy;
-                    textArea.style.position = "fixed"; // Hindari scroll jump
-                    textArea.style.left = "-9999px";
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
+            useEffect(() => {
+                const fetchUsers = async () => {
+                    const usersCollection = collection(db, 'users');
+                    const userSnapshot = await getDocs(usersCollection);
+                    const usersList = userSnapshot.docs
+                        .map(doc => ({ id: doc.id, ...doc.data() }))
+                        .filter(user => user.id !== auth.currentUser.uid); // Jangan tampilkan diri sendiri
+                    setUsers(usersList);
+                    setLoading(false);
+                };
 
-                    // Tampilkan notifikasi
-                    copyNotification.classList.remove('opacity-0');
-                    setTimeout(() => {
-                        copyNotification.classList.add('opacity-0');
-                    }, 2000);
-                } catch (e) {
-                    alert('Maaf, browser Anda tidak mendukung fitur salin otomatis.');
+                fetchUsers();
+            }, []);
+
+            const startChat = (user) => {
+                setRecipient(user);
+                setCurrentPage('chat');
+            };
+
+            if (loading) return <div className="p-4 text-center" style={{ color: 'var(--text-secondary)' }}>Memuat daftar pengguna...</div>;
+            
+            return (
+                <div className="p-2">
+                    <h2 className="text-xl font-bold p-2" style={{ color: 'var(--text-primary)' }}>Mulai Percakapan</h2>
+                    {users.map(user => (
+                        <div 
+                            key={user.id} 
+                            onClick={() => startChat(user)}
+                            className="flex items-center p-3 mb-2 rounded-lg cursor-pointer hover:opacity-75" 
+                            style={{ backgroundColor: 'var(--bg-primary)' }}
+                        >
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3" style={{ backgroundColor: 'var(--accent-primary)' }}>
+                                <span className="text-white font-bold">{user.username.charAt(0).toUpperCase()}</span>
+                            </div>
+                            <div>
+                                <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{user.username}</p>
+                                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+        
+        // Komponen untuk Halaman Chat DM
+        const Chat = ({ recipient, currentUser }) => {
+            const [messages, setMessages] = useState([]);
+            const [newMessage, setNewMessage] = useState('');
+            const chatBoxRef = useRef(null);
+
+            const chatRoomId = useMemo(() => {
+                // Membuat ID chat room yang konsisten
+                return [currentUser.uid, recipient.id].sort().join('_');
+            }, [currentUser.uid, recipient.id]);
+
+            useEffect(() => {
+                const messagesRef = collection(db, 'messages', chatRoomId, 'chats');
+                const q = query(messagesRef, orderBy('timestamp'));
+
+                const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                    const msgs = [];
+                    querySnapshot.forEach(doc => {
+                        msgs.push({ id: doc.id, ...doc.data() });
+                    });
+                    setMessages(msgs);
+                });
+
+                return () => unsubscribe();
+            }, [chatRoomId]);
+
+            useEffect(() => {
+                // Auto-scroll ke pesan terbaru
+                if (chatBoxRef.current) {
+                    chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
                 }
-            });
-        }
+            }, [messages]);
 
-        // --- Event Listeners ---
-        generateBtn.addEventListener('click', generateArticle);
-        copyBtn.addEventListener('click', copyToClipboard);
+            const handleSendMessage = async (e) => {
+                e.preventDefault();
+                if (newMessage.trim() === '') return;
+
+                const messagesRef = collection(db, 'messages', chatRoomId, 'chats');
+                await addDoc(messagesRef, {
+                    text: newMessage,
+                    senderUid: currentUser.uid,
+                    timestamp: serverTimestamp()
+                });
+                setNewMessage('');
+            };
+
+            return (
+                <div className="flex flex-col h-full">
+                    <div ref={chatBoxRef} className="flex-grow p-4 overflow-y-auto">
+                        {messages.map(msg => (
+                            <div key={msg.id} className={`flex mb-3 ${msg.senderUid === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-xs md:max-w-md p-3 rounded-lg ${msg.senderUid === currentUser.uid ? 'rounded-br-none' : 'rounded-bl-none'}`}
+                                    style={{ 
+                                        backgroundColor: msg.senderUid === currentUser.uid ? 'var(--accent-primary)' : 'var(--bg-primary)',
+                                        color: msg.senderUid === currentUser.uid ? '#fff' : 'var(--text-primary)'
+                                    }}
+                                >
+                                    {msg.text}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <form onSubmit={handleSendMessage} className="flex p-2 border-t" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-header-footer)'}}>
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder="Ketik pesan..."
+                            className="flex-grow p-2 rounded-lg"
+                            style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
+                        />
+                        <button type="submit" className="ml-2 p-2 rounded-lg" style={{ backgroundColor: 'var(--accent-primary)', color: '#fff' }}>
+                            <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+
+
+        // Komponen Utama Aplikasi
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [theme, setTheme] = useState(localStorage.getItem('app-theme') || 'dark');
+            const [currentPage, setCurrentPage] = useState('feed'); // 'feed', 'users', 'chat'
+            const [recipient, setRecipient] = useState(null); // Untuk DM
+
+            useEffect(() => {
+                const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                    setUser(currentUser);
+                    setLoading(false);
+                });
+                return () => unsubscribe();
+            }, []);
+
+            useEffect(() => {
+                document.body.setAttribute('data-theme', theme);
+                localStorage.setItem('app-theme', theme);
+            }, [theme]);
+
+            const handleThemeChange = () => {
+                const themes = ['light', 'dark', 'hacker'];
+                const currentIndex = themes.indexOf(theme);
+                const nextIndex = (currentIndex + 1) % themes.length;
+                setTheme(themes[nextIndex]);
+            };
+            
+            const handleLogout = async () => {
+                await signOut(auth);
+                setCurrentPage('feed');
+            };
+
+            const renderPage = () => {
+                switch (currentPage) {
+                    case 'feed':
+                        return <Feed currentUser={user} />;
+                    case 'users':
+                        return <UsersList setCurrentPage={setCurrentPage} setRecipient={setRecipient} />;
+                    case 'chat':
+                        if (recipient) {
+                           return <Chat recipient={recipient} currentUser={user} />;
+                        }
+                        // Jika tidak ada recipient, kembali ke daftar user
+                        setCurrentPage('users'); 
+                        return null;
+                    default:
+                        return <Feed currentUser={user} />;
+                }
+            };
+            
+            const getHeaderTitle = () => {
+                switch (currentPage) {
+                    case 'feed': return 'Feed';
+                    case 'users': return 'Pesan Baru';
+                    case 'chat': return recipient?.username || 'Chat';
+                    default: return 'Sosial App';
+                }
+            }
+
+            if (loading) {
+                return <div className="h-screen flex justify-center items-center" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Memuat Aplikasi...</div>;
+            }
+
+            if (!user) {
+                return <AuthPage />;
+            }
+
+            return (
+                <>
+                    <header className="app-header p-4 flex justify-between items-center">
+                        {currentPage === 'chat' && (
+                            <button onClick={() => setCurrentPage('users')} className="p-2 -ml-2">
+                                <Icon path="M15.75 19.5L8.25 12l7.5-7.5" className="w-6 h-6" style={{ color: 'var(--text-primary)' }} />
+                            </button>
+                        )}
+                        <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{getHeaderTitle()}</h1>
+                        <div className="flex items-center space-x-2">
+                            <button onClick={handleThemeChange} className="p-2">
+                                <Icon path="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" className="w-6 h-6" style={{ color: 'var(--text-primary)' }} />
+                            </button>
+                            <button onClick={handleLogout} className="p-2">
+                                <Icon path="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m-3 0l3-3m0 0l-3-3m3 3H9" className="w-6 h-6" style={{ color: 'var(--text-primary)' }} />
+                            </button>
+                        </div>
+                    </header>
+                    <main className="app-content">
+                        {renderPage()}
+                    </main>
+                    <footer className="app-footer p-2 flex justify-around items-center">
+                        <button onClick={() => setCurrentPage('feed')} className={`p-2 rounded-lg ${currentPage === 'feed' ? 'opacity-100' : 'opacity-60'}`}>
+                           <Icon path="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" className="w-7 h-7" style={{ color: 'var(--accent-primary)' }} />
+                        </button>
+                        <button onClick={() => setCurrentPage('users')} className={`p-2 rounded-lg ${currentPage === 'users' || currentPage === 'chat' ? 'opacity-100' : 'opacity-60'}`}>
+                            <Icon path="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.76 9.76 0 01-2.53-.375m-10.492 0c-.106.02a.315.315 0 01-.315-.315a2.5 2.5 0 01.315-2.492C3.693 6.08 7.978 3 12 3c4.022 0 8.307 3.08 9.474 6.685a2.5 2.5 0 01.315 2.492.315.315 0 01-.315.315c-.106-.02-.215-.032-.326-.04a9.753 9.753 0 01-2.17-1.37c-.359-.2-.695-.418-1.026-.653a3.532 3.532 0 00-2.296-.653H12c-.896 0-1.73.29-2.424.777-.694.486-1.293 1.06-1.782 1.732a9.753 9.753 0 01-2.17 1.37c-.11.009-.22.02-.326.04z" className="w-7 h-7" style={{ color: 'var(--accent-primary)' }} />
+                        </button>
+                    </footer>
+                </>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = createRoot(container);
+        root.render(<App />);
 
     </script>
 </body>
