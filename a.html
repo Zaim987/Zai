@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Artikel Otomatis</title>
+    
+    <!-- Memuat Tailwind CSS dari CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Memuat Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Menggunakan font Inter sebagai default */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style untuk output artikel agar format HTML-nya terlihat rapi */
+        .article-preview h2 {
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            margin-top: 1.5rem; /* 24px */
+            margin-bottom: 0.5rem; /* 8px */
+        }
+        .article-preview p {
+            margin-bottom: 1rem; /* 16px */
+            line-height: 1.6;
+        }
+        .article-preview strong {
+            font-weight: 700;
+        }
+        .article-preview ul {
+            list-style-type: disc;
+            padding-left: 1.5rem; /* 24px */
+            margin-bottom: 1rem; /* 16px */
+        }
+        .article-preview li {
+            margin-bottom: 0.5rem; /* 8px */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+
+    <div class="container mx-auto max-w-3xl p-4 sm:p-6 md:p-8">
+        
+        <!-- Header Aplikasi -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">Generator Artikel Otomatis</h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Masukkan topik dan biarkan AI menulis untuk Anda.</p>
+        </header>
+
+        <!-- Panel Kontrol Utama -->
+        <main class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <div class="space-y-6">
+                <!-- Input Topik Artikel -->
+                <div>
+                    <label for="topic" class="block text-lg font-semibold mb-2">1. Masukkan Topik Artikel</label>
+                    <textarea id="topic" rows="3" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Contoh: Manfaat teknologi AI dalam pendidikan"></textarea>
+                </div>
+
+                <!-- Pilihan Panjang Artikel -->
+                <div>
+                    <label for="length" class="block text-lg font-semibold mb-2">2. Pilih Panjang Artikel</label>
+                    <select id="length" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="pendek">Pendek (~150 kata)</option>
+                        <option value="sedang" selected>Sedang (~300 kata)</option>
+                        <option value="panjang">Panjang (500+ kata)</option>
+                    </select>
+                </div>
+
+                <!-- Tombol Generate -->
+                <div>
+                    <button id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition-all duration-300 ease-in-out transform hover:scale-105 disabled:bg-blue-400 disabled:cursor-not-allowed">
+                        <svg id="generateIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span id="generateBtnText">Buat Artikel</span>
+                        <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Area Hasil Artikel -->
+        <section id="resultSection" class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hasil Artikel</h2>
+                <button id="copyBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg flex items-center transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Salin
+                </button>
+            </div>
+            <div id="preview" class="article-preview p-4 border rounded-lg bg-gray-50 dark:bg-gray-700 min-h-[200px] text-gray-700 dark:text-gray-300">
+                <!-- Konten artikel akan muncul di sini -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Notifikasi "Tersalin" -->
+    <div id="copyNotification" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transition-opacity duration-300">
+        Teks berhasil disalin!
+    </div>
+
+    <script>
+        // --- Referensi Elemen DOM ---
+        const topicInput = document.getElementById('topic');
+        const lengthSelect = document.getElementById('length');
+        const generateBtn = document.getElementById('generateBtn');
+        const generateBtnText = document.getElementById('generateBtnText');
+        const generateIcon = document.getElementById('generateIcon');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultSection = document.getElementById('resultSection');
+        const previewArea = document.getElementById('preview');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyNotification = document.getElementById('copyNotification');
+
+        // --- Fungsi untuk Mengatur Status Loading ---
+        function setLoading(isLoading) {
+            if (isLoading) {
+                generateBtn.disabled = true;
+                generateBtnText.textContent = 'Menghasilkan...';
+                generateIcon.classList.add('hidden');
+                loadingSpinner.classList.remove('hidden');
+            } else {
+                generateBtn.disabled = false;
+                generateBtnText.textContent = 'Buat Artikel';
+                generateIcon.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // --- Fungsi untuk Membuat Artikel via Gemini API ---
+        async function generateArticle() {
+            const topic = topicInput.value.trim();
+            if (!topic) {
+                alert('Silakan masukkan topik artikel terlebih dahulu.');
+                return;
+            }
+
+            setLoading(true);
+            resultSection.classList.remove('hidden');
+            previewArea.innerHTML = '<p class="text-center">AI sedang berpikir... mohon tunggu sebentar.</p>';
+
+            const lengthOption = lengthSelect.value;
+            let wordCount;
+            switch (lengthOption) {
+                case 'pendek':
+                    wordCount = 150;
+                    break;
+                case 'sedang':
+                    wordCount = 300;
+                    break;
+                case 'panjang':
+                    wordCount = 500;
+                    break;
+            }
+
+            // Membuat prompt yang detail untuk AI
+            const prompt = `Buatkan saya sebuah artikel blog yang informatif dan menarik dengan topik: "${topic}". 
+            Target panjang artikel adalah sekitar ${wordCount} kata.
+            Struktur artikel harus jelas dan mudah dibaca.
+            Gunakan format HTML yang rapi dengan tag-tag berikut:
+            - Gunakan <h2> untuk judul utama atau sub-judul yang paling penting.
+            - Gunakan <p> untuk setiap paragraf.
+            - Gunakan <strong> untuk menekankan poin-poin atau kata kunci yang penting.
+            - Jika sesuai, boleh tambahkan daftar poin menggunakan <ul> dan <li>.
+            Tolong berikan respons hanya berupa kode HTML dari artikel tersebut, tanpa penjelasan tambahan di luar HTML.`;
+
+            // Konfigurasi untuk memanggil Gemini API
+            const apiKey = ""; // Kunci API akan di-handle oleh environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [{ text: prompt }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    topK: 40
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    const articleHtml = result.candidates[0].content.parts[0].text;
+                    // Membersihkan jika ada ```html di awal dan ``` di akhir
+                    const cleanHtml = articleHtml.replace(/^```html\n?/, '').replace(/\n?```$/, '');
+                    previewArea.innerHTML = cleanHtml;
+                } else {
+                    previewArea.innerHTML = '<p class="text-red-500">Maaf, gagal menghasilkan artikel. Respon dari AI tidak valid. Silakan coba lagi.</p>';
+                }
+
+            } catch (error) {
+                console.error("Error generating article:", error);
+                previewArea.innerHTML = `<p class="text-red-500">Terjadi kesalahan saat menghubungi AI. Silakan periksa koneksi Anda dan coba lagi. <br><br>Detail: ${error.message}</p>`;
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // --- Fungsi untuk Menyalin Teks ke Clipboard ---
+        function copyToClipboard() {
+            const contentToCopy = previewArea.innerHTML;
+            if (!contentToCopy) return;
+
+            // Menggunakan metode yang lebih modern dan aman
+            navigator.clipboard.writeText(contentToCopy).then(() => {
+                // Tampilkan notifikasi
+                copyNotification.classList.remove('opacity-0');
+                setTimeout(() => {
+                    copyNotification.classList.add('opacity-0');
+                }, 2000); // Sembunyikan setelah 2 detik
+            }).catch(err => {
+                console.error('Gagal menyalin teks: ', err);
+                // Fallback untuk browser lama atau environment yang tidak aman
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = contentToCopy;
+                    textArea.style.position = "fixed"; // Hindari scroll jump
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+
+                    // Tampilkan notifikasi
+                    copyNotification.classList.remove('opacity-0');
+                    setTimeout(() => {
+                        copyNotification.classList.add('opacity-0');
+                    }, 2000);
+                } catch (e) {
+                    alert('Maaf, browser Anda tidak mendukung fitur salin otomatis.');
+                }
+            });
+        }
+
+        // --- Event Listeners ---
+        generateBtn.addEventListener('click', generateArticle);
+        copyBtn.addEventListener('click', copyToClipboard);
+
+    </script>
+</body>
+</html>
+
