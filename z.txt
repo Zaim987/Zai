@@ -1,0 +1,37 @@
+Build a futuristic, hacker-themed desktop web application similar to Instagram, using only pure HTML, CSS, and JavaScript (no frameworks or libraries allowed).
+The app should connect only to Firebase Authentication and Firebase Firestore using the config provided below.
+
+🔒 Authentication:
+Allow users to register, log in, and log out using Firebase Auth (email/password).
+👥 Realtime Users List:
+Show a list of all currently logged-in users in real time using Firestore presence tracking.
+📰 Feed (Text Only):
+Users can post text-only updates (like tweets).
+Show all posts in a scrollable feed.
+Feed updates in real-time (Firestore listeners).
+💬 1-on-1 Chat:
+Realtime direct messaging between users (1:1 chat).
+Use Firestore to store messages, with real-time syncing.
+🎨 Design:
+Use a hacker-inspired UI: dark mode, neon green highlights, monospaced fonts, animated transitions.
+Desktop layout only, no mobile responsiveness required.
+🔥 Firebase Config:
+html
+Salin
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+authDomain: "quantechapp.firebaseapp.com",
+databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
+projectId: "quantechapp",
+storageBucket: "quantechapp.firebasestorage.app",
+messagingSenderId: "825384610343",
+appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+measurementId: "G-E9L012VH32"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);</script>
