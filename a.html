@@ -1,146 +1,370 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sosial App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+    <title>Quantech</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        /* Menggunakan font Inter sebagai default dan VT323 untuk tema hacker */
         :root {
-            font-family: 'Inter', sans-serif;
+            --background-color: #0a0a0a;
+            --main-color: #00ff41;
+            --secondary-color: #4a4a4a;
+            --text-color: #ffffff;
+            --border-glow: 0 0 5px var(--main-color), 0 0 10px var(--main-color), 0 0 15px var(--main-color);
         }
 
-        /* Definisi variabel warna untuk setiap tema */
-        [data-theme="light"] {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f3f4f6;
-            --bg-header-footer: #ffffff;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #1d4ed8;
-            --border-color: #e5e7eb;
-            --font-family: 'Inter', sans-serif;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        [data-theme="dark"] {
-            --bg-primary: #121212;
-            --bg-secondary: #1f1f1f;
-            --bg-header-footer: #1e1e1e;
-            --text-primary: #e5e7eb;
-            --text-secondary: #9ca3af;
-            --accent-primary: #60a5fa;
-            --accent-secondary: #3b82f6;
-            --border-color: #374151;
-            --font-family: 'Inter', sans-serif;
-        }
-
-        [data-theme="hacker"] {
-            --bg-primary: #000000;
-            --bg-secondary: #0a0a0a;
-            --bg-header-footer: #050505;
-            --text-primary: #00ff00;
-            --text-secondary: #00dd00;
-            --accent-primary: #00ff00;
-            --accent-secondary: #00aa00;
-            --border-color: #00ff00;
-            --font-family: 'VT323', monospace;
-        }
-
-        /* Menerapkan variabel warna ke elemen */
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: var(--font-family);
-            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--background-color);
+            color: var(--main-color);
+            font-family: 'VT323', monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
-        /* Layout utama aplikasi */
-        #root {
+        .container {
+            width: 100%;
+            height: 100%;
+            display: none;
+            grid-template-columns: 250px 1fr 350px;
+            grid-template-rows: 50px 1fr;
+            grid-template-areas:
+                "header header header"
+                "users feed chat";
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .panel {
+            background-color: rgba(10, 10, 10, 0.8);
+            border: 1px solid var(--main-color);
+            box-shadow: var(--border-glow);
+            padding: 15px;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Header --- */
+        .header {
+            grid-area: header;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            text-shadow: var(--border-glow);
+        }
+
+        .header button {
+            background: none;
+            border: 1px solid var(--main-color);
+            color: var(--main-color);
+            padding: 8px 15px;
+            font-family: 'VT323', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .header button:hover {
+            background-color: var(--main-color);
+            color: var(--background-color);
+            box-shadow: var(--border-glow);
+        }
+
+        /* --- Users Panel --- */
+        .users-panel {
+            grid-area: users;
+        }
+        .users-panel h2, .feed-panel h2, .chat-panel h2 {
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--main-color);
+            padding-bottom: 10px;
+        }
+        #users-list .user {
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        #users-list .user:hover {
+            background-color: var(--secondary-color);
+        }
+        #users-list .user .status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ff0000; /* Offline by default */
+            margin-right: 10px;
+            box-shadow: 0 0 5px #ff0000;
+        }
+        #users-list .user .status.online {
+            background-color: var(--main-color);
+            box-shadow: var(--border-glow);
+        }
+
+
+        /* --- Feed Panel --- */
+        .feed-panel {
+            grid-area: feed;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            max-width: 600px; /* Lebar maksimal untuk tampilan seperti mobile */
-            margin: 0 auto;
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
         }
 
-        /* Header dan Footer statis */
-        .app-header, .app-footer {
-            flex-shrink: 0;
-            background-color: var(--bg-header-footer);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 10;
-        }
-        .app-footer {
-            border-top: 1px solid var(--border-color);
-            border-bottom: none;
-        }
-
-        /* Konten tengah yang bisa di-scroll */
-        .app-content {
+        #post-feed {
             flex-grow: 1;
-            overflow-y: auto;
-            background-color: var(--bg-secondary);
+            margin-bottom: 15px;
         }
-        /* Kustomisasi scrollbar */
-        .app-content::-webkit-scrollbar {
-            width: 6px;
+
+        .post {
+            border: 1px dashed var(--secondary-color);
+            padding: 10px;
+            margin-bottom: 10px;
         }
-        .app-content::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
+        .post .post-author {
+            font-weight: bold;
+            color: var(--text-color);
         }
-        .app-content::-webkit-scrollbar-thumb {
-            background-color: var(--accent-primary);
-            border-radius: 20px;
+        .post .post-content {
+            margin-top: 5px;
         }
+
+        #post-form {
+            display: flex;
+        }
+
+        #post-input {
+            flex-grow: 1;
+            background-color: var(--secondary-color);
+            border: 1px solid var(--main-color);
+            color: var(--text-color);
+            padding: 10px;
+            font-family: 'VT323', monospace;
+        }
+
+        #post-form button {
+            background-color: var(--main-color);
+            color: var(--background-color);
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        /* --- Chat Panel --- */
+        .chat-panel {
+            grid-area: chat;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-window {
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+        #chat-window .message {
+            margin-bottom: 10px;
+        }
+        #chat-window .message.sent {
+            text-align: right;
+        }
+        #chat-window .message.received {
+            text-align: left;
+        }
+        #chat-window .message span {
+            background-color: var(--secondary-color);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        #chat-window .message.sent span {
+            background-color: #005f1a;
+        }
+
+        #chat-form {
+            display: flex;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            background-color: var(--secondary-color);
+            border: 1px solid var(--main-color);
+            color: var(--text-color);
+            padding: 10px;
+            font-family: 'VT323', monospace;
+        }
+        #chat-form button {
+            background-color: var(--main-color);
+            color: var(--background-color);
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #chat-with-user {
+            color: var(--text-color);
+        }
+
+
+        /* --- Auth Forms --- */
+        .auth-container {
+            width: 350px;
+            text-align: center;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-form h2 {
+            margin-bottom: 20px;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: var(--secondary-color);
+            border: 1px solid var(--main-color);
+            color: var(--text-color);
+            font-family: 'VT323', monospace;
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--main-color);
+            border: none;
+            color: var(--background-color);
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .auth-switch {
+            margin-top: 20px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        #error-message {
+            color: #ff0000;
+            margin-top: 15px;
+            height: 20px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--main-color);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff6a;
+        }
+
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "react": "https://esm.sh/react@18.2.0",
-                "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
-            }
-        }
-    </script>
+    <div id="auth-container" class="auth-container panel">
+        <form id="login-form" class="auth-form active">
+            <h2>// LOGIN</h2>
+            <input type="email" id="login-email" placeholder="email" required>
+            <input type="password" id="login-password" placeholder="password" required>
+            <button type="submit">ACCESS</button>
+            <p class="auth-switch" onclick="toggleForms()">> No account? Register here.</p>
+        </form>
+        <form id="register-form" class="auth-form">
+            <h2>// REGISTER</h2>
+            <input type="email" id="register-email" placeholder="email" required>
+            <input type="password" id="register-password" placeholder="password" required>
+            <button type="submit">CREATE ACCOUNT</button>
+            <p class="auth-switch" onclick="toggleForms()">> Already have an account? Login.</p>
+        </form>
+        <p id="error-message"></p>
+    </div>
+
+    <div id="app-container" class="container">
+        <header class="header panel">
+            <h1>QUANTECH</h1>
+            <div>
+                <span id="current-user-email" style="margin-right: 20px;"></span>
+                <button id="logout-btn">LOGOUT</button>
+            </div>
+        </header>
+
+        <div class="users-panel panel">
+            <h2>// ONLINE USERS</h2>
+            <div id="users-list"></div>
+        </div>
+
+        <div class="feed-panel panel">
+            <h2>// GLOBAL FEED</h2>
+            <div id="post-feed"></div>
+            <form id="post-form">
+                <input type="text" id="post-input" placeholder="Broadcast a message...">
+                <button type="submit">SEND</button>
+            </form>
+        </div>
+
+        <div class="chat-panel panel">
+            <h2>// DIRECT MESSAGE</h2>
+            <p>Chatting with: <span id="chat-with-user">...</span></p>
+            <div id="chat-window"></div>
+            <form id="chat-form">
+                <input type="text" id="chat-input" placeholder="Type your message..." disabled>
+                <button type="submit" disabled>SEND</button>
+            </form>
+        </div>
+    </div>
 
     <script type="module">
-        import React, { useState, useEffect, useRef, useMemo } from 'react';
-        import { createRoot } from 'react-dom/client';
-        import { initializeApp } from 'firebase/app';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { 
             getAuth, 
             createUserWithEmailAndPassword, 
             signInWithEmailAndPassword, 
             signOut, 
             onAuthStateChanged 
-        } from 'firebase/auth';
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { 
             getFirestore, 
             collection, 
             addDoc, 
             query, 
-            orderBy, 
             onSnapshot, 
+            orderBy, 
             serverTimestamp,
             doc,
             setDoc,
-            getDocs
-        } from 'firebase/firestore';
+            getDoc,
+            where
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-        // Konfigurasi Firebase yang Anda berikan
+        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
             authDomain: "quantechapp.firebaseapp.com",
@@ -150,408 +374,193 @@
             appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
         };
 
-        // Inisialisasi Firebase
+        // --- Initialize Firebase ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Komponen Ikon sederhana
-        const Icon = ({ path, className = "w-6 h-6" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-                <path strokeLinecap="round" strokeLinejoin="round" d={path} />
-            </svg>
-        );
+        // --- DOM Elements ---
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const errorMessage = document.getElementById('error-message');
+        const logoutBtn = document.getElementById('logout-btn');
+        const currentUserEmailEl = document.getElementById('currentUserEmail');
+        const postForm = document.getElementById('post-form');
+        const postInput = document.getElementById('post-input');
+        const postFeed = document.getElementById('post-feed');
+        const usersList = document.getElementById('users-list');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatWindow = document.getElementById('chat-window');
+        const chatWithUserEl = document.getElementById('chat-with-user');
+        
+        let currentChatPartner = null;
+        let unsubscribeChat = null;
 
-        // Komponen untuk Halaman Autentikasi (Login & Register)
-        const AuthPage = () => {
-            const [isLogin, setIsLogin] = useState(true);
-            const [email, setEmail] = useState('');
-            const [password, setPassword] = useState('');
-            const [username, setUsername] = useState('');
-            const [error, setError] = useState('');
-            const [loading, setLoading] = useState(false);
+        // --- Auth UI Toggle ---
+        window.toggleForms = () => {
+            loginForm.classList.toggle('active');
+            registerForm.classList.toggle('active');
+            errorMessage.textContent = '';
+        };
 
-            const handleAuthAction = async (e) => {
-                e.preventDefault();
-                setLoading(true);
-                setError('');
-                try {
-                    if (isLogin) {
-                        await signInWithEmailAndPassword(auth, email, password);
-                    } else {
-                        if (!username) {
-                            setError("Username tidak boleh kosong.");
-                            setLoading(false);
-                            return;
-                        }
-                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                        // Simpan data user ke Firestore
-                        await setDoc(doc(db, "users", userCredential.user.uid), {
-                            username: username,
-                            email: email,
-                            uid: userCredential.user.uid
-                        });
+        // --- Authentication Logic ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                // User is signed in
+                authContainer.style.display = 'none';
+                appContainer.style.display = 'grid';
+                document.getElementById('current-user-email').textContent = user.email;
+                
+                // Set user presence
+                const userStatusRef = doc(db, 'presence', user.uid);
+                setDoc(userStatusRef, { email: user.email, online: true });
+
+                window.addEventListener('beforeunload', () => {
+                    setDoc(userStatusRef, { online: false }, { merge: true });
+                });
+
+                loadPosts();
+                loadUsers();
+
+            } else {
+                // User is signed out
+                authContainer.style.display = 'block';
+                appContainer.style.display = 'none';
+                if(unsubscribeChat) unsubscribeChat();
+            }
+        });
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .catch(error => errorMessage.textContent = error.message);
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(error => errorMessage.textContent = error.message);
+        });
+
+        logoutBtn.addEventListener('click', () => {
+             const user = auth.currentUser;
+             if(user){
+                const userStatusRef = doc(db, 'presence', user.uid);
+                setDoc(userStatusRef, { online: false }, { merge: true }).then(() => {
+                    signOut(auth);
+                });
+             }
+        });
+
+        // --- Feed Logic ---
+        postForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = postInput.value.trim();
+            if (content && auth.currentUser) {
+                await addDoc(collection(db, 'posts'), {
+                    authorEmail: auth.currentUser.email,
+                    authorId: auth.currentUser.uid,
+                    content: content,
+                    createdAt: serverTimestamp()
+                });
+                postInput.value = '';
+            }
+        });
+
+        function loadPosts() {
+            const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+            onSnapshot(q, (snapshot) => {
+                postFeed.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const post = doc.data();
+                    const postEl = document.createElement('div');
+                    postEl.className = 'post';
+                    postEl.innerHTML = `
+                        <p class="post-author">> ${post.authorEmail}</p>
+                        <p class="post-content">${post.content}</p>
+                    `;
+                    postFeed.appendChild(postEl);
+                });
+            });
+        }
+
+        // --- Users & Presence Logic ---
+        function loadUsers() {
+            const q = query(collection(db, 'presence'));
+            onSnapshot(q, (snapshot) => {
+                usersList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    const userId = doc.id;
+                    if (userId !== auth.currentUser.uid) { // Don't show current user in the list
+                        const userEl = document.createElement('div');
+                        userEl.className = 'user';
+                        userEl.dataset.uid = userId;
+                        userEl.dataset.email = user.email;
+                        userEl.innerHTML = `
+                            <div class="status ${user.online ? 'online' : ''}"></div>
+                            <span>${user.email}</span>
+                        `;
+                        userEl.addEventListener('click', () => startChat(userId, user.email));
+                        usersList.appendChild(userEl);
                     }
-                } catch (err) {
-                    setError(err.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            return (
-                <div className="h-screen flex flex-col justify-center items-center p-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
-                    <h1 className="text-4xl font-bold mb-8" style={{ color: 'var(--accent-primary)' }}>Sosial App</h1>
-                    <div className="w-full max-w-sm p-6 rounded-lg shadow-md" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-                        <h2 className="text-2xl font-bold text-center mb-4" style={{ color: 'var(--text-primary)' }}>{isLogin ? 'Login' : 'Daftar'}</h2>
-                        <form onSubmit={handleAuthAction}>
-                            {!isLogin && (
-                                <div className="mb-4">
-                                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Username</label>
-                                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full px-3 py-2 rounded" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} placeholder="Username Anda" />
-                                </div>
-                            )}
-                            <div className="mb-4">
-                                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Email</label>
-                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-3 py-2 rounded" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} placeholder="email@contoh.com" />
-                            </div>
-                            <div className="mb-6">
-                                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Password</label>
-                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-3 py-2 rounded" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} placeholder="********" />
-                            </div>
-                            {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
-                            <button type="submit" disabled={loading} className="w-full font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" style={{ backgroundColor: 'var(--accent-primary)', color: '#fff' }}>
-                                {loading ? 'Memproses...' : (isLogin ? 'Login' : 'Daftar')}
-                            </button>
-                        </form>
-                        <p className="text-center text-sm mt-4" style={{ color: 'var(--text-secondary)' }}>
-                            {isLogin ? "Belum punya akun?" : "Sudah punya akun?"}
-                            <button onClick={() => setIsLogin(!isLogin)} className="font-bold ml-1" style={{ color: 'var(--accent-primary)' }}>
-                                {isLogin ? 'Daftar' : 'Login'}
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            );
-        };
-
-        // Komponen untuk Feed Status
-        const Feed = ({ currentUser }) => {
-            const [statuses, setStatuses] = useState([]);
-            const [newStatus, setNewStatus] = useState('');
-            const [users, setUsers] = useState({});
-
-            useEffect(() => {
-                // Ambil data semua user untuk menampilkan username
-                const fetchUsers = async () => {
-                    const usersCollection = collection(db, 'users');
-                    const userSnapshot = await getDocs(usersCollection);
-                    const userList = {};
-                    userSnapshot.forEach(doc => {
-                        userList[doc.id] = doc.data();
-                    });
-                    setUsers(userList);
-                };
-                fetchUsers();
-
-                // Dapatkan status secara real-time
-                const q = query(collection(db, "statuses"), orderBy("timestamp", "desc"));
-                const unsubscribe = onSnapshot(q, (querySnapshot) => {
-                    const statusesData = [];
-                    querySnapshot.forEach((doc) => {
-                        statusesData.push({ id: doc.id, ...doc.data() });
-                    });
-                    setStatuses(statusesData);
                 });
-
-                return () => unsubscribe();
-            }, []);
-
-            const handlePostStatus = async (e) => {
-                e.preventDefault();
-                if (newStatus.trim() === '') return;
-
-                await addDoc(collection(db, "statuses"), {
-                    text: newStatus,
-                    timestamp: serverTimestamp(),
-                    uid: currentUser.uid,
-                });
-                setNewStatus('');
-            };
-            
-            const formatTime = (timestamp) => {
-                if (!timestamp) return 'beberapa saat lalu';
-                return new Date(timestamp.seconds * 1000).toLocaleString('id-ID');
-            }
-
-            return (
-                <div className="p-4">
-                    <form onSubmit={handlePostStatus} className="mb-4">
-                        <textarea
-                            value={newStatus}
-                            onChange={(e) => setNewStatus(e.target.value)}
-                            placeholder="Apa yang kamu pikirkan?"
-                            className="w-full p-2 rounded-lg"
-                            style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
-                        ></textarea>
-                        <button type="submit" className="w-full mt-2 font-bold py-2 px-4 rounded" style={{ backgroundColor: 'var(--accent-primary)', color: '#fff' }}>
-                            Posting
-                        </button>
-                    </form>
-                    <div>
-                        {statuses.map(status => (
-                            <div key={status.id} className="p-4 mb-3 rounded-lg" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
-                                <div className="flex items-center mb-2">
-                                    <div className="font-bold" style={{ color: 'var(--text-primary)' }}>
-                                        {users[status.uid]?.username || 'User Anonim'}
-                                    </div>
-                                    <div className="text-xs ml-auto" style={{ color: 'var(--text-secondary)' }}>
-                                        {formatTime(status.timestamp)}
-                                    </div>
-                                </div>
-                                <p style={{ color: 'var(--text-primary)' }}>{status.text}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
+            });
+        }
         
-        // Komponen untuk menampilkan daftar user untuk DM
-        const UsersList = ({ setCurrentPage, setRecipient }) => {
-            const [users, setUsers] = useState([]);
-            const [loading, setLoading] = useState(true);
+        // --- Chat Logic ---
+        function startChat(partnerId, partnerEmail) {
+            currentChatPartner = partnerId;
+            chatWithUserEl.textContent = partnerEmail;
+            chatInput.disabled = false;
+            chatForm.querySelector('button').disabled = false;
+            chatWindow.innerHTML = ''; // Clear previous chat
 
-            useEffect(() => {
-                const fetchUsers = async () => {
-                    const usersCollection = collection(db, 'users');
-                    const userSnapshot = await getDocs(usersCollection);
-                    const usersList = userSnapshot.docs
-                        .map(doc => ({ id: doc.id, ...doc.data() }))
-                        .filter(user => user.id !== auth.currentUser.uid); // Jangan tampilkan diri sendiri
-                    setUsers(usersList);
-                    setLoading(false);
-                };
-
-                fetchUsers();
-            }, []);
-
-            const startChat = (user) => {
-                setRecipient(user);
-                setCurrentPage('chat');
-            };
-
-            if (loading) return <div className="p-4 text-center" style={{ color: 'var(--text-secondary)' }}>Memuat daftar pengguna...</div>;
-            
-            return (
-                <div className="p-2">
-                    <h2 className="text-xl font-bold p-2" style={{ color: 'var(--text-primary)' }}>Mulai Percakapan</h2>
-                    {users.map(user => (
-                        <div 
-                            key={user.id} 
-                            onClick={() => startChat(user)}
-                            className="flex items-center p-3 mb-2 rounded-lg cursor-pointer hover:opacity-75" 
-                            style={{ backgroundColor: 'var(--bg-primary)' }}
-                        >
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3" style={{ backgroundColor: 'var(--accent-primary)' }}>
-                                <span className="text-white font-bold">{user.username.charAt(0).toUpperCase()}</span>
-                            </div>
-                            <div>
-                                <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{user.username}</p>
-                                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            );
-        };
-        
-        // Komponen untuk Halaman Chat DM
-        const Chat = ({ recipient, currentUser }) => {
-            const [messages, setMessages] = useState([]);
-            const [newMessage, setNewMessage] = useState('');
-            const chatBoxRef = useRef(null);
-
-            const chatRoomId = useMemo(() => {
-                // Membuat ID chat room yang konsisten
-                return [currentUser.uid, recipient.id].sort().join('_');
-            }, [currentUser.uid, recipient.id]);
-
-            useEffect(() => {
-                const messagesRef = collection(db, 'messages', chatRoomId, 'chats');
-                const q = query(messagesRef, orderBy('timestamp'));
-
-                const unsubscribe = onSnapshot(q, (querySnapshot) => {
-                    const msgs = [];
-                    querySnapshot.forEach(doc => {
-                        msgs.push({ id: doc.id, ...doc.data() });
-                    });
-                    setMessages(msgs);
-                });
-
-                return () => unsubscribe();
-            }, [chatRoomId]);
-
-            useEffect(() => {
-                // Auto-scroll ke pesan terbaru
-                if (chatBoxRef.current) {
-                    chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
-                }
-            }, [messages]);
-
-            const handleSendMessage = async (e) => {
-                e.preventDefault();
-                if (newMessage.trim() === '') return;
-
-                const messagesRef = collection(db, 'messages', chatRoomId, 'chats');
-                await addDoc(messagesRef, {
-                    text: newMessage,
-                    senderUid: currentUser.uid,
-                    timestamp: serverTimestamp()
-                });
-                setNewMessage('');
-            };
-
-            return (
-                <div className="flex flex-col h-full">
-                    <div ref={chatBoxRef} className="flex-grow p-4 overflow-y-auto">
-                        {messages.map(msg => (
-                            <div key={msg.id} className={`flex mb-3 ${msg.senderUid === currentUser.uid ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-xs md:max-w-md p-3 rounded-lg ${msg.senderUid === currentUser.uid ? 'rounded-br-none' : 'rounded-bl-none'}`}
-                                    style={{ 
-                                        backgroundColor: msg.senderUid === currentUser.uid ? 'var(--accent-primary)' : 'var(--bg-primary)',
-                                        color: msg.senderUid === currentUser.uid ? '#fff' : 'var(--text-primary)'
-                                    }}
-                                >
-                                    {msg.text}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <form onSubmit={handleSendMessage} className="flex p-2 border-t" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-header-footer)'}}>
-                        <input
-                            type="text"
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Ketik pesan..."
-                            className="flex-grow p-2 rounded-lg"
-                            style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}
-                        />
-                        <button type="submit" className="ml-2 p-2 rounded-lg" style={{ backgroundColor: 'var(--accent-primary)', color: '#fff' }}>
-                            <Icon path="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                        </button>
-                    </form>
-                </div>
-            );
-        };
-
-
-        // Komponen Utama Aplikasi
-        const App = () => {
-            const [user, setUser] = useState(null);
-            const [loading, setLoading] = useState(true);
-            const [theme, setTheme] = useState(localStorage.getItem('app-theme') || 'dark');
-            const [currentPage, setCurrentPage] = useState('feed'); // 'feed', 'users', 'chat'
-            const [recipient, setRecipient] = useState(null); // Untuk DM
-
-            useEffect(() => {
-                const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-                    setUser(currentUser);
-                    setLoading(false);
-                });
-                return () => unsubscribe();
-            }, []);
-
-            useEffect(() => {
-                document.body.setAttribute('data-theme', theme);
-                localStorage.setItem('app-theme', theme);
-            }, [theme]);
-
-            const handleThemeChange = () => {
-                const themes = ['light', 'dark', 'hacker'];
-                const currentIndex = themes.indexOf(theme);
-                const nextIndex = (currentIndex + 1) % themes.length;
-                setTheme(themes[nextIndex]);
-            };
-            
-            const handleLogout = async () => {
-                await signOut(auth);
-                setCurrentPage('feed');
-            };
-
-            const renderPage = () => {
-                switch (currentPage) {
-                    case 'feed':
-                        return <Feed currentUser={user} />;
-                    case 'users':
-                        return <UsersList setCurrentPage={setCurrentPage} setRecipient={setRecipient} />;
-                    case 'chat':
-                        if (recipient) {
-                           return <Chat recipient={recipient} currentUser={user} />;
-                        }
-                        // Jika tidak ada recipient, kembali ke daftar user
-                        setCurrentPage('users'); 
-                        return null;
-                    default:
-                        return <Feed currentUser={user} />;
-                }
-            };
-            
-            const getHeaderTitle = () => {
-                switch (currentPage) {
-                    case 'feed': return 'Feed';
-                    case 'users': return 'Pesan Baru';
-                    case 'chat': return recipient?.username || 'Chat';
-                    default: return 'Sosial App';
-                }
+            if (unsubscribeChat) {
+                unsubscribeChat(); // Unsubscribe from previous chat listener
             }
 
-            if (loading) {
-                return <div className="h-screen flex justify-center items-center" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Memuat Aplikasi...</div>;
+            const chatId = [auth.currentUser.uid, partnerId].sort().join('_');
+            const chatRef = collection(db, 'chats', chatId, 'messages');
+            const q = query(chatRef, orderBy('createdAt'));
+
+            unsubscribeChat = onSnapshot(q, (snapshot) => {
+                chatWindow.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const message = doc.data();
+                    const messageEl = document.createElement('div');
+                    messageEl.classList.add('message');
+                    messageEl.classList.add(message.senderId === auth.currentUser.uid ? 'sent' : 'received');
+                    messageEl.innerHTML = `<span>${message.text}</span>`;
+                    chatWindow.appendChild(messageEl);
+                });
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            });
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (text && currentChatPartner && auth.currentUser) {
+                const chatId = [auth.currentUser.uid, currentChatPartner].sort().join('_');
+                const chatRef = collection(db, 'chats', chatId, 'messages');
+                await addDoc(chatRef, {
+                    text: text,
+                    senderId: auth.currentUser.uid,
+                    receiverId: currentChatPartner,
+                    createdAt: serverTimestamp()
+                });
+                chatInput.value = '';
             }
-
-            if (!user) {
-                return <AuthPage />;
-            }
-
-            return (
-                <>
-                    <header className="app-header p-4 flex justify-between items-center">
-                        {currentPage === 'chat' && (
-                            <button onClick={() => setCurrentPage('users')} className="p-2 -ml-2">
-                                <Icon path="M15.75 19.5L8.25 12l7.5-7.5" className="w-6 h-6" style={{ color: 'var(--text-primary)' }} />
-                            </button>
-                        )}
-                        <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{getHeaderTitle()}</h1>
-                        <div className="flex items-center space-x-2">
-                            <button onClick={handleThemeChange} className="p-2">
-                                <Icon path="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" className="w-6 h-6" style={{ color: 'var(--text-primary)' }} />
-                            </button>
-                            <button onClick={handleLogout} className="p-2">
-                                <Icon path="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m-3 0l3-3m0 0l-3-3m3 3H9" className="w-6 h-6" style={{ color: 'var(--text-primary)' }} />
-                            </button>
-                        </div>
-                    </header>
-                    <main className="app-content">
-                        {renderPage()}
-                    </main>
-                    <footer className="app-footer p-2 flex justify-around items-center">
-                        <button onClick={() => setCurrentPage('feed')} className={`p-2 rounded-lg ${currentPage === 'feed' ? 'opacity-100' : 'opacity-60'}`}>
-                           <Icon path="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" className="w-7 h-7" style={{ color: 'var(--accent-primary)' }} />
-                        </button>
-                        <button onClick={() => setCurrentPage('users')} className={`p-2 rounded-lg ${currentPage === 'users' || currentPage === 'chat' ? 'opacity-100' : 'opacity-60'}`}>
-                            <Icon path="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.76 9.76 0 01-2.53-.375m-10.492 0c-.106.02a.315.315 0 01-.315-.315a2.5 2.5 0 01.315-2.492C3.693 6.08 7.978 3 12 3c4.022 0 8.307 3.08 9.474 6.685a2.5 2.5 0 01.315 2.492.315.315 0 01-.315.315c-.106-.02-.215-.032-.326-.04a9.753 9.753 0 01-2.17-1.37c-.359-.2-.695-.418-1.026-.653a3.532 3.532 0 00-2.296-.653H12c-.896 0-1.73.29-2.424.777-.694.486-1.293 1.06-1.782 1.732a9.753 9.753 0 01-2.17 1.37c-.11.009-.22.02-.326.04z" className="w-7 h-7" style={{ color: 'var(--accent-primary)' }} />
-                        </button>
-                    </footer>
-                </>
-            );
-        };
-
-        const container = document.getElementById('root');
-        const root = createRoot(container);
-        root.render(<App />);
+        });
 
     </script>
 </body>
 </html>
-
