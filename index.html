@@ -1,48 +1,752 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Hackergram</title>
-  <link rel="stylesheet" href="style.css">
+  <title>QuantechGram SPA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
   <!-- Firebase SDK -->
-  <script type="module" src="app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <style>
+    :root {
+      --color-bg: #18191a;
+      --color-header: #23272f;
+      --color-card: #242526;
+      --color-text: #f5f6fa;
+      --color-accent: #0099ff;
+      --color-input: #20222b;
+      --color-border: #2f3136;
+      --color-active: #0c87ff;
+    }
+    [data-theme="light"] {
+      --color-bg: #f5f6fa;
+      --color-header: #fff;
+      --color-card: #fff;
+      --color-text: #222;
+      --color-accent: #0099ff;
+      --color-input: #f1f1f1;
+      --color-border: #e6e6e6;
+      --color-active: #0c87ff;
+    }
+    [data-theme="hacker"] {
+      --color-bg: #010101;
+      --color-header: #000;
+      --color-card: #0c0e0a;
+      --color-text: #39ff14;
+      --color-accent: #39ff14;
+      --color-input: #000;
+      --color-border: #39ff14;
+      --color-active: #39ff14;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      overscroll-behavior-y: none;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 10;
+      height: 56px;
+      background: var(--color-header);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-sizing: border-box;
+    }
+    .header .nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .header .nav button {
+      background: none;
+      border: none;
+      color: var(--color-text);
+      font-size: 18px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-weight: 600;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .header .nav button.active,
+    .header .nav button:hover {
+      background: var(--color-active);
+      color: #fff;
+    }
+    .header .theme-toggle {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .header .theme-toggle button {
+      background: none;
+      border: none;
+      color: var(--color-accent);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 5px;
+      transition: background 0.12s;
+    }
+    .header .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+    .container {
+      flex: 1;
+      margin-top: 56px;
+      width: 100%;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-bottom: 12px;
+    }
+    main {
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .card {
+      background: var(--color-card);
+      padding: 16px;
+      margin: 14px 8px 0 8px;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      border: 1px solid var(--color-border);
+      transition: background 0.2s;
+    }
+    .card .timestamp {
+      color: #888;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    .card .username {
+      font-weight: 600;
+      color: var(--color-accent);
+      font-size: 15px;
+    }
+    .status-input {
+      margin: 14px 8px 0 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .status-input input, .status-input textarea {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      background: var(--color-input);
+      color: var(--color-text);
+      font-size: 15px;
+      outline: none;
+      resize: none;
+    }
+    .status-input button {
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .centered {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 75vh;
+      padding: 0 20px;
+    }
+    .auth-form {
+      background: var(--color-card);
+      padding: 25px 18px 22px 18px;
+      border-radius: 10px;
+      max-width: 340px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid var(--color-border);
+    }
+    .auth-form h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 22px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .auth-form input {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--color-border);
+      background: var(--color-input);
+      color: var(--color-text);
+      font-size: 15px;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .auth-form button {
+      width: 100%;
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 11px 0;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 7px;
+      transition: background 0.14s;
+    }
+    .auth-form .switch {
+      background: none;
+      color: var(--color-accent);
+      border: none;
+      text-align: center;
+      font-size: 15px;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .auth-form .error {
+      color: #ff3860;
+      margin-bottom: 7px;
+      font-size: 13px;
+      text-align: center;
+    }
+    .users-list {
+      padding: 14px 8px;
+    }
+    .users-list .user-row {
+      padding: 13px 0 11px 0;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.13s;
+    }
+    .users-list .user-row:last-child {
+      border-bottom: none;
+    }
+    .users-list .user-row:hover {
+      background: var(--color-input);
+    }
+    .users-list .user-uid {
+      font-size: 13px;
+      color: #888;
+    }
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 56px);
+    }
+    .chat-header {
+      padding: 16px 8px 10px 14px;
+      background: var(--color-header);
+      border-bottom: 1px solid var(--color-border);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--color-accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      background: var(--color-bg);
+    }
+    .chat-message {
+      max-width: 80%;
+      padding: 8px 13px;
+      border-radius: 13px;
+      font-size: 15px;
+      word-break: break-word;
+      background: var(--color-card);
+      align-self: flex-start;
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+    .chat-message.own {
+      background: var(--color-accent);
+      color: #fff;
+      align-self: flex-end;
+      border: none;
+    }
+    .chat-input-row {
+      display: flex;
+      padding: 10px 9px 14px 9px;
+      gap: 8px;
+      background: var(--color-header);
+      border-top: 1px solid var(--color-border);
+    }
+    .chat-input-row input, .chat-input-row textarea {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      background: var(--color-input);
+      color: var(--color-text);
+      font-size: 15px;
+      outline: none;
+      resize: none;
+    }
+    .chat-input-row button {
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 7px 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .logout-btn {
+      background: none;
+      color: #f66;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      padding: 2px 9px;
+      border-radius: 5px;
+      transition: background 0.12s;
+    }
+    .logout-btn:hover {
+      background: #ff386022;
+    }
+    @media (max-width: 600px) {
+      .container, main {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      .card, .status-input {
+        margin-left: 4px; margin-right: 4px;
+      }
+    }
+    /* Scrollbar for dark/hacker */
+    ::-webkit-scrollbar {
+      width: 8px;
+      background: var(--color-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border);
+      border-radius: 6px;
+    }
+  </style>
 </head>
-<body>
-  <div id="app" class="container">
-    <!-- Login/Register Section -->
-    <div id="auth-section">
-      <h1>Hackergram</h1>
-      <input id="email" type="email" placeholder="Email">
-      <input id="password" type="password" placeholder="Password">
-      <button id="login-btn">Login</button>
-      <button id="register-btn">Register</button>
-      <div id="auth-msg"></div>
+<body data-theme="dark">
+  <div class="header" id="header" style="display:none">
+    <div class="nav">
+      <button id="nav-feed" class="active">Feed</button>
+      <button id="nav-users">Users</button>
+      <button id="nav-dm">DM</button>
     </div>
-    <!-- Main App Section (hidden by default) -->
-    <div id="main-section" style="display:none;">
-      <div class="sidebar">
-        <h2>Online Users</h2>
-        <ul id="users-list"></ul>
-        <button id="logout-btn">Logout</button>
-      </div>
-      <div class="feed">
-        <h2>Feed</h2>
-        <form id="post-form">
-          <input id="post-input" placeholder="What's on your mind?">
-          <button type="submit">Post</button>
-        </form>
-        <ul id="posts-feed"></ul>
-      </div>
-      <div class="chat">
-        <h2>Chat</h2>
-        <div id="chat-users"></div>
-        <div id="chat-window"></div>
-        <form id="chat-form" style="display:none;">
-          <input id="chat-input" placeholder="Type a message">
-          <button type="submit">Send</button>
-        </form>
-      </div>
+    <div class="theme-toggle">
+      <button id="theme-dark" title="Dark Mode">🌑</button>
+      <button id="theme-light" title="Light Mode">🌕</button>
+      <button id="theme-hacker" title="Hacker Mode">💾</button>
     </div>
+    <div class="user-info" id="userinfo"></div>
   </div>
+  <div class="container">
+    <main id="app">
+      <!-- Dynamic Content -->
+    </main>
+  </div>
+  <script>
+    // --- THEME MANAGEMENT ---
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+    function getTheme() {
+      return localStorage.getItem('theme') || 'dark';
+    }
+    // Init theme
+    setTheme(getTheme());
+    // Theme toggle events
+    document.getElementById('theme-dark').onclick = () => setTheme('dark');
+    document.getElementById('theme-light').onclick = () => setTheme('light');
+    document.getElementById('theme-hacker').onclick = () => setTheme('hacker');
+
+    // --- FIREBASE INIT ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // --- APP STATE MANAGEMENT ---
+    let currentUser = null;
+    let currentView = 'feed'; // feed | users | dm
+    let currentChatUser = null; // {uid, email, displayName}
+
+    // --- HELPERS ---
+    function escapeHTML(str) {
+      return (str || '').replace(/[<>&"'`]/g, c => ({
+        '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;','`':'&#96;'
+      })[c]);
+    }
+    function formatTimeAgo(ts) {
+      if (!ts) return '';
+      const date = (typeof ts === 'object' && ts.seconds)
+        ? new Date(ts.seconds * 1000)
+        : new Date(ts);
+      const diff = (Date.now() - date.getTime()) / 1000;
+      if (diff < 60) return 'baru saja';
+      if (diff < 3600) return `${Math.floor(diff/60)} menit lalu`;
+      if (diff < 86400) return `${Math.floor(diff/3600)} jam lalu`;
+      if (diff < 172800) return 'kemarin';
+      const d = date;
+      return `${d.getDate().toString().padStart(2,0)}/${(d.getMonth()+1).toString().padStart(2,0)} ${d.getHours()}:${d.getMinutes().toString().padStart(2,"0")}`;
+    }
+    function getChatRoomId(uid1, uid2) {
+      // consistent room id
+      return [uid1, uid2].sort().join('_');
+    }
+
+    // --- AUTH UI ---
+    function renderAuthForm(isLogin=true, error='') {
+      document.getElementById('header').style.display = 'none';
+      document.getElementById('app').innerHTML = `
+        <div class="centered">
+          <form class="auth-form" id="authform">
+            <h2>${isLogin ? 'Login' : 'Register'}</h2>
+            <input type="email" id="auth-email" required placeholder="Email">
+            <input type="password" id="auth-pass" required placeholder="Password" minlength="6">
+            ${!isLogin ? '<input type="text" id="auth-name" placeholder="Nama (opsional)">' : ''}
+            ${error ? `<div class="error">${escapeHTML(error)}</div>` : ''}
+            <button type="submit">${isLogin ? 'Login' : 'Register'}</button>
+            <button type="button" class="switch" id="switchbtn">
+              ${isLogin ? 'Belum punya akun? Register' : 'Sudah punya akun? Login'}
+            </button>
+          </form>
+        </div>
+      `;
+      document.getElementById('authform').onsubmit = async e => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const pass = document.getElementById('auth-pass').value;
+        if (!isLogin) {
+          const name = document.getElementById('auth-name').value.trim();
+          try {
+            const res = await auth.createUserWithEmailAndPassword(email, pass);
+            await res.user.updateProfile({ displayName: name });
+            await db.collection('users').doc(res.user.uid).set({
+              email, name, created: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          } catch(err) {
+            renderAuthForm(false, err.message);
+            return;
+          }
+        } else {
+          try {
+            await auth.signInWithEmailAndPassword(email, pass);
+          } catch(err) {
+            renderAuthForm(true, err.message);
+            return;
+          }
+        }
+      }
+      document.getElementById('switchbtn').onclick = () => {
+        renderAuthForm(!isLogin);
+      }
+    }
+
+    // --- HEADER UI ---
+    function renderHeader() {
+      document.getElementById('header').style.display = '';
+      // Nav btns
+      ['feed','users','dm'].forEach(id => {
+        const btn = document.getElementById('nav-'+id);
+        btn.classList.toggle('active', id === currentView);
+        btn.onclick = () => {
+          if (currentView !== id) {
+            currentView = id;
+            currentChatUser = null;
+            updateView();
+          }
+        }
+      });
+      // User info
+      const user = auth.currentUser;
+      document.getElementById('userinfo').innerHTML = user
+        ? `
+          <span>${escapeHTML(user.displayName||user.email)}</span>
+          <button class="logout-btn" id="logoutbtn">Logout</button>
+        ` : '';
+      if (user) {
+        document.getElementById('logoutbtn').onclick = async () => {
+          await auth.signOut();
+        }
+      }
+    }
+
+    // --- FEED UI ---
+    async function renderFeed() {
+      renderHeader();
+      let statusList = [];
+      let userMap = {};
+      // Ambil user displayName
+      const usersSnap = await db.collection('users').get();
+      usersSnap.forEach(doc => {
+        const {email, name} = doc.data();
+        userMap[doc.id] = name || email;
+      });
+      // Ambil status
+      const statusesSnap = await db.collection('statuses')
+        .orderBy('timestamp', 'desc').limit(50).get();
+      statusList = statusesSnap.docs.map(doc => ({
+        id: doc.id, ...doc.data()
+      }));
+      // Render
+      let html = `
+        <div class="status-input">
+          <input id="statusinput" maxlength="160" autocomplete="off" placeholder="Apa yang kamu pikirkan?">
+          <button id="poststatus">Post</button>
+        </div>
+      `;
+      if (!statusList.length) {
+        html += `<div class="centered"><div>Tidak ada status.</div></div>`;
+      }
+      for (const s of statusList) {
+        html += `
+          <div class="card">
+            <div class="username">${escapeHTML(userMap[s.uid]||'Anon')}</div>
+            <div>${escapeHTML(s.text)}</div>
+            <div class="timestamp">${formatTimeAgo(s.timestamp)}</div>
+          </div>
+        `;
+      }
+      document.getElementById('app').innerHTML = html;
+
+      document.getElementById('poststatus').onclick = async () => {
+        const input = document.getElementById('statusinput');
+        let txt = input.value.trim();
+        if (!txt) return;
+        if (txt.length > 160) txt = txt.slice(0,160);
+        input.value = '';
+        await db.collection('statuses').add({
+          text: txt,
+          uid: auth.currentUser.uid,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        updateView();
+      };
+    }
+
+    // --- USERS LIST UI ---
+    async function renderUsersList() {
+      renderHeader();
+      const user = auth.currentUser;
+      const snap = await db.collection('users').get();
+      let html = `<div class="users-list">`;
+      snap.forEach(doc => {
+        if (doc.id === user.uid) return; // skip self
+        const d = doc.data();
+        html += `
+          <div class="user-row" data-uid="${doc.id}" tabindex="0">
+            <span class="username">${escapeHTML(d.name || d.email)}</span>
+            <span class="user-uid">@${doc.id.slice(0,6)}...</span>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      document.getElementById('app').innerHTML = html;
+      // Click event
+      Array.from(document.querySelectorAll('.user-row')).forEach(row => {
+        row.onclick = () => {
+          const uid = row.getAttribute('data-uid');
+          const d = snap.docs.find(doc => doc.id === uid).data();
+          currentView = 'dm';
+          currentChatUser = {uid, displayName: d.name || d.email, email: d.email};
+          updateView();
+        };
+      });
+    }
+
+    // --- DM UI ---
+    async function renderDMList() {
+      renderHeader();
+      const myuid = auth.currentUser.uid;
+      // Ambil semua chat yang pernah diikuti user (by messages)
+      const messagesSnap = await db.collection('messages').get();
+      let chatUids = new Set();
+      for (const doc of messagesSnap.docs) {
+        const roomId = doc.id;
+        if (roomId.includes(myuid)) {
+          const [a,b] = roomId.split('_');
+          const other = (a===myuid)?b:a;
+          if (other !== myuid) chatUids.add(other);
+        }
+      }
+      // Tampilkan chat list
+      let html = `<div class="users-list">`;
+      if (!chatUids.size) html += '<div>Tidak ada DM</div>';
+      else {
+        for (const uid of chatUids) {
+          // Fetch user name/email
+          const udoc = await db.collection('users').doc(uid).get();
+          if (!udoc.exists) continue;
+          const d = udoc.data();
+          html += `
+            <div class="user-row" data-uid="${uid}" tabindex="0">
+              <span class="username">${escapeHTML(d.name || d.email)}</span>
+              <span class="user-uid">@${uid.slice(0,6)}...</span>
+            </div>
+          `;
+        }
+      }
+      html += `</div>`;
+      document.getElementById('app').innerHTML = html;
+      // Click event
+      Array.from(document.querySelectorAll('.user-row')).forEach(row => {
+        row.onclick = async () => {
+          const uid = row.getAttribute('data-uid');
+          const udoc = await db.collection('users').doc(uid).get();
+          const d = udoc.data();
+          currentChatUser = {uid, displayName: d.name || d.email, email: d.email};
+          updateView();
+        };
+      });
+    }
+    // --- DM CHAT UI ---
+    async function renderChatRoom(chatUser) {
+      renderHeader();
+      const myuid = auth.currentUser.uid, otheruid = chatUser.uid;
+      const roomId = getChatRoomId(myuid, otheruid);
+      let messages = [];
+      // Fetch messages
+      const snap = await db.collection('messages').doc(roomId).collection('msgs')
+        .orderBy('timestamp','asc').limit(100).get();
+      snap.forEach(doc => messages.push({...doc.data(), id: doc.id}));
+
+      // Chat UI
+      let html = `
+        <div class="chat-container">
+          <div class="chat-header">
+            <span style="font-size:21px">💬</span>
+            ${escapeHTML(chatUser.displayName)}
+            <button class="logout-btn" id="backbtn" style="margin-left:auto;">← Kembali</button>
+          </div>
+          <div class="chat-messages" id="chatmsgs">
+            ${messages.map(msg => `
+              <div class="chat-message${msg.senderUid===myuid?' own':''}">
+                ${escapeHTML(msg.text)}
+                <div class="timestamp" style="font-size:11px;margin-top:3px;text-align:right">${formatTimeAgo(msg.timestamp)}</div>
+              </div>
+            `).join('')}
+          </div>
+          <form class="chat-input-row" id="chatinputrow" autocomplete="off">
+            <input id="msginput" maxlength="500" autocomplete="off" placeholder="Ketik pesan...">
+            <button type="submit">Kirim</button>
+          </form>
+        </div>
+      `;
+      document.getElementById('app').innerHTML = html;
+      // Scroll to bottom
+      const chatmsgs = document.getElementById('chatmsgs');
+      chatmsgs.scrollTop = chatmsgs.scrollHeight;
+
+      document.getElementById('backbtn').onclick = () => {
+        currentChatUser = null;
+        updateView();
+      };
+      document.getElementById('chatinputrow').onsubmit = async e => {
+        e.preventDefault();
+        const input = document.getElementById('msginput');
+        let txt = input.value.trim();
+        if (!txt) return;
+        if (txt.length > 500) txt = txt.slice(0,500);
+        input.value = '';
+        await db.collection('messages').doc(roomId).collection('msgs').add({
+          text: txt,
+          senderUid: myuid,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        updateView();
+      };
+    }
+
+    // --- MAIN NAVIGATION ---
+    async function updateView() {
+      if (!auth.currentUser) {
+        renderAuthForm();
+        return;
+      }
+      renderHeader();
+      if (currentView === 'feed') {
+        await renderFeed();
+      } else if (currentView === 'users') {
+        await renderUsersList();
+      } else if (currentView === 'dm') {
+        if (currentChatUser) {
+          await renderChatRoom(currentChatUser);
+        } else {
+          await renderDMList();
+        }
+      }
+    }
+
+    // --- AUTH STATE LISTENER ---
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      if (user) {
+        // Pastikan user ada di collection users
+        db.collection('users').doc(user.uid).set({
+          email: user.email,
+          name: user.displayName || user.email
+        }, {merge:true});
+        currentView = 'feed';
+        currentChatUser = null;
+        updateView();
+      } else {
+        renderAuthForm();
+      }
+    });
+
+    // --- INIT: set initial theme
+    window.addEventListener('DOMContentLoaded',()=>{
+      setTheme(getTheme());
+    });
+  </script>
 </body>
 </html>
