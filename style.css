@@ -1,0 +1,73 @@
+body {
+  background: #111;
+  color: #39ff14;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1, h2 {
+  color: #39ff14;
+  text-shadow: 0 0 8px #39ff14;
+}
+
+input, button {
+  background: #222;
+  color: #39ff14;
+  border: 1px solid #39ff14;
+  padding: 8px;
+  margin: 4px 0;
+  font-family: inherit;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+input:focus, button:hover {
+  background: #111;
+  box-shadow: 0 0 8px #39ff14;
+}
+
+.sidebar, .feed, .chat {
+  background: #181818;
+  border: 1px solid #39ff14;
+  border-radius: 8px;
+  margin: 16px;
+  padding: 16px;
+  box-shadow: 0 0 16px #39ff1444;
+  min-width: 250px;
+  min-height: 300px;
+}
+
+.sidebar {
+  float: left;
+}
+
+.feed {
+  float: left;
+}
+
+.chat {
+  float: left;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+::-webkit-scrollbar {
+  background: #222;
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #39ff1455;
+  border-radius: 5px;
+  box-shadow: 0 0 4px #39ff14;
+}

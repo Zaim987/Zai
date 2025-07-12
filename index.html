@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hackergram</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDK -->
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div id="app" class="container">
+    <!-- Login/Register Section -->
+    <div id="auth-section">
+      <h1>Hackergram</h1>
+      <input id="email" type="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
+      <button id="login-btn">Login</button>
+      <button id="register-btn">Register</button>
+      <div id="auth-msg"></div>
+    </div>
+    <!-- Main App Section (hidden by default) -->
+    <div id="main-section" style="display:none;">
+      <div class="sidebar">
+        <h2>Online Users</h2>
+        <ul id="users-list"></ul>
+        <button id="logout-btn">Logout</button>
+      </div>
+      <div class="feed">
+        <h2>Feed</h2>
+        <form id="post-form">
+          <input id="post-input" placeholder="What's on your mind?">
+          <button type="submit">Post</button>
+        </form>
+        <ul id="posts-feed"></ul>
+      </div>
+      <div class="chat">
+        <h2>Chat</h2>
+        <div id="chat-users"></div>
+        <div id="chat-window"></div>
+        <form id="chat-form" style="display:none;">
+          <input id="chat-input" placeholder="Type a message">
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
