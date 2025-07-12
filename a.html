@@ -1,425 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social App</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniGram</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --text-color: #ffffff;
+      --accent-color: #1e90ff;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background-color: #1f1f1f;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header nav button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      background: var(--accent-color);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    footer {
+      background-color: #1f1f1f;
+      padding: 10px;
+      text-align: center;
+    }
+    .status, .message {
+      background-color: #2a2a2a;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .hacker-theme {
+      --bg-color: #000000;
+      --text-color: #00ff00;
+      --accent-color: #00ff00;
+    }
+    .light-theme {
+      --bg-color: #f0f0f0;
+      --text-color: #000000;
+      --accent-color: #1e90ff;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, orderBy, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        :root {
-            /* Dark Theme (Default) */
-            --bg-primary: #121212;
-            --bg-secondary: #1e1e1e;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --accent: #1a8cd8;
-        }
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
 
-        [data-theme="light"] {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f0f2f5;
-            --text-primary: #000000;
-            --text-secondary: #65676b;
-            --accent: #1a8cd8;
-        }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
 
-        [data-theme="hacker"] {
-            --bg-primary: #000000;
-            --bg-secondary: #0a0a0a;
-            --text-primary: #00ff00;
-            --text-secondary: #008800;
-            --accent: #00ff00;
-        }
+    const content = document.getElementById('content');
 
-        body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
+    function renderLogin() {
+      content.innerHTML = `
+        <h2>Login / Register</h2>
+        <input id="email" placeholder="Email" /><br>
+        <input id="password" placeholder="Password" type="password" /><br>
+        <button onclick="login()">Login</button>
+        <button onclick="register()">Register</button>
+      `;
+    }
 
-        #app {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    window.login = async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (e) {
+        alert(e.message);
+      }
+    };
 
-        header {
-            background: var(--bg-secondary);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--text-secondary);
-        }
+    window.register = async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, 'users', cred.user.uid), { email });
+      } catch (e) {
+        alert(e.message);
+      }
+    };
 
-        .header-content {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    function renderFeed() {
+      content.innerHTML = `
+        <h2>Feed</h2>
+        <textarea id="statusInput" placeholder="What's on your mind?"></textarea><br>
+        <button onclick="postStatus()">Post</button>
+        <div id="feed"></div>
+      `;
+      const feedRef = collection(db, 'statuses');
+      const q = query(feedRef, orderBy('timestamp', 'desc'));
+      onSnapshot(q, snapshot => {
+        const feed = document.getElementById('feed');
+        feed.innerHTML = '';
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const el = document.createElement('div');
+          el.className = 'status';
+          el.innerText = `${d.uid}: ${d.text}`;
+          feed.appendChild(el);
+        });
+      });
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 1rem;
-        }
+    window.postStatus = async () => {
+      const text = document.getElementById('statusInput').value;
+      const user = auth.currentUser;
+      if (!user || !text.trim()) return;
+      await addDoc(collection(db, 'statuses'), {
+        text,
+        uid: user.uid,
+        timestamp: new Date()
+      });
+      document.getElementById('statusInput').value = '';
+    };
 
-        .nav-link {
-            color: var(--text-primary);
-            text-decoration: none;
-            cursor: pointer;
-        }
+    function renderUsers() {
+      content.innerHTML = '<h2>Users</h2><div id="userList"></div>';
+      getDocs(collection(db, 'users')).then(snapshot => {
+        const list = document.getElementById('userList');
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const btn = document.createElement('button');
+          btn.innerText = data.email;
+          btn.onclick = () => startChat(doc.id);
+          list.appendChild(btn);
+        });
+      });
+    }
 
-        main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
+    function startChat(uid) {
+      content.innerHTML = `
+        <h2>Chat with ${uid}</h2>
+        <div id="chatBox" style="height:300px; overflow:auto; border:1px solid #555;"></div>
+        <input id="msgInput" placeholder="Type a message" />
+        <button onclick="sendMsg('${uid}')">Send</button>
+      `;
+      const chatId = [auth.currentUser.uid, uid].sort().join('_');
+      const msgRef = collection(db, 'messages', chatId, 'chat');
+      const q = query(msgRef, orderBy('timestamp'));
+      onSnapshot(q, snapshot => {
+        const box = document.getElementById('chatBox');
+        box.innerHTML = '';
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const p = document.createElement('div');
+          p.className = 'message';
+          p.innerText = `${d.senderUid}: ${d.text}`;
+          box.appendChild(p);
+        });
+      });
+    }
 
-        .content {
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    window.sendMsg = async (uid) => {
+      const input = document.getElementById('msgInput');
+      const text = input.value;
+      const sender = auth.currentUser.uid;
+      const chatId = [sender, uid].sort().join('_');
+      await addDoc(collection(db, 'messages', chatId, 'chat'), {
+        senderUid: sender,
+        text,
+        timestamp: new Date()
+      });
+      input.value = '';
+    };
 
-        .auth-form, .post-form {
-            background: var(--bg-secondary);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('hacker-theme')) {
+        html.classList.remove('hacker-theme');
+        html.classList.add('light-theme');
+        localStorage.setItem('theme', 'light-theme');
+      } else if (html.classList.contains('light-theme')) {
+        html.classList.remove('light-theme');
+        localStorage.setItem('theme', '');
+      } else {
+        html.classList.add('hacker-theme');
+        localStorage.setItem('theme', 'hacker-theme');
+      }
+    }
 
-        input, textarea, button {
-            width: 100%;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--text-secondary);
-            color: var(--text-primary);
-            border-radius: 4px;
-        }
+    window.onload = () => {
+      const theme = localStorage.getItem('theme');
+      if (theme) document.documentElement.classList.add(theme);
 
-        button {
-            background: var(--accent);
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .status-card {
-            background: var(--bg-secondary);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .chat-container {
-            display: flex;
-            height: calc(100vh - 60px);
-        }
-
-        .users-list {
-            width: 200px;
-            background: var(--bg-secondary);
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            background: var(--bg-secondary);
-        }
-
-        .message.sent {
-            align-self: flex-end;
-            background: var(--accent);
-        }
-
-        .theme-toggle {
-            padding: 0.5rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--text-secondary);
-            color: var(--text-primary);
-            border-radius: 4px;
-        }
-    </style>
+      onAuthStateChanged(auth, user => {
+        if (user) renderFeed();
+        else renderLogin();
+      });
+    };
+  </script>
 </head>
 <body>
-    <div id="app">
-        <header>
-            <div class="header-content">
-                <h1>Social App</h1>
-                <div class="nav-links">
-                    <a class="nav-link" onclick="showFeed()">Feed</a>
-                    <a class="nav-link" onclick="showUsers()">Users</a>
-                    <a class="nav-link" onclick="showMessages()">Messages</a>
-                    <select class="theme-toggle" onchange="changeTheme(this.value)">
-                        <option value="dark">Dark</option>
-                        <option value="light">Light</option>
-                        <option value="hacker">Hacker</option>
-                    </select>
-                </div>
-            </div>
-        </header>
-        <main>
-            <div class="content" id="mainContent"></div>
-        </main>
+  <header>
+    <div>
+      <button onclick="renderFeed()">Feed</button>
+      <button onclick="renderUsers()">Users</button>
     </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore.js"></script>
-
-    <script>
-        // Firebase initialization
-        const firebaseConfig = {
-            apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-            authDomain: "quantechapp.firebaseapp.com",
-            projectId: "quantechapp",
-            storageBucket: "quantechapp.appspot.com",
-            messagingSenderId: "825384610343",
-            appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        
-        // Theme Management
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-        }
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        changeTheme(savedTheme);
-
-        // Auth State Management
-        let currentUser = null;
-        auth.onAuthStateChanged((user) => {
-            currentUser = user;
-            if (user) {
-                showFeed();
-            } else {
-                showAuth();
-            }
-        });
-
-        // View Management
-        function showAuth() {
-            const content = `
-                <div class="auth-form">
-                    <h2>Login</h2>
-                    <input type="email" id="loginEmail" placeholder="Email">
-                    <input type="password" id="loginPassword" placeholder="Password">
-                    <button onclick="login()">Login</button>
-                    <h2>Register</h2>
-                    <input type="email" id="registerEmail" placeholder="Email">
-                    <input type="password" id="registerPassword" placeholder="Password">
-                    <button onclick="register()">Register</button>
-                </div>
-            `;
-            document.getElementById('mainContent').innerHTML = content;
-        }
-
-        function showFeed() {
-            if (!currentUser) return;
-            
-            const content = `
-                <div class="post-form">
-                    <textarea id="statusText" placeholder="What's on your mind?"></textarea>
-                    <button onclick="postStatus()">Post</button>
-                </div>
-                <div id="feed"></div>
-            `;
-            document.getElementById('mainContent').innerHTML = content;
-            loadFeed();
-        }
-
-        function showUsers() {
-            if (!currentUser) return;
-            
-            db.collection('users').get().then((snapshot) => {
-                const users = snapshot.docs
-                    .map(doc => ({id: doc.id, ...doc.data()}))
-                    .filter(user => user.id !== currentUser.uid);
-                
-                const content = `
-                    <div class="users-list">
-                        ${users.map(user => `
-                            <div class="user-item" onclick="startChat('${user.id}')">
-                                ${user.email}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                document.getElementById('mainContent').innerHTML = content;
-            });
-        }
-
-        function showMessages() {
-            if (!currentUser) return;
-            
-            const content = `
-                <div class="chat-container">
-                    <div class="users-list" id="chatUsers"></div>
-                    <div class="chat-messages" id="chatMessages"></div>
-                </div>
-            `;
-            document.getElementById('mainContent').innerHTML = content;
-            loadChats();
-        }
-
-        // Firebase Operations
-        async function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        async function register() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await db.collection('users').doc(userCredential.user.uid).set({
-                    email: email
-                });
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        async function postStatus() {
-            const text = document.getElementById('statusText').value;
-            if (!text.trim()) return;
-
-            try {
-                await db.collection('statuses').add({
-                    text: text,
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                document.getElementById('statusText').value = '';
-                loadFeed();
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        async function loadFeed() {
-            const feedDiv = document.getElementById('feed');
-            
-            db.collection('statuses')
-                .orderBy('timestamp', 'desc')
-                .onSnapshot((snapshot) => {
-                    const statuses = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    
-                    feedDiv.innerHTML = statuses.map(status => `
-                        <div class="status-card">
-                            <strong>${status.userEmail}</strong>
-                            <p>${status.text}</p>
-                        </div>
-                    `).join('');
-                });
-        }
-
-        function getChatRoomId(uid1, uid2) {
-            return [uid1, uid2].sort().join('_');
-        }
-
-        async function startChat(otherUserId) {
-            const chatRoomId = getChatRoomId(currentUser.uid, otherUserId);
-            showMessages();
-            loadMessages(chatRoomId);
-        }
-
-        async function loadChats() {
-            const chatsRef = db.collection('messages');
-            const usersRef = db.collection('users');
-            
-            const users = await usersRef.get();
-            const chatUsers = users.docs
-                .map(doc => ({id: doc.id, ...doc.data()}))
-                .filter(user => user.id !== currentUser.uid);
-
-            document.getElementById('chatUsers').innerHTML = chatUsers.map(user => `
-                <div class="user-item" onclick="startChat('${user.id}')">
-                    ${user.email}
-                </div>
-            `).join('');
-        }
-
-        async function loadMessages(chatRoomId) {
-            const messagesDiv = document.getElementById('chatMessages');
-            
-            db.collection('messages')
-                .doc(chatRoomId)
-                .collection('messages')
-                .orderBy('timestamp')
-                .onSnapshot((snapshot) => {
-                    const messages = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    
-                    messagesDiv.innerHTML = `
-                        ${messages.map(msg => `
-                            <div class="message ${msg.senderId === currentUser.uid ? 'sent' : 'received'}">
-                                ${msg.text}
-                            </div>
-                        `).join('')}
-                        <input type="text" id="messageInput" placeholder="Type a message...">
-                        <button onclick="sendMessage('${chatRoomId}')">Send</button>
-                    `;
-                });
-        }
-
-        async function sendMessage(chatRoomId) {
-            const input = document.getElementById('messageInput');
-            const text = input.value;
-            if (!text.trim()) return;
-
-            try {
-                await db.collection('messages')
-                    .doc(chatRoomId)
-                    .collection('messages')
-                    .add({
-                        text: text,
-                        senderId: currentUser.uid,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                input.value = '';
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-    </script>
+    <div>
+      <button onclick="toggleTheme()">🌗 Theme</button>
+      <button onclick="firebase.auth().signOut()">Logout</button>
+    </div>
+  </header>
+  <div id="content"></div>
+  <footer>
+    MiniGram SPA - Firebase Only
+  </footer>
 </body>
 </html>
