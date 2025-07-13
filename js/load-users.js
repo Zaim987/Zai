@@ -1,11 +1,17 @@
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-export function loadUsers() {
+export async function loadUsers() {
   const auth = getAuth();
-  const user = auth.currentUser;
+  const db = getFirestore();
 
-  if (user) {
-    const nameDisplay = document.getElementById("displayName");
-    nameDisplay.textContent = user.displayName || user.email || "Pengguna";
-  }
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      // Ngisi elemen salam
+      const nameTarget = document.getElementById("displayName");
+      nameTarget.textContent = user.displayName || user.email || "Pengguna";
+
+      // Gak usah appendChild maneh
+    }
+  });
 }
