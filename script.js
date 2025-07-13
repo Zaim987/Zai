@@ -1,5 +1,5 @@
 // Firebase Configuration & Imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { initializeApp as initializeFirebaseApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
@@ -8,14 +8,14 @@ const firebaseConfig = {
     authDomain: "quantechapp.firebaseapp.com",
     databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
     projectId: "quantechapp",
-    storageBucket: "quantechapp.firebasestorage.app",
+    storageBucket: "quantechapp.appspot.com",
     messagingSenderId: "825384610343",
     appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
     measurementId: "G-E9L012VH32"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeFirebaseApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -43,7 +43,6 @@ const successMessage = document.getElementById('successMessage');
 const errorText = document.getElementById('errorText');
 const successText = document.getElementById('successText');
 
-// Global Variables
 let currentUser = null;
 let currentRoom = 'global';
 let currentChatPartner = null;
@@ -52,16 +51,14 @@ let unsubscribeUsers = null;
 let unsubscribePrivateChats = null;
 let allUsers = [];
 
-// Initialize App
 window.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
+    initAppLogic();
     setupEventListeners();
 });
 
-function initializeApp() {
+function initAppLogic() {
     showLoading();
-    
-    // Monitor authentication state
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
@@ -80,7 +77,6 @@ function initializeApp() {
         hideLoading();
     });
 
-    // Handle page unload
     window.addEventListener('beforeunload', () => {
         if (currentUser) {
             updateUserOnlineStatus(false);
@@ -89,23 +85,13 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
-    // Authentication Forms
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
-    document.getElementById('registerForm').addEventListener('submit', handleRegister);
-    
-    // Chat Form
+    loginForm.addEventListener('submit', handleLogin);
+    registerForm.addEventListener('submit', handleRegister);
     document.getElementById('messageForm').addEventListener('submit', handleSendMessage);
-    
-    // Logout Button
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-    
-    // New Chat Button
     document.getElementById('newChatBtn').addEventListener('click', openNewChatModal);
-    
-    // User Search
     userSearchInput.addEventListener('input', handleUserSearch);
-    
-    // Enter key for message input
+
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -113,6 +99,10 @@ function setupEventListeners() {
         }
     });
 }
+
+// The rest of the logic remains the same
+// ... Paste remaining code here (continued from your current full script)
+
 
 // Authentication Functions (Same as before)
 async function handleLogin(e) {
