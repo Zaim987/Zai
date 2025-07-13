@@ -10,28 +10,47 @@ import {
   setDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 🔁 Auto redirect nek wis login valid
+// ✅ AUTO REDIRECT NEK WIS LOGIN & SESSION VALID
 auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    const sessionId = localStorage.getItem("sessionId");
+  if (!user) return;
+
+  const sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) return;
+
+  try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
       const data = userSnap.data();
+      const timestamp = data.sessionTimestamp;
+
+      let sessionTimeMs;
+      if (typeof timestamp === 'number') {
+        sessionTimeMs = timestamp;
+      } else if (timestamp.toMillis) {
+        sessionTimeMs = timestamp.toMillis();
+      } else {
+        return;
+      }
+
       const now = Date.now();
       const maxAge = 30 * 60 * 1000;
 
       if (
         data.sessionId === sessionId &&
-        (now - data.sessionTimestamp) < maxAge
+        (now - sessionTimeMs) < maxAge
       ) {
+        console.log("✅ Session valid, redirecting...");
         window.location.href = "dashboard.html";
       }
     }
+  } catch (err) {
+    console.error("🔥 Error pas cek session:", err);
   }
 });
 
+// ✅ LOGIN SUBMIT
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("email").value.trim();
@@ -55,27 +74,37 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 
     if (userSnap.exists()) {
       const data = userSnap.data();
-      if (data.sessionId && (now - data.sessionTimestamp) < maxAge) {
+      const timestamp = data.sessionTimestamp;
+
+      let sessionTimeMs;
+      if (typeof timestamp === 'number') {
+        sessionTimeMs = timestamp;
+      } else if (timestamp?.toMillis) {
+        sessionTimeMs = timestamp.toMillis();
+      }
+
+      if (data.sessionId && (now - sessionTimeMs) < maxAge) {
         await signOut(auth);
         errorDiv.textContent = "⚠️ Iseh login nang device liyo!";
         return;
       }
     }
 
-    // Update session anyar
+    // Simpen session anyar
     await setDoc(userRef, {
       sessionId,
-      sessionTimestamp: now,
+      sessionTimestamp: now
     }, { merge: true });
 
     localStorage.setItem("sessionId", sessionId);
     window.location.href = "dashboard.html";
 
   } catch (error) {
-    let msg = "Login gagal, cok!";
+    let msg = "Login gagal, jancok!";
     if (error.code === 'auth/user-not-found') msg = "📛 Email ora ketemu.";
     else if (error.code === 'auth/wrong-password') msg = "🔒 Password salah, goblok.";
     else if (error.code === 'auth/invalid-email') msg = "📬 Email ra valid.";
+    else if (error.code === 'auth/too-many-requests') msg = "🚫 Kakehan nyoba, enteni sek!";
     errorDiv.textContent = msg;
   } finally {
     loginBtn.classList.remove("loading");
