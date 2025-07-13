@@ -1,179 +1,337 @@
+// Firebase Configuration & Imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-// =================== Firebase Config ===================
 const firebaseConfig = {
-  apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
-  authDomain: "quantechapp.firebaseapp.com",
-  databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
-  projectId: "quantechapp",
-  storageBucket: "quantechapp.firebasestorage.app",
-  messagingSenderId: "825384610343",
-  appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
-  measurementId: "G-E9L012VH32"
+    apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+    authDomain: "quantechapp.firebaseapp.com",
+    databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
+    projectId: "quantechapp",
+    storageBucket: "quantechapp.firebasestorage.app",
+    messagingSenderId: "825384610343",
+    appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
+    measurementId: "G-E9L012VH32"
 };
+
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db   = getFirestore(app);
+const db = getFirestore(app);
 
-// ===================== DOM =====================
-
+// DOM Elements
 const authContainer = document.getElementById('auth-container');
-const loginForm     = document.getElementById('login-form');
-const registerForm  = document.getElementById('register-form');
-const toRegisterBtn = document.getElementById('to-register');
-const toLoginBtn    = document.getElementById('to-login');
-const loginError    = document.getElementById('login-error');
-const registerError = document.getElementById('register-error');
+const chatContainer = document.getElementById('chat-container');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const messagesContainer = document.getElementById('messagesContainer');
+const messageInput = document.getElementById('messageInput');
+const currentUserSpan = document.getElementById('currentUser');
+const loading = document.getElementById('loading');
+const errorMessage = document.getElementById('errorMessage');
+const successMessage = document.getElementById('successMessage');
+const errorText = document.getElementById('errorText');
+const successText = document.getElementById('successText');
 
-const chatApp   = document.getElementById('chat-app');
-const chatForm  = document.getElementById('chat-form');
-const chatInput = document.getElementById('chat-input');
-const chatMsgs  = document.getElementById('chat-messages');
-const userEmail = document.getElementById('user-email');
-const logoutBtn = document.getElementById('logout-btn');
+// Global Variables
+let currentUser = null;
+let unsubscribeMessages = null;
 
-// =============== Auth Logic ===============
+// Initialize App
+window.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+    setupEventListeners();
+});
 
-// Switch Auth Forms
-toRegisterBtn.onclick = e => {
-  loginForm.classList.remove('active');
-  registerForm.classList.add('active');
-  loginError.textContent = '';
-  registerError.textContent = '';
-};
-toLoginBtn.onclick = e => {
-  registerForm.classList.remove('active');
-  loginForm.classList.add('active');
-  loginError.textContent = '';
-  registerError.textContent = '';
-};
-
-// Handle Register
-registerForm.onsubmit = async e => {
-  e.preventDefault();
-  registerError.textContent = '';
-  const email = document.getElementById('register-email').value.trim();
-  const pass  = document.getElementById('register-password').value;
-
-  // Simple Email & Password Validation
-  if (!email.match(/^[\w\-.]+@[\w\-]+(\.[\w\-]+)+$/)) {
-    registerError.textContent = "Format email tidak valid!";
-    return;
-  }
-  if (pass.length < 6) {
-    registerError.textContent = "Password minimal 6 karakter";
-    return;
-  }
-  try {
-    await createUserWithEmailAndPassword(auth, email, pass);
-  } catch(err) {
-    if (err.code === 'auth/email-already-in-use') registerError.textContent = "Email sudah digunakan";
-    else if (err.code === 'auth/weak-password') registerError.textContent = "Password terlalu lemah";
-    else registerError.textContent = err.message;
-  }
-};
-
-// Handle Login
-loginForm.onsubmit = async e => {
-  e.preventDefault();
-  loginError.textContent = '';
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-password').value;
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch(err) {
-    if (err.code === 'auth/wrong-password') loginError.textContent = "Password salah";
-    else if (err.code === 'auth/user-not-found') loginError.textContent = "User tidak ditemukan";
-    else if (err.code === 'auth/invalid-email') loginError.textContent = "Format email salah";
-    else loginError.textContent = err.message;
-  }
-};
-
-// Handle Logout
-logoutBtn.onclick = () => signOut(auth);
-
-// =============== Realtime Chat Logic ===============
-
-let unsubscribeChat = null;
-
-function showChat(user) {
-  authContainer.style.display = 'none';
-  chatApp.style.display = 'flex';
-
-  userEmail.textContent = user.email;
-
-  // --- Realtime Listener ---
-  if (unsubscribeChat) unsubscribeChat();
-  
-  const q = query(collection(db, 'messages'), orderBy('createdAt', 'asc'));
-  unsubscribeChat = onSnapshot(q, snap => {
-    chatMsgs.innerHTML = "";
-    snap.forEach(doc => {
-      const msg = doc.data();
-      addMessageToUI(msg, user);
+function initializeApp() {
+    showLoading();
+    
+    // Monitor authentication state
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            showChatInterface();
+            loadMessages();
+        } else {
+            currentUser = null;
+            showAuthInterface();
+        }
+        hideLoading();
     });
-    chatMsgs.scrollTop = chatMsgs.scrollHeight;
-  });
 }
 
-function showAuth() {
-  authContainer.style.display = 'flex';
-  chatApp.style.display = 'none';
-  chatInput.value = "";
-  if (unsubscribeChat) unsubscribeChat();
+function setupEventListeners() {
+    // Authentication Forms
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('registerForm').addEventListener('submit', handleRegister);
+    
+    // Chat Form
+    document.getElementById('messageForm').addEventListener('submit', handleSendMessage);
+    
+    // Logout Button
+    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    
+    // Enter key for message input
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+        }
+    });
 }
 
-// Add Message to Chat
-function addMessageToUI(msg, user) {
-  const wrap = document.createElement('div');
-  wrap.className = "message" + (user && msg.uid === user.uid ? " own" : "");
-  const sender = document.createElement('span');
-  sender.className = "sender";
-  sender.textContent = msg.displayName || msg.email.split("@")[0];
-  wrap.appendChild(sender);
-
-  const text = document.createElement('span');
-  text.textContent = msg.text;
-  wrap.appendChild(text);
-
-  // Time
-  const time = document.createElement('span');
-  time.className = "msg-time";
-  time.textContent = msg.createdAt?.toDate ? formatTime(msg.createdAt.toDate()) : '';
-  wrap.appendChild(time);
-
-  chatMsgs.appendChild(wrap);
+// Authentication Functions
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showError('Please fill in all fields');
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        showSuccess('Welcome back!');
+    } catch (error) {
+        hideLoading();
+        showError(getErrorMessage(error.code));
+    }
 }
 
-function formatTime(dt) {
-  let d = new Date(dt);
-  return (
-    d.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) +
-    " " +
-    d.toLocaleDateString()
-  );
+async function handleRegister(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    
+    if (!name || !email || !password) {
+        showError('Please fill in all fields');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showError('Password must be at least 6 characters');
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+        showSuccess('Account created successfully!');
+    } catch (error) {
+        hideLoading();
+        showError(getErrorMessage(error.code));
+    }
 }
 
-// Send Message
-chatForm.onsubmit = async e => {
-  e.preventDefault();
-  const msgVal = chatInput.value.trim();
-  chatInput.value = '';
+async function handleLogout() {
+    try {
+        await signOut(auth);
+        showSuccess('Logged out successfully');
+    } catch (error) {
+        showError('Error logging out');
+    }
+}
 
-  if (!auth.currentUser || !msgVal) return;
-  await addDoc(collection(db, 'messages'), {
-    text: msgVal,
-    uid: auth.currentUser.uid,
-    email: auth.currentUser.email,
-    displayName: auth.currentUser.email.split("@")[0],
-    createdAt: serverTimestamp()
-  });
-};
+// Chat Functions
+async function handleSendMessage(e) {
+    e.preventDefault();
+    
+    const message = messageInput.value.trim();
+    
+    if (!message) return;
+    
+    if (message.length > 500) {
+        showError('Message too long (max 500 characters)');
+        return;
+    }
+    
+    try {
+        await addDoc(collection(db, 'messages'), {
+            text: message,
+            sender: currentUser.displayName || currentUser.email,
+            senderEmail: currentUser.email,
+            timestamp: serverTimestamp(),
+            userId: currentUser.uid
+        });
+        
+        messageInput.value = '';
+        messageInput.focus();
+    } catch (error) {
+        showError('Failed to send message');
+        console.error('Error sending message:', error);
+    }
+}
 
-// =============== Auth State Listener ===============
-onAuthStateChanged(auth, user => {
-  if (user) showChat(user);
-  else showAuth();
+function loadMessages() {
+    // Unsubscribe from previous listener if exists
+    if (unsubscribeMessages) {
+        unsubscribeMessages();
+    }
+    
+    const messagesQuery = query(
+        collection(db, 'messages'),
+        orderBy('timestamp', 'asc')
+    );
+    
+    unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+        messagesContainer.innerHTML = '';
+        
+        snapshot.forEach((doc) => {
+            const messageData = doc.data();
+            displayMessage(messageData);
+        });
+        
+        scrollToBottom();
+    }, (error) => {
+        console.error('Error loading messages:', error);
+        showError('Failed to load messages');
+    });
+}
+
+function displayMessage(messageData) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${messageData.userId === currentUser.uid ? 'own' : ''}`;
+    
+    const time = messageData.timestamp ? 
+        formatTime(messageData.timestamp.toDate()) : 
+        formatTime(new Date());
+    
+    messageDiv.innerHTML = `
+        <div class="message-content">
+            <div class="message-header">
+                <span class="message-sender">${escapeHtml(messageData.sender)}</span>
+                <span class="message-time">${time}</span>
+            </div>
+            <div class="message-text">${escapeHtml(messageData.text)}</div>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+}
+
+// UI Helper Functions
+function showAuthInterface() {
+    authContainer.classList.remove('hidden');
+    chatContainer.classList.add('hidden');
+    clearAuthForms();
+}
+
+function showChatInterface() {
+    authContainer.classList.add('hidden');
+    chatContainer.classList.remove('hidden');
+    
+    // Display current user info
+    const displayName = currentUser.displayName || currentUser.email.split('@')[0];
+    currentUserSpan.textContent = displayName;
+    
+    // Focus message input
+    setTimeout(() => {
+        messageInput.focus();
+    }, 100);
+}
+
+function showLogin() {
+    registerForm.classList.remove('active');
+    loginForm.classList.add('active');
+    clearAuthForms();
+}
+
+function showRegister() {
+    loginForm.classList.remove('active');
+    registerForm.classList.add('active');
+    clearAuthForms();
+}
+
+function clearAuthForms() {
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('registerName').value = '';
+    document.getElementById('registerEmail').value = '';
+    document.getElementById('registerPassword').value = '';
+}
+
+function showLoading() {
+    loading.classList.remove('hidden');
+}
+
+function hideLoading() {
+    loading.classList.add('hidden');
+}
+
+function showError(message) {
+    errorText.textContent = message;
+    errorMessage.classList.remove('hidden');
+    
+    setTimeout(() => {
+        hideError();
+    }, 5000);
+}
+
+function hideError() {
+    errorMessage.classList.add('hidden');
+}
+
+function showSuccess(message) {
+    successText.textContent = message;
+    successMessage.classList.remove('hidden');
+    
+    setTimeout(() => {
+        successMessage.classList.add('hidden');
+    }, 3000);
+}
+
+function scrollToBottom() {
+    setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 100);
+}
+
+// Utility Functions
+function formatTime(date) {
+    return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function getErrorMessage(errorCode) {
+    const errorMessages = {
+        'auth/user-not-found': 'No account found with this email',
+        'auth/wrong-password': 'Incorrect password',
+        'auth/email-already-in-use': 'Email already registered',
+        'auth/weak-password': 'Password is too weak',
+        'auth/invalid-email': 'Invalid email format',
+        'auth/too-many-requests': 'Too many failed attempts. Try again later',
+        'auth/network-request-failed': 'Network error. Check your connection'
+    };
+    
+    return errorMessages[errorCode] || 'An error occurred. Please try again';
+}
+
+// Make functions global for HTML onclick handlers
+window.showLogin = showLogin;
+window.showRegister = showRegister;
+window.hideError = hideError;
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeMessages) {
+        unsubscribeMessages();
+    }
 });
