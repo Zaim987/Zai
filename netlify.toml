@@ -1,0 +1,26 @@
+[build]
+  publish = "."  # folder utama karena HTML langsung di root
+  command = ""   # ga perlu build
+
+# HTML file = no cache
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# JS, audio = cache 1 tahun
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/audio/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Semua file static (gambare, font, dll)
+[[headers]]
+  for = "/(.*).(js|css|png|jpg|jpeg|gif|svg|webp|woff2|woff|ttf|mp3|ogg)"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
