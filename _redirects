@@ -1,3 +1,4 @@
-/msuk     /login.html     200
+/masuk     /login.html     200
 /user_baru  /register.html  200
-/home          /index.html     200
+/home          /dashboard.html     200
+/chat          /statistik.html     200
