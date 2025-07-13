@@ -1,7 +1,10 @@
+// login.js
+
 import { auth, db } from './firebase-init.js';
 import {
   signInWithEmailAndPassword,
   signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
@@ -10,61 +13,59 @@ import {
   setDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ✅ AUTO REDIRECT NEK WIS LOGIN & SESSION VALID
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
+const loginForm = document.getElementById("loginForm");
+const loginBtn = document.getElementById("loginBtn");
+const errorDiv = document.getElementById("error");
 
+// ⛔️ Sembunyikan form sampek Auth ready
+loginForm.style.display = "none";
+
+// ✅ Auth ready handler
+onAuthStateChanged(async (user) => {
   const sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) return;
+  if (user && sessionId) {
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
 
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        const ts = data.sessionTimestamp;
+        const sessionTimeMs = ts?.toMillis ? ts.toMillis() : ts;
+        const now = Date.now();
+        const maxAge = 30 * 60 * 1000;
 
-    if (userSnap.exists()) {
-      const data = userSnap.data();
-      const timestamp = data.sessionTimestamp;
-
-      let sessionTimeMs;
-      if (typeof timestamp === 'number') {
-        sessionTimeMs = timestamp;
-      } else if (timestamp.toMillis) {
-        sessionTimeMs = timestamp.toMillis();
-      } else {
-        return;
+        if (
+          data.sessionId === sessionId &&
+          (now - sessionTimeMs) < maxAge
+        ) {
+          window.location.href = "dashboard.html";
+          return;
+        }
       }
-
-      const now = Date.now();
-      const maxAge = 30 * 60 * 1000;
-
-      if (
-        data.sessionId === sessionId &&
-        (now - sessionTimeMs) < maxAge
-      ) {
-        console.log("✅ Session valid, redirecting...");
-        window.location.href = "dashboard.html";
-      }
+    } catch (err) {
+      console.error("🔥 Error cek session:", err);
     }
-  } catch (err) {
-    console.error("🔥 Error pas cek session:", err);
   }
+
+  // ✅ Tampilno form nek ora redirect
+  loginForm.style.display = "block";
 });
 
-// ✅ LOGIN SUBMIT
-document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+// ✅ Form login submit
+loginForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-  const errorDiv = document.getElementById("error");
-  const loginBtn = document.getElementById("loginBtn");
-
-  const sessionId = crypto.randomUUID(); // Session unik
-  const now = Date.now();
-  const maxAge = 30 * 60 * 1000; // 30 menit
 
   loginBtn.classList.add("loading");
   loginBtn.disabled = true;
   errorDiv.textContent = "";
+
+  const sessionId = crypto.randomUUID();
+  const now = Date.now();
+  const maxAge = 30 * 60 * 1000;
 
   try {
     const userCred = await signInWithEmailAndPassword(auth, email, password);
@@ -74,14 +75,8 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 
     if (userSnap.exists()) {
       const data = userSnap.data();
-      const timestamp = data.sessionTimestamp;
-
-      let sessionTimeMs;
-      if (typeof timestamp === 'number') {
-        sessionTimeMs = timestamp;
-      } else if (timestamp?.toMillis) {
-        sessionTimeMs = timestamp.toMillis();
-      }
+      const ts = data.sessionTimestamp;
+      const sessionTimeMs = ts?.toMillis ? ts.toMillis() : ts;
 
       if (data.sessionId && (now - sessionTimeMs) < maxAge) {
         await signOut(auth);
@@ -90,7 +85,6 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
       }
     }
 
-    // Simpen session anyar
     await setDoc(userRef, {
       sessionId,
       sessionTimestamp: now
@@ -100,9 +94,9 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     window.location.href = "dashboard.html";
 
   } catch (error) {
-    let msg = "Login gagal, jancok!";
+    let msg = "Login gagal!";
     if (error.code === 'auth/user-not-found') msg = "📛 Email ora ketemu.";
-    else if (error.code === 'auth/wrong-password') msg = "🔒 Password salah, goblok.";
+    else if (error.code === 'auth/wrong-password') msg = "🔒 Password salah.";
     else if (error.code === 'auth/invalid-email') msg = "📬 Email ra valid.";
     else if (error.code === 'auth/too-many-requests') msg = "🚫 Kakehan nyoba, enteni sek!";
     errorDiv.textContent = msg;
