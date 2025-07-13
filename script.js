@@ -8,7 +8,7 @@ const firebaseConfig = {
     authDomain: "quantechapp.firebaseapp.com",
     databaseURL: "https://quantechapp-default-rtdb.firebaseio.com",
     projectId: "quantechapp",
-    storageBucket: "quantechapp.firebasestorage.app",
+    storageBucket: "quantechapp.appspot.com", // FIXED
     messagingSenderId: "825384610343",
     appId: "1:825384610343:web:e490bc84877e6d7a93bc02",
     measurementId: "G-E9L012VH32"
@@ -39,14 +39,9 @@ let unsubscribeMessages = null;
 
 // Initialize App
 window.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
     setupEventListeners();
-});
 
-function initializeApp() {
     showLoading();
-    
-    // Monitor authentication state
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
@@ -58,20 +53,14 @@ function initializeApp() {
         }
         hideLoading();
     });
-}
+});
 
 function setupEventListeners() {
-    // Authentication Forms
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
-    document.getElementById('registerForm').addEventListener('submit', handleRegister);
-    
-    // Chat Form
+    loginForm.addEventListener('submit', handleLogin);
+    registerForm.addEventListener('submit', handleRegister);
     document.getElementById('messageForm').addEventListener('submit', handleSendMessage);
-    
-    // Logout Button
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-    
-    // Enter key for message input
+
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -83,17 +72,22 @@ function setupEventListeners() {
 // Authentication Functions
 async function handleLogin(e) {
     e.preventDefault();
-    
+
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-    
+
     if (!email || !password) {
         showError('Please fill in all fields');
         return;
     }
-    
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+        showError('Invalid email format');
+        return;
+    }
+
     showLoading();
-    
+
     try {
         await signInWithEmailAndPassword(auth, email, password);
         showSuccess('Welcome back!');
@@ -105,23 +99,28 @@ async function handleLogin(e) {
 
 async function handleRegister(e) {
     e.preventDefault();
-    
+
     const name = document.getElementById('registerName').value.trim();
     const email = document.getElementById('registerEmail').value.trim();
     const password = document.getElementById('registerPassword').value;
-    
+
     if (!name || !email || !password) {
         showError('Please fill in all fields');
         return;
     }
-    
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+        showError('Invalid email format');
+        return;
+    }
+
     if (password.length < 6) {
         showError('Password must be at least 6 characters');
         return;
     }
-    
+
     showLoading();
-    
+
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(userCredential.user, { displayName: name });
@@ -144,16 +143,15 @@ async function handleLogout() {
 // Chat Functions
 async function handleSendMessage(e) {
     e.preventDefault();
-    
+
     const message = messageInput.value.trim();
-    
     if (!message) return;
-    
+
     if (message.length > 500) {
         showError('Message too long (max 500 characters)');
         return;
     }
-    
+
     try {
         await addDoc(collection(db, 'messages'), {
             text: message,
@@ -162,9 +160,10 @@ async function handleSendMessage(e) {
             timestamp: serverTimestamp(),
             userId: currentUser.uid
         });
-        
+
         messageInput.value = '';
         messageInput.focus();
+        scrollToBottom(); // Tambahan scroll otomatis
     } catch (error) {
         showError('Failed to send message');
         console.error('Error sending message:', error);
@@ -172,24 +171,23 @@ async function handleSendMessage(e) {
 }
 
 function loadMessages() {
-    // Unsubscribe from previous listener if exists
     if (unsubscribeMessages) {
         unsubscribeMessages();
     }
-    
+
     const messagesQuery = query(
         collection(db, 'messages'),
         orderBy('timestamp', 'asc')
     );
-    
+
     unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
         messagesContainer.innerHTML = '';
-        
+
         snapshot.forEach((doc) => {
             const messageData = doc.data();
             displayMessage(messageData);
         });
-        
+
         scrollToBottom();
     }, (error) => {
         console.error('Error loading messages:', error);
@@ -200,11 +198,11 @@ function loadMessages() {
 function displayMessage(messageData) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${messageData.userId === currentUser.uid ? 'own' : ''}`;
-    
+
     const time = messageData.timestamp ? 
         formatTime(messageData.timestamp.toDate()) : 
         formatTime(new Date());
-    
+
     messageDiv.innerHTML = `
         <div class="message-content">
             <div class="message-header">
@@ -214,7 +212,7 @@ function displayMessage(messageData) {
             <div class="message-text">${escapeHtml(messageData.text)}</div>
         </div>
     `;
-    
+
     messagesContainer.appendChild(messageDiv);
 }
 
@@ -228,12 +226,10 @@ function showAuthInterface() {
 function showChatInterface() {
     authContainer.classList.add('hidden');
     chatContainer.classList.remove('hidden');
-    
-    // Display current user info
+
     const displayName = currentUser.displayName || currentUser.email.split('@')[0];
     currentUserSpan.textContent = displayName;
-    
-    // Focus message input
+
     setTimeout(() => {
         messageInput.focus();
     }, 100);
@@ -270,7 +266,7 @@ function hideLoading() {
 function showError(message) {
     errorText.textContent = message;
     errorMessage.classList.remove('hidden');
-    
+
     setTimeout(() => {
         hideError();
     }, 5000);
@@ -283,7 +279,7 @@ function hideError() {
 function showSuccess(message) {
     successText.textContent = message;
     successMessage.classList.remove('hidden');
-    
+
     setTimeout(() => {
         successMessage.classList.add('hidden');
     }, 3000);
@@ -320,7 +316,7 @@ function getErrorMessage(errorCode) {
         'auth/too-many-requests': 'Too many failed attempts. Try again later',
         'auth/network-request-failed': 'Network error. Check your connection'
     };
-    
+
     return errorMessages[errorCode] || 'An error occurred. Please try again';
 }
 
