@@ -15,20 +15,22 @@ const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
 const errorDiv = document.getElementById("error");
 
-// 🔐 Generate & simpen deviceId unik per perangkat
+// 🔐 Generate & simpen deviceId unik
 let deviceId = localStorage.getItem("deviceId");
 if (!deviceId) {
   deviceId = crypto.randomUUID();
   localStorage.setItem("deviceId", deviceId);
 }
+console.log("📱 deviceId:", deviceId);
 
-// ⛔️ Form disembunyikan dulu sampe auth siap
+// ⛔️ Form disembunyikan sek ben ora kedip
 loginForm.style.display = "none";
 
-// ✅ Cek session saat halaman dibuka
+// ✅ Auto redirect nek session valid & device cocok
 onAuthStateChanged(async (user) => {
   const sessionId = localStorage.getItem("sessionId");
   if (!user || !sessionId) {
+    console.log("ℹ️ Belum login atau sessionId kosong");
     loginForm.style.display = "block";
     return;
   }
@@ -44,27 +46,30 @@ onAuthStateChanged(async (user) => {
       const now = Date.now();
       const maxAge = 30 * 60 * 1000;
 
-      const storedDeviceId = data.deviceId;
+      console.log("📦 Data Firestore:", data);
 
       if (
         data.sessionId === sessionId &&
-        storedDeviceId === deviceId &&
+        data.deviceId === deviceId &&
         (now - sessionTimeMs) < maxAge
       ) {
-        console.log("✅ Session valid & device cocok. Redirecting...");
+        console.log("✅ Session valid & device cocok, redirecting...");
         window.location.href = "dashboard.html";
         return;
+      } else {
+        console.warn("⏳ Session mismatch or expired or beda device");
       }
+    } else {
+      console.warn("❗️ Data user durung ada");
     }
   } catch (err) {
-    console.error("🔥 Error cek session:", err);
+    console.error("🔥 Error pas cek session:", err);
   }
 
-  // Nek gagal redirect, tampilno form
   loginForm.style.display = "block";
 });
 
-// ✅ Proses login manual
+// ✅ Submit Login
 loginForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -79,6 +84,8 @@ loginForm?.addEventListener("submit", async (e) => {
   const now = Date.now();
   const maxAge = 30 * 60 * 1000;
 
+  console.log("🔑 Login attempt:", { email });
+
   try {
     const userCred = await signInWithEmailAndPassword(auth, email, password);
     const user = userCred.user;
@@ -91,30 +98,46 @@ loginForm?.addEventListener("submit", async (e) => {
       const sessionTimeMs = ts?.toMillis ? ts.toMillis() : ts;
       const storedDeviceId = data.deviceId;
 
-      // ❌ Nek isih aktif & beda device, tolak
+      console.log("🧾 Existing session data:", data);
+
       if (
         data.sessionId &&
         (now - sessionTimeMs) < maxAge &&
         storedDeviceId !== deviceId
       ) {
+        console.warn("🚫 Login ditolak: iseh aktif di device liyo");
         await signOut(auth);
         errorDiv.textContent = "⚠️ Iseh login nang device liyo!";
         return;
       }
     }
 
-    // ✅ Simpen session anyar karo deviceId
-    await setDoc(userRef, {
+    // ✅ Simpen session + deviceId
+    console.log("📤 Nyimpen session ke Firestore:", {
       sessionId,
       sessionTimestamp: now,
       deviceId
-    }, { merge: true });
+    });
+
+    try {
+      await setDoc(userRef, {
+        sessionId,
+        sessionTimestamp: now,
+        deviceId
+      }, { merge: true });
+      console.log("✅ Session tersimpen sukses!");
+    } catch (err) {
+      console.error("❌ Gagal nyimpen Firestore:", err);
+      errorDiv.textContent = "🔥 Error nyimpen session Firestore!";
+      return;
+    }
 
     localStorage.setItem("sessionId", sessionId);
     window.location.href = "dashboard.html";
 
   } catch (error) {
-    let msg = "Login gagal, jancok!";
+    console.error("❌ Login error:", error);
+    let msg = "Login gagal!";
     if (error.code === 'auth/user-not-found') msg = "📛 Email ora ketemu.";
     else if (error.code === 'auth/wrong-password') msg = "🔒 Password salah.";
     else if (error.code === 'auth/invalid-email') msg = "📬 Email ra valid.";
