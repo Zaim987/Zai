@@ -70,49 +70,132 @@
 
     <!-- Chat Interface -->
     <div id="chat-container" class="chat-container hidden">
-        <!-- Header -->
-        <div class="chat-header">
-            <div class="header-left">
-                <h1><i class="fas fa-comments"></i> QuantechChat</h1>
-                <span class="online-indicator">
-                    <i class="fas fa-circle"></i> Global Chat
-                </span>
-            </div>
-            <div class="header-right">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="currentUser"></span>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <span id="sidebarCurrentUser" class="username"></span>
+                        <span class="status">Online</span>
+                    </div>
                 </div>
                 <button id="logoutBtn" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
-                    Logout
                 </button>
             </div>
-        </div>
 
-        <!-- Chat Messages Area -->
-        <div class="chat-main">
-            <div id="messagesContainer" class="messages-container">
-                <!-- Messages will be loaded here -->
+            <!-- Chat Rooms -->
+            <div class="chat-rooms">
+                <!-- Global Chat -->
+                <div class="room-item active" data-room="global" onclick="switchToRoom('global')">
+                    <div class="room-avatar">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="room-info">
+                        <span class="room-name">Global Chat</span>
+                        <span class="room-info-text">Public channel</span>
+                    </div>
+                    <div class="unread-badge hidden" id="global-badge">0</div>
+                </div>
+
+                <!-- Private Chats Section -->
+                <div class="section-title">
+                    <span>Private Chats</span>
+                    <button id="newChatBtn" class="new-chat-btn" title="Start New Chat">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="privateChats" class="private-chats">
+                    <!-- Private chat rooms will be loaded here -->
+                </div>
+
+                <!-- Online Users Section -->
+                <div class="section-title">
+                    <span>Online Users</span>
+                    <span id="onlineCount" class="online-count">0</span>
+                </div>
+                <div id="onlineUsers" class="online-users">
+                    <!-- Online users will be loaded here -->
+                </div>
             </div>
         </div>
 
-        <!-- Message Input -->
-        <div class="chat-input">
-            <form id="messageForm" class="message-form">
-                <div class="input-container">
-                    <input 
-                        type="text" 
-                        id="messageInput" 
-                        placeholder="Type a message..." 
-                        maxlength="500"
-                        required
-                    >
-                    <button type="submit" class="send-btn">
-                        <i class="fas fa-paper-plane"></i>
+        <!-- Main Chat Area -->
+        <div class="main-chat">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="header-left">
+                    <div class="chat-avatar">
+                        <i id="chatIcon" class="fas fa-globe"></i>
+                    </div>
+                    <div class="chat-info">
+                        <h2 id="chatTitle">Global Chat</h2>
+                        <span id="chatSubtitle" class="chat-subtitle">Public channel for everyone</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button id="chatSettings" class="header-btn" title="Chat Settings">
+                        <i class="fas fa-cog"></i>
                     </button>
                 </div>
-            </form>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div class="chat-main">
+                <div id="messagesContainer" class="messages-container">
+                    <!-- Messages will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="chat-input">
+                <form id="messageForm" class="message-form">
+                    <div class="input-container">
+                        <button type="button" id="emojiBtn" class="emoji-btn" title="Emoji">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            placeholder="Type a message..." 
+                            maxlength="500"
+                            required
+                        >
+                        <button type="submit" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Chat Modal -->
+    <div id="newChatModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Start New Private Chat</h3>
+                <button onclick="closeNewChatModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="user-search">
+                    <div class="search-input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearchInput" placeholder="Search users by email or name...">
+                    </div>
+                </div>
+                <div id="searchResults" class="search-results">
+                    <!-- Search results will appear here -->
+                </div>
+                <div id="allUsersList" class="all-users-list">
+                    <!-- All users will be listed here -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -135,7 +218,6 @@
         <span id="successText"></span>
     </div>
 
-    <script src="script.js" type="module" defer></script>
-
+    <script src="script.js"></script>
 </body>
 </html>
