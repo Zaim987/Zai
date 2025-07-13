@@ -1,222 +1,363 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>QuantumX Chat</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet"/>
-  <script type="module">
-    // ... (SCRIPT-MU SAMA, TAK GAWE SINGKAT)
-    // Ga tak ubah, tinggal copas ulang dari sebelumnya
-  </script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      transition: all 0.3s ease-in-out;
-    }
-    body {
-      background-color: #020202;
-      font-family: 'Orbitron', sans-serif;
-      color: white;
-      height: 100vh;
-      overflow-x: hidden;
-      margin: 0;
-      padding: 0;
-    }
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem;
-      background-color: black;
-      box-shadow: 0 0 10px cyan;
-    }
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      text-shadow: 0 0 10px cyan;
-    }
-    #dm-target-label {
-      font-size: 0.9rem;
-      color: cyan;
-      margin-left: 1rem;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .menu-btn {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      text-shadow: 0 0 5px cyan;
-    }
-    .chat-wrapper {
-      animation: fadeSlideDown 0.8s ease-out;
-      height: calc(100vh - 64px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem 1rem;
-    }
-    .chat-box {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      width: 100%;
-      max-width: 800px;
-      padding: 2rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      box-shadow: 0 0 20px cyan;
-      gap: 1rem;
-      max-height: 400px;
-      overflow: hidden;
-    }
-    .message-list {
-      flex-grow: 1;
-      max-height: 300px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .message {
-      background-color: #111;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      animation: chatFadeIn 0.3s ease forwards;
-      max-width: 70%;
-    }
-    .left {
-      align-self: flex-start;
-      background-color: #222;
-    }
-    .right {
-      align-self: flex-end;
-      background-color: cyan;
-      color: black;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>QuantumX Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet"/>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApM08t1ghCxK56_0znbPMT9i5zduOKmn0",
+      authDomain: "quantechapp.firebaseapp.com",
+      projectId: "quantechapp",
+      storageBucket: "quantechapp.appspot.com",
+      messagingSenderId: "825384610343",
+      appId: "1:825384610343:web:e490bc84877e6d7a93bc02"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    let unsubscribeMessages = null;
+    let currentDisplayName = null;
+    let dmTarget = null;
+
+    function goBack() {
+      document.querySelector(".chat-wrapper").classList.add("fade-out-up");
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 600);
     }
 
-    /* ✅ FIXED CHAT INPUT AREA */
-    .chat-input {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 0.75rem;
-      align-items: center;
-      position: sticky;
-      bottom: 0;
-      padding: 1rem 0;
-      padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-      background-color: #020202;
-      z-index: 100;
+    function resetDM() {
+      dmTarget = null;
+      const welcomeEl = document.querySelector(".welcome-text");
+      const dmLabel = document.getElementById("dm-target-label");
+      if (welcomeEl) welcomeEl.textContent = `Ruang Umum QuantumX`;
+      if (dmLabel) dmLabel.textContent = "• Obrolan Umum •";
+      listenMessages();
     }
-    .chat-input input {
-      flex: 1 1 auto;
-      min-width: 0;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 8px;
-      background-color: #111;
-      color: white;
-      font-family: 'Orbitron', sans-serif;
-    }
-    .chat-input button {
-      flex-shrink: 0;
-      white-space: nowrap;
-      max-width: 100px;
-      padding: 0.75rem 1rem;
-      background-color: cyan;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      color: black;
-      font-weight: bold;
-      font-family: 'Orbitron', sans-serif;
+    window.resetDM = resetDM;
+
+    function insertPrivateMessage(name, uid) {
+      const input = document.getElementById("msgInput");
+      input.value = `@${name} `;
+      input.focus();
+      dmTarget = { uid, name };
+
+      const dmLabel = document.getElementById("dm-target-label");
+      dmLabel.textContent = `• Message to ${name} •`;
+
+      const welcomeEl = document.querySelector(".welcome-text");
+      welcomeEl.textContent = `Obrolan Pribadi karo ${name}`;
+      listenMessages();
     }
 
-    #user-list {
-      margin-top: 2rem;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 1rem;
-      border-radius: 10px;
-      max-width: 800px;
-      width: 100%;
-      box-shadow: 0 0 10px cyan;
+    async function sendMessage() {
+      const input = document.getElementById("msgInput");
+      const msg = input.value.trim();
+      if (msg.length > 0) {
+        await addDoc(collection(db, "messages"), {
+          text: msg,
+          sender: currentUser.uid,
+          senderName: currentDisplayName,
+          to: dmTarget ? dmTarget.uid : null,
+          createdAt: serverTimestamp()
+        });
+        input.value = "";
+      }
     }
-    #users {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      max-height: 200px;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-    .user-item {
-      padding: 0.5rem;
-      border-bottom: 1px solid #333;
-    }
-    .user-item:hover {
-      background-color: rgba(255,255,255,0.1);
-    }
-    @keyframes chatFadeIn {
-      0% { opacity: 0; transform: translateX(10px); }
-      100% { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes fadeSlideDown {
-      0% { opacity: 0; transform: translateY(-20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    .fade-out-up {
-      animation: fadeOutUp 0.6s ease-in-out forwards;
-    }
-    @keyframes fadeOutUp {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
-    }
-  </style>
-</head>
-<body>
-  <div class="chat-wrapper">
-    <header class="top-bar">
-      <div class="logo">QuantumX <span id="dm-target-label"></span></div>
-      <div>
-        <button class="menu-btn" onclick="resetDM()">🌐 Umum</button>
-        <button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
-      </div>
-    </header>
-    <main class="chat-box">
-      <h2 class="welcome-text">Selamat Datang!</h2>
-      <div class="message-list" id="messages"></div>
-      <div class="chat-input">
-        <input id="msgInput" placeholder="Ketik pesenmu..." type="text"/>
-        <button onclick="sendMessage()">Kirim</button>
-      </div>
-    </main>
-    <div id="user-list">
-      <h3>Daftar Pengguna</h3>
-      <div id="users"></div>
-    </div>
-  </div>
 
-  <!-- ✅ Tambahan JS buat auto scroll saat keyboard muncul -->
-  <script>
-    window.addEventListener("resize", () => {
-      const active = document.activeElement;
-      if (active && active.tagName === "INPUT") {
+    function listenMessages() {
+      if (unsubscribeMessages) unsubscribeMessages();
+
+      const q = query(collection(db, "messages"), orderBy("createdAt"));
+      const msgList = document.getElementById("messages");
+
+      unsubscribeMessages = onSnapshot(q, (snapshot) => {
+        msgList.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+
+          if (dmTarget) {
+            const isIncoming = data.to === currentUser.uid && data.sender === dmTarget.uid;
+            const isOutgoing = data.to === dmTarget.uid && data.sender === currentUser.uid;
+            if (!isIncoming && !isOutgoing) return;
+          } else {
+            if (data.to !== null) return;
+          }
+
+          const div = document.createElement("div");
+          div.className = "message";
+          div.textContent = `${data.senderName || "Anon"}: ${data.text}`;
+
+          if (data.sender === currentUser.uid) {
+            div.classList.add("right");
+          } else {
+            div.classList.add("left");
+          }
+
+          msgList.appendChild(div);
+        });
         setTimeout(() => {
-          active.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 200);
+          msgList.scrollTop = msgList.scrollHeight;
+        }, 50);
+      });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        dmTarget = null;
+
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          currentDisplayName = userSnap.data().displayName || "Pengguna";
+        } else {
+          currentDisplayName = "Anon";
+        }
+
+        const welcomeEl = document.querySelector(".welcome-text");
+        const dmLabel = document.getElementById("dm-target-label");
+        if (welcomeEl) welcomeEl.textContent = `Ruang Umum QuantumX`;
+        if (dmLabel) dmLabel.textContent = "• Obrolan Umum •";
+
+        const snapshot = await getDocs(collection(db, "users"));
+        const list = document.getElementById("users");
+        snapshot.forEach((docSnap) => {
+          if (docSnap.id === user.uid) return;
+          const data = docSnap.data();
+          const div = document.createElement("div");
+          div.className = "user-item";
+          div.textContent = `${data.displayName || 'Tanpa Nama'}`;
+          div.style.cursor = "pointer";
+          div.addEventListener("click", () => insertPrivateMessage(data.displayName, docSnap.id));
+          list.appendChild(div);
+        });
+
+        listenMessages();
       }
     });
-  </script>
+
+    window.goBack = goBack;
+    window.sendMessage = sendMessage;
+</script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+}
+body {
+  background-color: #020202;
+  font-family: 'Orbitron', sans-serif;
+  color: white;
+  height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: black;
+  box-shadow: 0 0 10px cyan;
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px cyan;
+}
+#dm-target-label {
+  font-size: 0.9rem;
+  color: cyan;
+  margin-left: 1rem;
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.menu-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  text-shadow: 0 0 5px cyan;
+}
+.chat-wrapper {
+  animation: fadeSlideDown 0.8s ease-out;
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+.chat-box {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 0 20px cyan;
+  gap: 1rem;
+  max-height: 400px;
+  overflow: hidden;
+}
+.message-list {
+  flex-grow: 1;
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.message {
+  background-color: #111;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  animation: chatFadeIn 0.3s ease forwards;
+  max-width: 70%;
+}
+.left {
+  align-self: flex-start;
+  background-color: #222;
+}
+.right {
+  align-self: flex-end;
+  background-color: cyan;
+  color: black;
+}
+
+/* ✅ FIXED chat-input agar responsif */
+.chat-input {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.75rem;
+  align-items: center;
+  position: sticky;
+  bottom: 0;
+  padding: 1rem 0;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  background-color: #020202;
+  z-index: 100;
+}
+.chat-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #111;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+}
+.chat-input button {
+  flex-shrink: 0;
+  white-space: nowrap;
+  max-width: 100px;
+  padding: 0.75rem 1rem;
+  background-color: cyan;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+  font-family: 'Orbitron', sans-serif;
+}
+
+#user-list {
+  margin-top: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 0 10px cyan;
+}
+#users {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.user-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid #333;
+}
+.user-item:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+@keyframes chatFadeIn {
+  0% { opacity: 0; transform: translateX(10px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeSlideDown {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.fade-out-up {
+  animation: fadeOutUp 0.6s ease-in-out forwards;
+}
+@keyframes fadeOutUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); visibility: hidden; }
+}
+</style>
+</head>
+<body>
+<div class="chat-wrapper">
+<header class="top-bar">
+<div class="logo">QuantumX <span id="dm-target-label"></span></div>
+<div>
+<button class="menu-btn" onclick="resetDM()">🌐 Umum</button>
+<button class="menu-btn" onclick="goBack()">⬅ Dashboard</button>
+</div>
+</header>
+<main class="chat-box">
+<h2 class="welcome-text">Selamat Datang!</h2>
+<div class="message-list" id="messages"></div>
+<div class="chat-input">
+<input id="msgInput" placeholder="Ketik pesenmu..." type="text"/>
+<button onclick="sendMessage()">Kirim</button>
+</div>
+</main>
+<div id="user-list">
+<h3>Daftar Pengguna</h3>
+<div id="users"></div>
+</div>
+</div>
+
+<!-- ✅ JS bantu auto-scroll input saat resize (HP Android) -->
+<script>
+  window.addEventListener("resize", () => {
+    const active = document.activeElement;
+    if (active && active.tagName === "INPUT") {
+      setTimeout(() => {
+        active.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 200);
+    }
+  });
+</script>
 </body>
 </html>
