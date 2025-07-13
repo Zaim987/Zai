@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Quantech Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Auth Container -->
+  <div id="auth-container" class="auth-container">
+    <div class="form-wrapper">
+      <h1>Quantech Chat</h1>
+      <form id="login-form" class="form active">
+        <h2>Login</h2>
+        <input type="email" id="login-email" placeholder="Email" required autocomplete="username" />
+        <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password" />
+        <button type="submit">Login</button>
+        <p class="switch-prompt">Belum punya akun? <span id="to-register">Daftar</span></p>
+        <p class="form-error" id="login-error"></p>
+      </form>
+      <form id="register-form" class="form">
+        <h2>Register</h2>
+        <input type="email" id="register-email" placeholder="Email" required autocomplete="username" />
+        <input type="password" id="register-password" placeholder="Password (min 6 karakter)" minlength="6" required autocomplete="new-password" />
+        <button type="submit">Register</button>
+        <p class="switch-prompt">Sudah punya akun? <span id="to-login">Login</span></p>
+        <p class="form-error" id="register-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Chat -->
+  <div id="chat-app" class="chat-app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="brand">💬 Quantech Chat</span>
+      </div>
+      <div class="sidebar-footer">
+        <span id="user-email"></span>
+        <button id="logout-btn">Logout</button>
+      </div>
+    </aside>
+    <main class="chat-main">
+      <div class="chat-header">
+        <h2>🔹 Global Chat Room</h2>
+      </div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <form id="chat-form" class="chat-input-bar">
+        <input type="text" id="chat-input" placeholder="Ketik pesan..." maxlength="400" autocomplete="off" required />
+        <button type="submit" title="Kirim">➤</button>
+      </form>
+    </main>
+  </div>
+
+  <!-- Firebase + App Logic -->
+  <script src="script.js" type="module"></script>
+</body>
+</html>
